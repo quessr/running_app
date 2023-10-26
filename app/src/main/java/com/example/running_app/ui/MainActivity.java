@@ -5,7 +5,9 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.os.Bundle;
+import android.util.Log;
 
+import com.example.running_app.BuildConfig;
 import com.example.running_app.R;
 import com.example.running_app.ui.fragments.RunFragment;
 
@@ -20,6 +22,8 @@ public class MainActivity extends AppCompatActivity {
 
         fragmentTransaction.add(R.id.run_fragment_container, runFragment);
         fragmentTransaction.commit();
+
+        Log.d("HSR", "" + BuildConfig.GOOGLE_MAP_API_KEY );
     }
 
 }

@@ -1,6 +1,16 @@
+import java.util.Properties
+import java.io.FileInputStream
+
 plugins {
     id("com.android.application")
 }
+
+val localProperties = Properties()
+val localPropertiesFile = FileInputStream(rootProject.file("local.properties"))
+localProperties.load(localPropertiesFile)
+localPropertiesFile.close()
+
+val googleMapApiKey = localProperties.getProperty("GOOGLE_MAP_API_KEY")
 
 android {
     namespace = "com.example.running_app"
@@ -14,9 +24,15 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+//        buildConfigField("String", "GOOGLE_MAP_API_KEY", "\"${localProperties.getProperty("GOOGLE_MAP_API_KEY")}\"")
+        buildConfigField("String", "GOOGLE_MAP_API_KEY", "\"${googleMapApiKey}\"")
+
+        manifestPlaceholders["GOOGLE_MAP_API_KEY"] = googleMapApiKey
     }
 
     buildTypes {
+
         release {
             isMinifyEnabled = false
             proguardFiles(
@@ -36,6 +52,10 @@ android {
 
     viewBinding {
         enable = true
+    }
+
+    buildFeatures {
+        buildConfig = true
     }
 }
 
