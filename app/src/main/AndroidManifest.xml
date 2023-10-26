@@ -28,6 +28,7 @@
         </activity>
         <service
             android:name=".data.database.dao.TimerService"/>
+        <receiver android:name=".data.database.dao.TimerBroadcastReceiver"/>
     </application>
 
 </manifest>

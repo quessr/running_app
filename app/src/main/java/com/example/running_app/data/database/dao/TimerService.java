@@ -4,6 +4,10 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 
+import androidx.lifecycle.ViewModelProvider;
+
+import com.example.running_app.ui.viewmodels.TimerViewmodel;
+
 import java.util.Timer;
 import java.util.TimerTask;
 
