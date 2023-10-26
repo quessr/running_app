@@ -70,4 +70,8 @@ dependencies {
 
     // data binding
     implementation(platform("org.jetbrains.kotlin:kotlin-bom:1.8.0"))
+
+    //구글맵
+    implementation("com.google.android.gms:play-services-maps:18.0.2")
+    implementation("com.google.android.gms:play-services-location:19.0.1")
 }
