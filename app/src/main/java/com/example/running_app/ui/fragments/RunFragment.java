@@ -2,6 +2,8 @@ package com.example.running_app.ui.fragments;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -23,21 +25,31 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 
-public class RunFragment extends Fragment implements OnMapReadyCallback {
+import java.util.ArrayList;
+import java.util.List;
+
+public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTracker.updateMap {
     private FragmentRunBinding binding;
     private GpsTracker gpsTracker;
     private GoogleMap mGoogleMap;
     SupportMapFragment mapFragment;
 
     private int MY_PERMISSIONS_REQUEST_LOCATION = 1;
+    private Polyline polyline;
+    private List<LatLng> polylinePoints = new ArrayList<>();
+    private Marker currentLocationMarker;
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        gpsTracker = new GpsTracker(getContext());
+        gpsTracker = new GpsTracker(getContext(), this);
 
 
     }
@@ -101,5 +113,41 @@ public class RunFragment extends Fragment implements OnMapReadyCallback {
                 .snippet("처음위치")
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
 
+    }
+
+    public void updatePolyline(Location location) {
+        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+        polylinePoints.add(latLng);
+
+        Log.d("GPS@@", "polylinePoints" + polylinePoints);
+
+        if (polyline != null) {
+            polyline.remove();
+        }
+
+        PolylineOptions polylineOptions = new PolylineOptions().addAll(polylinePoints).color(Color.BLUE).width(10f).geodesic(true);
+
+        polyline = mGoogleMap.addPolyline(polylineOptions);
+    }
+
+    public void updateMarker(Location location) {
+        if (polylinePoints.size() > 1) {
+            currentLocationMarker.remove();
+        }
+
+        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+        currentLocationMarker = mGoogleMap.addMarker(new MarkerOptions()
+                .position(latLng)
+                .title("마포")
+                .snippet("현재위치"));
+
+    }
+
+    @Override
+    public void updateMap(Location location) {
+        if (location.getProvider().equals("gps")) {
+            updatePolyline(location);
+            updateMarker(location);
+        }
     }
 }
