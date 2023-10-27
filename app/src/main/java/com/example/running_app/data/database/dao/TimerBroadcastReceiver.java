@@ -18,6 +18,5 @@ public class TimerBroadcastReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         timer_fragment.updateTime(intent);  //receive로 호출된 intent 값 fragment의 updateTime 함수로 전달
-        Toast.makeText(context, "Time check", Toast.LENGTH_SHORT).show();
     }
 }
