@@ -26,9 +26,12 @@ public class GpsTracker extends Service implements LocationListener {
     Location location;
     double latitude;
     double longitude;
+    private updateMap mListener;
 
-    public GpsTracker(Context mContext) {
+
+    public GpsTracker(Context mContext, updateMap listener) {
         this.mContext = mContext;
+        mListener = listener;
         getLocation();
     }
 
@@ -111,6 +114,8 @@ public class GpsTracker extends Service implements LocationListener {
 
         Toast.makeText(mContext, "현재위치 LC \n위도 " + location.getLatitude() + "\n경도 " + longitude, Toast.LENGTH_LONG).show();
         Toast.makeText(mContext, location.getProvider(), Toast.LENGTH_LONG).show();
+
+        if(mListener != null) mListener.updateMap(location);
     }
 
     public double getLongitude() {
@@ -134,6 +139,10 @@ public class GpsTracker extends Service implements LocationListener {
         if (locationManager != null) {
             locationManager.removeUpdates(GpsTracker.this);
         }
+    }
+
+    public interface updateMap{
+        void updateMap(Location location);
     }
 
     @Nullable
