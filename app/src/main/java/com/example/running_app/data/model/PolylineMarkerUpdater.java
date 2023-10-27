@@ -24,6 +24,7 @@ public class PolylineMarkerUpdater {
     public PolylineMarkerUpdater(GoogleMap googleMap) {
         mGoogleMap = googleMap;
     }
+
     public void updatePolyline(Location location) {
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
         polylinePoints.add(latLng);
