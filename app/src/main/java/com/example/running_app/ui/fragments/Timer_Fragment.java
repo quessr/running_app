@@ -40,10 +40,8 @@ public class Timer_Fragment extends Fragment {
 
 
         serviceIntent = new Intent(requireContext(), TimerService.class);
-//        requireActivity().registerReceiver(updateTime, new IntentFilter(TimerService.TIMER_UPDATED));₩
         receiver = new TimerBroadcastReceiver(this);
         requireActivity().registerReceiver(receiver, new IntentFilter(TimerService.TIMER_UPDATED));
-
 
         timerBinding.startStopButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -86,20 +84,9 @@ public class Timer_Fragment extends Fragment {
         timerBinding.startStopButton.setText("Start");
         timerStarted = false;
     }
-
-//        private final BroadcastReceiver updateTime = new BroadcastReceiver() {
-//        @Override
-//        public void onReceive(Context context, Intent intent) {
-//            time = intent.getDoubleExtra(TimerService.TIME_EXTRA, 0.0);
-//            timerBinding.timeTV.setText(getTimeStringFromDouble(time));
-//
-//            Toast.makeText(context, "Time check", Toast.LENGTH_SHORT).show();
-//        }
-//    };
-
-
-    public void updateTime(double reTime) {
-        timerBinding.timeTV.setText(getTimeStringFromDouble(reTime));
+    public void updateTime(Intent intent) {
+        time = intent.getDoubleExtra(TimerService.TIME_EXTRA, 0.0);
+        timerBinding.timeTV.setText(getTimeStringFromDouble(time));
     }
 
     private String getTimeStringFromDouble(double time) {

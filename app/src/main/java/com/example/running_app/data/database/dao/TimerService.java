@@ -26,7 +26,7 @@ public class TimerService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         double time = intent.getDoubleExtra(TIME_EXTRA, 0.0);
-        timer.scheduleAtFixedRate(new TimeTask(time), 0, 1000);
+        timer.scheduleAtFixedRate(new TimeTask(time), 0, 1000); //delay(일정 시간) 이 지난 후에 period(시간 간격) 으로 task(작업)을 수행한다.
         return START_NOT_STICKY;
     }
 
