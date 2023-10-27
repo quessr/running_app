@@ -53,7 +53,7 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
         super.onCreate(savedInstanceState);
 
         gpsTracker = new GpsTracker(getContext(), this);
-        polylineMarkerUpdater = new PolylineMarkerUpdater(mGoogleMap);
+//        polylineMarkerUpdater = new PolylineMarkerUpdater(mGoogleMap);
 
 
     }
@@ -71,6 +71,13 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
 
         if (mapFragment != null) {
             mapFragment.getMapAsync(this);
+            binding.runStartBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    updateMap(gpsTracker.getLocation());
+                }
+            });
+
         } else {
             Log.e("RunFragment", "mapFragment is null");
         }
@@ -102,6 +109,8 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
         mGoogleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         mGoogleMap.setBuildingsEnabled(true);
 
+        polylineMarkerUpdater = new PolylineMarkerUpdater(mGoogleMap);
+
         LatLng lastKnownLocation = new LatLng(lastLatitude, lastLongitude);
 
 
@@ -116,6 +125,15 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
                 .title("마포")
                 .snippet("처음위치")
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+
+        // 지도 회전 
+        CameraPosition cameraPosition = new CameraPosition.Builder()
+                .target(lastKnownLocation)
+                .bearing(180)                  // 180도 회전
+                .zoom(18)
+                .build();
+
+        googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
     }
 
@@ -154,4 +172,5 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
             polylineMarkerUpdater.updateMarker(location);
         }
     }
+
 }
