@@ -4,7 +4,7 @@ import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
-@Entity
+@Entity(tableName = "TB_Run")
 public class TB_Run {
     @PrimaryKey(autoGenerate = true)
     private int run_id = 0;
@@ -14,6 +14,46 @@ public class TB_Run {
     private double timer;
     @ColumnInfo(name = "create_at")
     private String create_at;
-    @ColumnInfo(name = "total_distance")
-    private double total_distance;
+
+    public int getRun_id() {
+        return run_id;
+    }
+
+    public void setRun_id(int run_id) {
+        this.run_id = run_id;
+    }
+
+    public int getWalk_count() {
+        return walk_count;
+    }
+
+    public void setWalk_count(int walk_count) {
+        this.walk_count = walk_count;
+    }
+
+    public double getTimer() {
+        return timer;
+    }
+
+    public void setTimer(double timer) {
+        this.timer = timer;
+    }
+
+    public String getCreate_at() {
+        return create_at;
+    }
+
+    public void setCreate_at(String create_at) {
+        this.create_at = create_at;
+    }
+
+    @Override
+    public String toString() {
+        return "TB_Run{" +
+                "run_id=" + run_id +
+                ", walk_count=" + walk_count +
+                ", timer=" + timer +
+                ", create_at='" + create_at + '\'' +
+                '}';
+    }
 }
