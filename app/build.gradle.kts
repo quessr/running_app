@@ -74,4 +74,7 @@ dependencies {
     //구글맵
     implementation("com.google.android.gms:play-services-maps:18.0.2")
     implementation("com.google.android.gms:play-services-location:19.0.1")
+
+    // Notification
+    implementation("androidx.core:core:1.0.0")
 }

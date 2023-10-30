@@ -2,6 +2,9 @@ package com.example.running_app.data.model;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -9,13 +12,18 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
+
+import com.example.running_app.R;
 
 public class GpsTracker extends Service implements LocationListener {
 
@@ -27,13 +35,25 @@ public class GpsTracker extends Service implements LocationListener {
     double latitude;
     double longitude;
     private updateMap mListener;
+    private static GpsTracker instance;
 
 
-    public GpsTracker(Context mContext, updateMap listener) {
-        this.mContext = mContext;
-        mListener = listener;
-        getLocation();
+    public GpsTracker() {
+        Log.d("HSR", "new GpsTracker() ");
+        this.mContext = this;
+//        this.mContext = mContext;
+//        mListener = listener;
+//        getLocation();
     }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        Log.d("HSR", "onCreate");
+        getLocation();
+
+    }
+
 
     @SuppressLint("ServiceCast")
     public Location getLocation() {
@@ -115,7 +135,7 @@ public class GpsTracker extends Service implements LocationListener {
         Toast.makeText(mContext, "현재위치 LC \n위도 " + location.getLatitude() + "\n경도 " + longitude, Toast.LENGTH_LONG).show();
         Toast.makeText(mContext, location.getProvider(), Toast.LENGTH_LONG).show();
 
-        if(mListener != null) mListener.updateMap(location);
+        if (mListener != null) mListener.updateMap(location);
     }
 
     public double getLongitude() {
@@ -141,8 +161,44 @@ public class GpsTracker extends Service implements LocationListener {
         }
     }
 
-    public interface updateMap{
+    public interface updateMap {
         void updateMap(Location location);
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.d("HSR", "onStartCommand");
+
+        startForeground(1, createNotification());
+        return START_STICKY;
+    }
+
+    @SuppressLint("MissingPermission")
+    private Notification createNotification() {
+
+        Log.d("HSR", "createNotification");
+
+        String channelId = "gps_tacker_channel";
+        int notificationId = 0;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(channelId, "GPS Tracker Channel", NotificationManager.IMPORTANCE_DEFAULT);
+
+            NotificationManager manager = getSystemService(NotificationManager.class);
+            manager.createNotificationChannel(channel);
+        }
+
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, channelId)
+                .setContentTitle("GPS Traker")
+                .setContentText("Tracking your location...")
+                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+
+//        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+//
+//        // notificationId is a unique int for each notification that you must define
+//        notificationManager.notify(notificationId, builder.build());
+        return  builder.build();
     }
 
     @Nullable
