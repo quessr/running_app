@@ -20,12 +20,11 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 
 import com.example.running_app.R;
 
-public class GpsTracker extends Service implements LocationListener {
+public class GpsTrackerService extends Service implements LocationListener {
 
     private final Context mContext;
     protected LocationManager locationManager;
@@ -36,13 +35,13 @@ public class GpsTracker extends Service implements LocationListener {
     double longitude;
     private updateMap mListener;
 
-    public GpsTracker() {
+    public GpsTrackerService() {
         mContext = this;
         mListener = null;
         Log.d("HSR", "GpsTracker no arg ");
     }
 
-    public GpsTracker(Context mContext, updateMap listener) {
+    public GpsTrackerService(Context mContext, updateMap listener) {
         this.mContext = mContext;
         mListener = listener;
         getLocation();
@@ -159,7 +158,7 @@ public class GpsTracker extends Service implements LocationListener {
 
     public void stopUsingGPS() {
         if (locationManager != null) {
-            locationManager.removeUpdates(GpsTracker.this);
+            locationManager.removeUpdates(GpsTrackerService.this);
         }
     }
 

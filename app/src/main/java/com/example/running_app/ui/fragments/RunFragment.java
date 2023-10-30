@@ -15,7 +15,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.running_app.R;
-import com.example.running_app.data.model.GpsTracker;
+import com.example.running_app.data.model.GpsTrackerService;
 import com.example.running_app.data.model.PolylineMarkerUpdater;
 import com.example.running_app.databinding.FragmentRunBinding;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -28,9 +28,9 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTracker.updateMap {
+public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrackerService.updateMap {
     private FragmentRunBinding binding;
-    private GpsTracker gpsTracker;
+    private GpsTrackerService gpsTracker;
     public GoogleMap mGoogleMap;
     SupportMapFragment mapFragment;
 
@@ -44,7 +44,7 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        gpsTracker = new GpsTracker(getContext(), this);
+        gpsTracker = new GpsTrackerService(getContext(), this);
 
 
     }

@@ -10,21 +10,20 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Intent;
-import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 
 import com.example.running_app.BuildConfig;
 import com.example.running_app.R;
-import com.example.running_app.data.model.GpsTracker;
+import com.example.running_app.data.model.GpsTrackerService;
 import com.example.running_app.ui.fragments.RunFragment;
 
 public class MainActivity extends AppCompatActivity {
     FragmentManager fragmentManager = getSupportFragmentManager();
     FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
     RunFragment runFragment = new RunFragment();
-    private GpsTracker gpsTracker;
+    private GpsTrackerService gpsTracker;
 
     private static final int NOTIFICATION_ID = 0;
     private NotificationManager notificationManager = null;
@@ -38,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
         fragmentTransaction.add(R.id.run_fragment_container, runFragment);
         fragmentTransaction.commit();
 
-        Intent serviceIntent = new Intent(this, GpsTracker.class);
+        Intent serviceIntent = new Intent(this, GpsTrackerService.class);
         ContextCompat.startForegroundService(this, serviceIntent);
 
 //        createNotification();
