@@ -44,7 +44,7 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-//        gpsTracker = new GpsTracker(getContext(), this);
+        gpsTracker = new GpsTracker(getContext(), this);
 
 
     }
@@ -82,10 +82,10 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_BACKGROUND_LOCATION, Manifest.permission.FOREGROUND_SERVICE},
                     MY_PERMISSIONS_REQUEST_LOCATION);
         } else {
-//H            double lastLatitude = gpsTracker.getLatitude();
-//            double lastLongitude = gpsTracker.getLongitude();
+            double lastLatitude = gpsTracker.getLatitude();
+            double lastLongitude = gpsTracker.getLongitude();
 
-//            Log.d("GPS_LOCATION", "lastLatitude :" + lastLatitude + " lastLongitude :" + lastLongitude);
+            Log.d("GPS_LOCATION", "lastLatitude :" + lastLatitude + " lastLongitude :" + lastLongitude);
         }
 
         return view;
@@ -94,8 +94,8 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
 
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
-//        double lastLatitude = gpsTracker.getLatitude();
-//        double lastLongitude = gpsTracker.getLongitude();
+        double lastLatitude = gpsTracker.getLatitude();
+        double lastLongitude = gpsTracker.getLongitude();
 
         mGoogleMap = googleMap;
         mGoogleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
@@ -103,29 +103,29 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
 
         polylineMarkerUpdater = new PolylineMarkerUpdater(mGoogleMap);
 
-//        LatLng lastKnownLocation = new LatLng(lastLatitude, lastLongitude);
+        LatLng lastKnownLocation = new LatLng(lastLatitude, lastLongitude);
 
 
         if (ActivityCompat.checkSelfPermission(this.requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this.requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             googleMap.setMyLocationEnabled(true);
         }
 
-//        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(lastKnownLocation, 18));
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(lastKnownLocation, 18));
 
-//        googleMap.addMarker(new MarkerOptions()
-//                .position(lastKnownLocation)
-//                .title("마포")
-//                .snippet("처음위치")
-//                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+        googleMap.addMarker(new MarkerOptions()
+                .position(lastKnownLocation)
+                .title("마포")
+                .snippet("처음위치")
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
 
         // 지도 회전
-//        CameraPosition cameraPosition = new CameraPosition.Builder()
-//                .target(lastKnownLocation)
-//                .bearing(180)                  // 180도 회전
-//                .zoom(18)
-//                .build();
+        CameraPosition cameraPosition = new CameraPosition.Builder()
+                .target(lastKnownLocation)
+                .bearing(180)                  // 180도 회전
+                .zoom(18)
+                .build();
 
-//        googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+        googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
     }
 

@@ -35,25 +35,27 @@ public class GpsTracker extends Service implements LocationListener {
     double latitude;
     double longitude;
     private updateMap mListener;
-    private static GpsTracker instance;
-
 
     public GpsTracker() {
-        Log.d("HSR", "new GpsTracker() ");
-        this.mContext = this;
-//        this.mContext = mContext;
-//        mListener = listener;
-//        getLocation();
+        mContext = this;
+        mListener = null;
+        Log.d("HSR", "GpsTracker no arg ");
+    }
+
+    public GpsTracker(Context mContext, updateMap listener) {
+        this.mContext = mContext;
+        mListener = listener;
+        getLocation();
+        Log.d("HSR", "GpsTracker two arg ");
+
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
         Log.d("HSR", "onCreate");
-        getLocation();
 
     }
-
 
     @SuppressLint("ServiceCast")
     public Location getLocation() {
