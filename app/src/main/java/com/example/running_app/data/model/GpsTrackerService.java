@@ -12,6 +12,7 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
@@ -35,24 +36,23 @@ public class GpsTrackerService extends Service implements LocationListener {
     double longitude;
     private updateMap mListener;
 
-    public GpsTrackerService() {
-        mContext = this;
-        mListener = null;
-        Log.d("HSR", "GpsTracker no arg ");
+    private final IBinder mBinder = new LocalBinder();
+
+    public class LocalBinder extends Binder {
+        public GpsTrackerService getService() {
+            return GpsTrackerService.this;
+        }
     }
 
-    public GpsTrackerService(Context mContext, updateMap listener) {
-        this.mContext = mContext;
-        mListener = listener;
-        getLocation();
-        Log.d("HSR", "GpsTracker two arg ");
-
+    public GpsTrackerService() {
+        mContext = this;
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
         Log.d("HSR", "onCreate");
+        getLocation();
 
     }
 
@@ -133,9 +133,7 @@ public class GpsTrackerService extends Service implements LocationListener {
     public void onLocationChanged(@NonNull Location location) {
         updateLocation(location);
 
-        Toast.makeText(mContext, "현재위치 LC \n위도 " + location.getLatitude() + "\n경도 " + longitude, Toast.LENGTH_LONG).show();
-        Toast.makeText(mContext, location.getProvider(), Toast.LENGTH_LONG).show();
-
+        Toast.makeText(mContext, "현재위치 "+location.getProvider()+" \n위도 " + location.getLatitude() + "\n경도 " + longitude, Toast.LENGTH_LONG).show();
         if (mListener != null) mListener.updateMap(location);
     }
 
@@ -160,6 +158,10 @@ public class GpsTrackerService extends Service implements LocationListener {
         if (locationManager != null) {
             locationManager.removeUpdates(GpsTrackerService.this);
         }
+    }
+
+    public void setListener(updateMap listener){
+        mListener = listener;
     }
 
     public interface updateMap {
@@ -205,8 +207,6 @@ public class GpsTrackerService extends Service implements LocationListener {
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        return null;
+        return mBinder;
     }
-
-
 }
