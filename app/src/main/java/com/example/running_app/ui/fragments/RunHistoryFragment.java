@@ -44,6 +44,7 @@ public class RunHistoryFragment extends Fragment {
         tbRun.setWalk_count(100);
         tbRun.setTimer(0.7);
         tbRun.setCreate_at("2023/10/27");
+        tbRun.setIs_active(1);
         runDao.setInsertRun(tbRun);
 
          TB_Run latest = runDao.getLatestActiveOne();
@@ -56,6 +57,7 @@ public class RunHistoryFragment extends Fragment {
         tbGps.setLon((long) 126.926735502823);
         tbGps.setCreate_at("2023/10/30");
         gpsDao.setInsertGps(tbGps);
+
 
 
 

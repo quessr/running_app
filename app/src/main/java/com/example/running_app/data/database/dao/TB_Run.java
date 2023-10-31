@@ -15,6 +15,19 @@ public class TB_Run {
     @ColumnInfo(name = "create_at")
     private String create_at;
 
+    // 1: active (달리기 중)
+    // 0 : not active (달리기 완료)
+    @ColumnInfo(name = "is_active")
+    private int is_active;
+
+    public int getIs_active() {
+        return is_active;
+    }
+
+    public void setIs_active(int is_active) {
+        this.is_active = is_active;
+    }
+
     public int getRun_id() {
         return run_id;
     }

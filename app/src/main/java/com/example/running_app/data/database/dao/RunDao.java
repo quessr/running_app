@@ -30,7 +30,7 @@ public interface RunDao {
      * run_id를 이용하여 TB_GPS 테이블에 달리기 정보를 채워주세요.
      * @return : 활성화 달리기 정보 (달리기가 완료되지 않는 레코드)
      */
-    @Query("SELECT * FROM TB_Run WHERE is_active ORDER BY run_id DESC LIMIT 1") //쿼리 : 데이터베이스에 요청하는 명령문
+    @Query("SELECT * FROM TB_Run WHERE is_active == 1 ORDER BY run_id DESC LIMIT 1") //쿼리 : 데이터베이스에 요청하는 명령문
     TB_Run getLatestActiveOne();
 
 }
