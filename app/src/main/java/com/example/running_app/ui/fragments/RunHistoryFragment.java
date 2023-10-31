@@ -58,6 +58,7 @@ public class RunHistoryFragment extends Fragment {
         gpsDao.setInsertGps(tbGps);
 
 
+
         //데이터 조회
         List<TB_Run> tb_runList = runDao.getRunAll();
         for (int i = 0; i < tb_runList.size(); i++) {
