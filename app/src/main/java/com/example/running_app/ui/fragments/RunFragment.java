@@ -1,6 +1,7 @@
 package com.example.running_app.ui.fragments;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
@@ -61,12 +62,13 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
 
         if (mapFragment != null) {
             mapFragment.getMapAsync(this);
-            binding.runStartBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-//                    updateMap(gpsTracker.getLocation());
-                }
-            });
+//            binding.runStartBtn.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    Intent intent = new Intent(getContext(), RunStartCountdownFragment.class);
+//                    startActivity(intent);
+//                }
+//            });
 
         } else {
             Log.e("RunFragment", "mapFragment is null");

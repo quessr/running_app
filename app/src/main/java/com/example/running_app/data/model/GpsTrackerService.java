@@ -52,8 +52,12 @@ public class GpsTrackerService extends Service implements LocationListener {
     public void onCreate() {
         super.onCreate();
         Log.d("HSR", "onCreate");
-        getLocation();
+//        getLocation();
 
+    }
+
+    public void startLocationUpdate() {
+        getLocation();
     }
 
     @SuppressLint("ServiceCast")
