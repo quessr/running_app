@@ -171,9 +171,11 @@ public class GpsTrackerService extends Service implements LocationListener {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d("HSR", "onStartCommand");
-
-        startForeground(1, createNotification());
         return START_STICKY;
+    }
+
+    public void startForeground(){
+        startForeground(1, createNotification());
     }
 
     @SuppressLint("MissingPermission")

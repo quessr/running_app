@@ -56,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
             if(service != null){
                 GpsTrackerService.LocalBinder mGpsTrackerServiceBinder = (GpsTrackerService.LocalBinder)service;
                 gpsTracker = mGpsTrackerServiceBinder.getService();
+                gpsTracker.startForeground();
                 gpsTracker.setListener(listener);
             }
         }
