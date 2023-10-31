@@ -7,7 +7,7 @@ import androidx.room.PrimaryKey;
 @Entity(tableName = "TB_Run")
 public class TB_Run {
     @PrimaryKey(autoGenerate = true)
-    private int run_id = 0;
+    private int run_id;
     @ColumnInfo(name = "walk_count")
     private int walk_count;
     @ColumnInfo(name = "timer")

@@ -2,19 +2,24 @@ package com.example.running_app.ui.fragments;
 
 import android.app.Application;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.room.Room;
 
 import com.example.running_app.R;
 import com.example.running_app.data.database.dao.GpsDao;
 import com.example.running_app.data.database.dao.RunDao;
+import com.example.running_app.data.database.dao.RunDatabase;
+import com.example.running_app.data.database.dao.TB_GPS;
 import com.example.running_app.data.database.dao.TB_Run;
 import com.example.running_app.ui.RunningAdapter;
 import com.example.running_app.ui.viewmodels.RunViewModel;
@@ -59,26 +64,37 @@ public class RunHistoryFragment extends Fragment {
 //                .allowMainThreadQueries()   //Main Thread 에서 DB에 IO(입출력) 을 가능하게 함
 //                .build();
 
-//        runDao = database.runDao(); //인터페이스 사용 준비 완료(객체 할당)
+//        runDao = RunDatabase.runDao(); //인터페이스 사용 준비 완료(객체 할당)
 //        gpsDao = database.gpsDao();
 
-//        //데이터 삽입
-//        TB_Run tbRun = new TB_Run();    //객체 인스턴스 생성
-//        tbRun.setWalk_count(100);
-//        tbRun.setTimer(0.7);
-//        tbRun.setCreate_at("2023/10/27");
-//        runDao.setInsertRun(tbRun);
-//
-//         TB_Run latest = runDao.getLatestOne();
-//
-//
-//        //데이터 삽입
-//        TB_GPS tbGps = new TB_GPS();
-//        tbGps.setRun_id(latest.getRun_id());
-//        tbGps.setLat((long) 37.5564036476463);
-//        tbGps.setLon((long) 126.926735502823);
-//        tbGps.setCreate_at("2023/10/30");
-//        gpsDao.setInsertGps(tbGps);
+        //데이터 삽입
+        TB_Run tbRun = new TB_Run();    //객체 인스턴스 생성
+        tbRun.setWalk_count(100);
+        tbRun.setTimer(0.7);
+        tbRun.setCreate_at("2023/10/27");
+        tbRun.setIs_active(1);
+        viewModel.setInsertRun(tbRun);
+
+        runDao = RunDatabase.INSTANCE.runDao();
+
+//        TB_Run latest = runDao.getLatestActiveOne();
+        LiveData<List<TB_Run>> test  = runDao.getRunAll();
+        List<TB_Run> result = test.getValue();
+        if (result != null){
+            for (int i =0; i < result.size(); i++){
+                Log.d("agag", result.get(i).toString());
+            }
+        }
+
+        TB_Run latest = viewModel.getLatestActiveOne().get(tbRun.getRun_id());
+
+        //데이터 삽입
+        TB_GPS tbGps = new TB_GPS();    //객체 인스턴스 생성
+        tbGps.setRun_id(latest.getRun_id());
+        tbGps.setLat((long) 37.5564036476463);
+        tbGps.setLon((long) 126.926735502823);
+        tbGps.setCreate_at("2023/10/30");
+        viewModel.setInsertGps(tbGps);
 
 
 
