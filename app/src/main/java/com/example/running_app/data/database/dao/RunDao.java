@@ -1,6 +1,7 @@
 package com.example.running_app.data.database.dao;
 
 
+import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
@@ -23,7 +24,7 @@ public interface RunDao {
 
     //조회 쿼리
     @Query("SELECT * FROM TB_Run") //쿼리 : 데이터베이스에 요청하는 명령문
-    List<TB_Run> getRunAll();
+    LiveData<List<TB_Run>> getRunAll();
 
     /**
      * 현재 활성화된 달리기 레코드를 반환합니다.
