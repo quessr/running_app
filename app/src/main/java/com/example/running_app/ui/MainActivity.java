@@ -48,6 +48,8 @@ public class MainActivity extends AppCompatActivity {
 
         binding.runEndBtn.setVisibility(isEndButtonVisible ? View.VISIBLE : View.GONE);
         binding.runStartBtn.setVisibility(isStartButtonVisible ? View.VISIBLE : View.GONE);
+        binding.stepcountTimerContainer.setVisibility(View.GONE);
+
 
         fragmentTransaction.add(R.id.run_fragment_container, runFragment);
         fragmentTransaction.commit();
@@ -71,6 +73,7 @@ public class MainActivity extends AppCompatActivity {
 
                 binding.runStartBtn.setVisibility(View.GONE);
                 binding.runEndBtn.setVisibility(View.VISIBLE);
+                binding.stepcountTimerContainer.setVisibility(View.VISIBLE);
 
             }
         });
