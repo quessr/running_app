@@ -43,6 +43,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <service
+            android:name=".data.database.dao.TimerService"/>
+        <receiver android:name=".data.database.dao.TimerBroadcastReceiver"/>
     </application>
 
 </manifest>
