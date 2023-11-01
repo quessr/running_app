@@ -109,6 +109,15 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        binding.runEndBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                gpsTracker.stopUsingGPS();
+                gpsTracker.stopService(new Intent(MainActivity.this,GpsTrackerService.class));
+                gpsTracker.stopNotification();
+            }
+        });
+
     }
 
 }
