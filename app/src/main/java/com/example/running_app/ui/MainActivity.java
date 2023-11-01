@@ -3,6 +3,7 @@ package com.example.running_app.ui;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.room.Room;
 
 import android.app.NotificationManager;
 import android.content.ComponentName;
@@ -21,6 +22,7 @@ import com.example.running_app.data.model.GpsTrackerService;
 import com.example.running_app.databinding.ActivityMainBinding;
 import com.example.running_app.ui.fragments.RunFragment;
 import com.example.running_app.ui.fragments.RunHistoryFragment;
+import com.example.running_app.data.model.GpsTrackerService;
 
 public class MainActivity extends AppCompatActivity {
     FragmentManager fragmentManager = getSupportFragmentManager();
@@ -36,44 +38,6 @@ public class MainActivity extends AppCompatActivity {
     private ActivityMainBinding binding;
     public boolean isStartButtonVisible = true;
     public boolean isEndButtonVisible = false;
-
-
-    GpsTrackerService.updateMap listener = new GpsTrackerService.updateMap(){
-
-        @Override
-        public void updateMap(Location location) {
-            Log.d("HSR", "MainActivity.updateMap : "+location);
-            runFragment.updateMap(location);
-        }
-    };
-
-    ServiceConnection serviceGpsTrackerConnection = new ServiceConnection() {
-        @Override
-        public void onServiceDisconnected(ComponentName name) {
-            gpsTracker.setListener(null);
-            gpsTracker = null;
-        }
-
-        @Override
-        public void onServiceConnected(ComponentName name, IBinder service) {
-            Log.d("HSR", "onServiceConnected()");
-            if(service != null){
-                GpsTrackerService.LocalBinder mGpsTrackerServiceBinder = (GpsTrackerService.LocalBinder)service;
-                gpsTracker = mGpsTrackerServiceBinder.getService();
-                gpsTracker.startForeground();
-                gpsTracker.setListener(listener);
-
-            }
-        }
-    };
-
-    public Location getGpsTrackerLocation(){
-        if (gpsTracker != null) {
-            return gpsTracker.getLocation();
-        } else {
-            return null; // 또는 다른 적절한 값
-        }
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,7 +58,6 @@ public class MainActivity extends AppCompatActivity {
 
 //        Intent serviceIntent = new Intent(this, GpsTracker.class);
 //        ContextCompat.startForegroundService(this, serviceIntent);
-
 
         Log.d("HSR", "" + BuildConfig.GOOGLE_MAP_API_KEY );
 
@@ -135,5 +98,39 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    GpsTrackerService.updateMap listener = new GpsTrackerService.updateMap(){
 
+        @Override
+        public void updateMap(Location location) {
+            Log.d("HSR", "MainActivity.updateMap : "+location);
+            runFragment.updateMap(location);
+        }
+    };
+    ServiceConnection serviceGpsTrackerConnection = new ServiceConnection() {
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            gpsTracker.setListener(null);
+            gpsTracker = null;
+        }
+
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            Log.d("HSR", "onServiceConnected()");
+            if(service != null){
+                GpsTrackerService.LocalBinder mGpsTrackerServiceBinder = (GpsTrackerService.LocalBinder)service;
+                gpsTracker = mGpsTrackerServiceBinder.getService();
+                gpsTracker.startForeground();
+                gpsTracker.setListener(listener);
+
+            }
+        }
+    };
+
+    public Location getGpsTrackerLocation(){
+        if (gpsTracker != null) {
+            return gpsTracker.getLocation();
+        } else {
+            return null; // 또는 다른 적절한 값
+        }
+    }
 }
