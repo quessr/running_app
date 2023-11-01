@@ -35,6 +35,8 @@ public class GpsTrackerService extends Service implements LocationListener {
     double latitude;
     double longitude;
     private updateMap mListener;
+    private NotificationManager notificationManager;
+    int notificationId = 0;
 
     private final IBinder mBinder = new LocalBinder();
 
@@ -52,8 +54,12 @@ public class GpsTrackerService extends Service implements LocationListener {
     public void onCreate() {
         super.onCreate();
         Log.d("HSR", "onCreate");
-        getLocation();
+//        getLocation();
 
+    }
+
+    public void startLocationUpdate() {
+        getLocation();
     }
 
     @SuppressLint("ServiceCast")
@@ -184,13 +190,13 @@ public class GpsTrackerService extends Service implements LocationListener {
         Log.d("HSR", "createNotification");
 
         String channelId = "gps_tacker_channel";
-        int notificationId = 0;
+
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(channelId, "GPS Tracker Channel", NotificationManager.IMPORTANCE_DEFAULT);
 
-            NotificationManager manager = getSystemService(NotificationManager.class);
-            manager.createNotificationChannel(channel);
+            notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
         }
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, channelId)
@@ -204,6 +210,20 @@ public class GpsTrackerService extends Service implements LocationListener {
 //        // notificationId is a unique int for each notification that you must define
 //        notificationManager.notify(notificationId, builder.build());
         return  builder.build();
+    }
+
+    @Override
+    public boolean stopService(Intent name) {
+        Toast.makeText(mContext, "서비스가 중지 되었습니다.", Toast.LENGTH_SHORT).show();
+
+        return super.stopService(name);
+    }
+
+    public void stopNotification() {
+        if (notificationManager != null) {
+            notificationManager.cancel(notificationId);
+            stopForeground(true);
+        }
     }
 
     @Nullable

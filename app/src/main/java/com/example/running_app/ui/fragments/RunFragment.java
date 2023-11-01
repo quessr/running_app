@@ -1,6 +1,7 @@
 package com.example.running_app.ui.fragments;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
@@ -57,16 +58,9 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
         // 구글 맵 띄우기
         mapFragment = new SupportMapFragment();
         getChildFragmentManager().beginTransaction().replace(R.id.map, mapFragment).commit();
-        mapFragment.getMapAsync(this);
 
         if (mapFragment != null) {
             mapFragment.getMapAsync(this);
-            binding.runStartBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-//                    updateMap(gpsTracker.getLocation());
-                }
-            });
 
         } else {
             Log.e("RunFragment", "mapFragment is null");
@@ -81,6 +75,7 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_BACKGROUND_LOCATION, Manifest.permission.FOREGROUND_SERVICE},
                     MY_PERMISSIONS_REQUEST_LOCATION);
         } else {
+
         }
 
         return view;
@@ -98,34 +93,36 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
 
         polylineMarkerUpdater = new PolylineMarkerUpdater(mGoogleMap);
 
-        if (ActivityCompat.checkSelfPermission(this.requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this.requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(this.requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this.requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this.requireContext(), Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(this.requireContext(), Manifest.permission.FOREGROUND_SERVICE) != PackageManager.PERMISSION_GRANTED) {
             googleMap.setMyLocationEnabled(true);
         }
-        if(((MainActivity)getActivity()).gpsTracker != null){
-            lastLatitude = ((MainActivity)getActivity()).gpsTracker.getLatitude();
-            lastLongitude = ((MainActivity)getActivity()).gpsTracker.getLongitude();
+        if (((MainActivity) getActivity()).gpsTracker != null) {
+            lastLatitude = ((MainActivity) getActivity()).gpsTracker.getLatitude();
+            lastLongitude = ((MainActivity) getActivity()).gpsTracker.getLongitude();
             LatLng lastKnownLocation = new LatLng(lastLatitude, lastLongitude);
             googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(lastKnownLocation, 15));
             googleMap.addMarker(new MarkerOptions()
-                .position(lastKnownLocation)
-                .title("마포")
-                .snippet("처음위치")
-                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+                    .position(lastKnownLocation)
+                    .title("마포")
+                    .snippet("처음위치")
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
 
-        // 지도 회전
+            // 지도 회전
             CameraPosition cameraPosition = new CameraPosition.Builder()
-                .target(lastKnownLocation)
-                .bearing(180)                  // 180도 회전
-                .zoom(18)
-                .build();
+                    .target(lastKnownLocation)
+                    .bearing(180)                  // 180도 회전
+                    .zoom(18)
+                    .build();
 
             googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
         } else {
             new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    double lastLatitude = ((MainActivity)getActivity()).gpsTracker.getLatitude();
-                    double lastLongitude = ((MainActivity)getActivity()).gpsTracker.getLongitude();
+                    double lastLatitude = ((MainActivity) getActivity()).gpsTracker.getLatitude();
+                    double lastLongitude = ((MainActivity) getActivity()).gpsTracker.getLongitude();
                     LatLng lastKnownLocation = new LatLng(lastLatitude, lastLongitude);
                     googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(lastKnownLocation, 15));
                     googleMap.addMarker(new MarkerOptions()
@@ -148,13 +145,24 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
         }
     }
 
+
     @Override
     public void updateMap(Location location) {
-        Log.d("HSR", "RunFragment : "+location);
+        Log.d("HSR", "RunFragment : " + location);
         if (location.getProvider().equals("gps")) {
             polylineMarkerUpdater.updatePolyline(location);
             polylineMarkerUpdater.updateMarker(location);
         }
+
+        LatLng lastKnownLocation = new LatLng(location.getLatitude(), location.getLongitude());
+        mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(lastKnownLocation, 15));
+
+        mGoogleMap.addMarker(new MarkerOptions()
+                .position(lastKnownLocation)
+                .title("마포")
+                .snippet("처음위치")
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
     }
+
 
 }
