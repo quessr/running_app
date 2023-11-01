@@ -20,11 +20,13 @@ import com.example.running_app.R;
 import com.example.running_app.data.model.GpsTrackerService;
 import com.example.running_app.databinding.ActivityMainBinding;
 import com.example.running_app.ui.fragments.RunFragment;
+import com.example.running_app.ui.fragments.RunHistoryFragment;
 
 public class MainActivity extends AppCompatActivity {
     FragmentManager fragmentManager = getSupportFragmentManager();
     FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
     RunFragment runFragment = new RunFragment();
+    RunHistoryFragment runHistoryFragment = new RunHistoryFragment();
     public GpsTrackerService gpsTracker;
 
     private static final int NOTIFICATION_ID = 0;
@@ -86,6 +88,7 @@ public class MainActivity extends AppCompatActivity {
         fragmentTransaction.add(R.id.run_fragment_container, runFragment);
         fragmentTransaction.commit();
 
+
         Intent gpsTrackerService = new Intent(getApplicationContext(), GpsTrackerService.class);
         bindService(gpsTrackerService, serviceGpsTrackerConnection, Context.BIND_AUTO_CREATE);
 
@@ -115,9 +118,22 @@ public class MainActivity extends AppCompatActivity {
                 gpsTracker.stopUsingGPS();
                 gpsTracker.stopService(new Intent(MainActivity.this,GpsTrackerService.class));
                 gpsTracker.stopNotification();
+
             }
         });
 
+        binding.showRecordBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                FragmentTransaction transaction = fragmentManager.beginTransaction();
+                transaction.replace(R.id.run_history, runHistoryFragment);
+                transaction.commit();
+
+                binding.runStartBtn.setVisibility(View.GONE);
+                binding.showRecordBtn.setVisibility(View.GONE);
+            }
+        });
     }
+
 
 }
