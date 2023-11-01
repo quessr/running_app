@@ -3,12 +3,15 @@ package com.example.running_app.data.database.dao;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
+import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
-@Entity(tableName = "TB_GPS",
+@Entity(indices = {@Index("run_id")},
+        tableName = "TB_GPS",
         foreignKeys = @ForeignKey(entity = TB_Run.class,
                 parentColumns = "run_id",
-                childColumns = "run_id"))
+                childColumns = "run_id",
+                onDelete = ForeignKey.CASCADE))
 public class TB_GPS {
     @PrimaryKey(autoGenerate = true)
     private int gps_id;

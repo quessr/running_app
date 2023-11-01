@@ -9,7 +9,7 @@ import androidx.room.RoomDatabase;
 import androidx.room.migration.Migration;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
-@Database(entities = {TB_Run.class, TB_GPS.class}, version = 12)
+@Database(entities = {TB_Run.class, TB_GPS.class}, version = 1, exportSchema = false)
 public abstract class RunDatabase extends RoomDatabase {
     public abstract RunDao runDao();
 

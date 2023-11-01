@@ -14,12 +14,12 @@ val googleMapApiKey = localProperties.getProperty("GOOGLE_MAP_API_KEY")
 
 android {
     namespace = "com.example.running_app"
-    compileSdk = 34
+    compileSdk = 33
 
     defaultConfig {
         applicationId = "com.example.running_app"
         minSdk = 24
-        targetSdk = 34
+        targetSdk = 33
         versionCode = 1
         versionName = "1.0"
 
@@ -57,6 +57,7 @@ android {
     buildFeatures {
         buildConfig = true
     }
+
 }
 
 dependencies {
@@ -71,7 +72,9 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
 
     //room
-    implementation("androidx.room:room-runtime:2.6.0")
+    //room 사용
+    implementation("androidx.room:room-runtime:2.5.2")
+    annotationProcessor("androidx.room:room-compiler:2.5.2")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
@@ -88,6 +91,5 @@ dependencies {
     // Notification
     implementation("androidx.core:core:1.0.0")
 
-    annotationProcessor("androidx.room:room-compiler:2.6.0")
 
 }
