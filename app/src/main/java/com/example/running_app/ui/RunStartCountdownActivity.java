@@ -31,15 +31,12 @@ public class RunStartCountdownActivity extends AppCompatActivity {
                 if (countdownValue >= 1) {
                     countdownText.setText(String.valueOf(countdownValue));
                     countdownValue--;
-                    handler.postDelayed(this, 1000); 
+                    handler.postDelayed(this, 1000);
                 } else {
-                    Intent intent = new Intent(RunStartCountdownActivity.this, MainActivity.class);
-                    startActivity(intent);
                     finish();
                 }
             }
         };
-
         handler.post(runnable);
     }
 }

@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.RunStartCountdownActivity">
+    tools:context=".ui.RunStartCountdownActivity"
+    android:background="#000">
 
 <!--    <TextView-->
 <!--        app:layout_constraintStart_toStartOf="parent"-->

@@ -157,6 +157,17 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
             polylineMarkerUpdater.updatePolyline(location);
             polylineMarkerUpdater.updateMarker(location);
         }
+
+        LatLng lastKnownLocation = new LatLng(location.getLatitude(), location.getLongitude());
+        mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(lastKnownLocation, 15));
+
+        mGoogleMap.addMarker(new MarkerOptions()
+                .position(lastKnownLocation)
+                .title("마포")
+                .snippet("처음위치")
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
     }
+
+
 
 }

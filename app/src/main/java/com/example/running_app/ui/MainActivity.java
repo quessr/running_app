@@ -32,6 +32,9 @@ public class MainActivity extends AppCompatActivity {
     String channelId = "gps_tacker_channel";
 
     private ActivityMainBinding binding;
+    public boolean isStartButtonVisible = true;
+    public boolean isEndButtonVisible = false;
+
 
     GpsTrackerService.updateMap listener = new GpsTrackerService.updateMap(){
 
@@ -57,7 +60,6 @@ public class MainActivity extends AppCompatActivity {
                 gpsTracker = mGpsTrackerServiceBinder.getService();
                 gpsTracker.startForeground();
                 gpsTracker.setListener(listener);
-//                gpsTracker.startLocationUpdate();
 
             }
         }
@@ -77,6 +79,9 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         View view = binding.getRoot();
         setContentView(view);
+
+        binding.runEndBtn.setVisibility(isEndButtonVisible ? View.VISIBLE : View.GONE);
+        binding.runStartBtn.setVisibility(isStartButtonVisible ? View.VISIBLE : View.GONE);
 
         fragmentTransaction.add(R.id.run_fragment_container, runFragment);
         fragmentTransaction.commit();
@@ -98,9 +103,12 @@ public class MainActivity extends AppCompatActivity {
 
                 gpsTracker.startLocationUpdate();
 
+                binding.runStartBtn.setVisibility(View.GONE);
+                binding.runEndBtn.setVisibility(View.VISIBLE);
 
             }
         });
 
     }
+
 }
