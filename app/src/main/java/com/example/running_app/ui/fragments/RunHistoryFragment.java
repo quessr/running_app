@@ -32,6 +32,7 @@ import com.example.running_app.ui.viewmodels.RunViewModel;
 import java.util.List;
 
 import com.example.running_app.R;
+import com.example.running_app.ui.viewmodels.TimerViewModel;
 
 public class RunHistoryFragment extends Fragment {
 
@@ -75,34 +76,36 @@ public class RunHistoryFragment extends Fragment {
 //        runDao = RunDatabase.runDao(); //인터페이스 사용 준비 완료(객체 할당)
 //        gpsDao = database.gpsDao();
 
-        //데이터 삽입
-        TB_Run tbRun = new TB_Run();    //객체 인스턴스 생성
-        tbRun.setWalk_count(100);
-        tbRun.setTimer(0.7);
-        tbRun.setCreate_at("2023/10/27");
-        tbRun.setIs_active(1);
-        viewModel.setInsertRun(tbRun);
 
-        runDao = RunDatabase.INSTANCE.runDao();
 
-//        TB_Run latest = runDao.getLatestActiveOne();
-        LiveData<List<TB_Run>> test  = runDao.getRunAll();
-        List<TB_Run> result = test.getValue();
-        if (result != null){
-            for (int i =0; i < result.size(); i++){
-                Log.d("agag", result.get(i).toString());
-            }
-        }
-
-        TB_Run latest = viewModel.getLatestActiveOne().get(tbRun.getRun_id());
-
-        //데이터 삽입
-        TB_GPS tbGps = new TB_GPS();    //객체 인스턴스 생성
-        tbGps.setRun_id(latest.getRun_id());
-        tbGps.setLat((long) 37.5564036476463);
-        tbGps.setLon((long) 126.926735502823);
-        tbGps.setCreate_at("2023/10/30");
-        viewModel.setInsertGps(tbGps);
+//        //데이터 삽입
+//        TB_Run tbRun = new TB_Run();    //객체 인스턴스 생성
+//        tbRun.setWalk_count(100);
+//        tbRun.setTimer(0.7);
+//        tbRun.setCreate_at("2023/10/27");
+//        tbRun.setIs_active(1);
+//        viewModel.setInsertRun(tbRun);
+//
+//        runDao = RunDatabase.INSTANCE.runDao();
+//
+////        TB_Run latest = runDao.getLatestActiveOne();
+//        LiveData<List<TB_Run>> test  = runDao.getRunAll();
+//        List<TB_Run> result = test.getValue();
+//        if (result != null){
+//            for (int i =0; i < result.size(); i++){
+//                Log.d("agag", result.get(i).toString());
+//            }
+//        }
+//
+//        TB_Run latest = viewModel.getLatestActiveOne().get(tbRun.getRun_id());
+//
+//        //데이터 삽입
+//        TB_GPS tbGps = new TB_GPS();    //객체 인스턴스 생성
+//        tbGps.setRun_id(latest.getRun_id());
+//        tbGps.setLat((long) 37.5564036476463);
+//        tbGps.setLon((long) 126.926735502823);
+//        tbGps.setCreate_at("2023/10/30");
+//        viewModel.setInsertGps(tbGps);
 
 
 

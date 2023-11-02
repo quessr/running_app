@@ -1,6 +1,7 @@
 package com.example.running_app.ui;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Observer;
@@ -26,6 +27,7 @@ import com.example.running_app.databinding.ActivityMainBinding;
 import com.example.running_app.ui.fragments.RunFragment;
 import com.example.running_app.ui.fragments.RunHistoryFragment;
 import com.example.running_app.data.model.GpsTrackerService;
+import com.example.running_app.ui.viewmodels.RunViewModel;
 import com.example.running_app.ui.viewmodels.TimerViewModel;
 
 public class MainActivity extends AppCompatActivity {
@@ -43,8 +45,9 @@ public class MainActivity extends AppCompatActivity {
     public boolean isStartButtonVisible = true;
     public boolean isEndButtonVisible = false;
 
-    //timer
+    //timer, room DB
     private TimerViewModel timerViewModel;
+    private RunViewModel runViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +58,8 @@ public class MainActivity extends AppCompatActivity {
 
         //timer - viewModel
         timerViewModel = new ViewModelProvider(this).get(TimerViewModel.class);
+        runViewModel = new ViewModelProvider(this).get(RunViewModel.class);
+        timerViewModel.setRunViewModel(runViewModel);
 
         binding.runEndBtn.setVisibility(isEndButtonVisible ? View.VISIBLE : View.GONE);
         binding.runStartBtn.setVisibility(isStartButtonVisible ? View.VISIBLE : View.GONE);
@@ -102,6 +107,7 @@ public class MainActivity extends AppCompatActivity {
 
                 //timer
                 timerViewModel.stopTimer();
+
             }
         });
 
