@@ -1,12 +1,9 @@
 package com.example.running_app.ui;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.room.Room;
 
 import android.app.NotificationManager;
 import android.content.ComponentName;
@@ -18,16 +15,15 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.View;
-import android.widget.TextView;
 
 import com.example.running_app.BuildConfig;
 import com.example.running_app.R;
 import com.example.running_app.data.model.GpsTrackerService;
 import com.example.running_app.data.model.StepCounter;
 import com.example.running_app.databinding.ActivityMainBinding;
+import com.example.running_app.ui.fragments.MainHistoryFragment;
 import com.example.running_app.ui.fragments.RunFragment;
 import com.example.running_app.ui.fragments.RunHistoryFragment;
-import com.example.running_app.data.model.GpsTrackerService;
 import com.example.running_app.ui.viewmodels.RunViewModel;
 import com.example.running_app.ui.viewmodels.TimerViewModel;
 
@@ -135,18 +131,28 @@ public class MainActivity extends AppCompatActivity {
                 FragmentTransaction transaction = fragmentManager.beginTransaction();
                 transaction.replace(R.id.run_history, runHistoryFragment);
                 transaction.commit();
+
+//                binding.stepcountTimerContainer.setVisibility(View.GONE);
+
             }
         });
 
         binding.showRecordBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+//                FragmentTransaction transaction = fragmentManager.beginTransaction();
+//                transaction.replace(R.id.run_history, runHistoryFragment);
+//                transaction.commit();
+
                 FragmentTransaction transaction = fragmentManager.beginTransaction();
-                transaction.replace(R.id.run_history, runHistoryFragment);
+                transaction.replace(R.id.run_history, new MainHistoryFragment());
                 transaction.commit();
 
                 binding.runStartBtn.setVisibility(View.GONE);
                 binding.showRecordBtn.setVisibility(View.GONE);
+
+//                binding.stepcountTimerContainer.setVisibility(View.GONE);
+                binding.mainConstraintLayout.setVisibility(View.GONE);
             }
         });
     }
