@@ -1,8 +1,11 @@
 package com.example.running_app.ui;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.room.Room;
 
 import android.app.NotificationManager;
@@ -15,6 +18,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 
 import com.example.running_app.BuildConfig;
 import com.example.running_app.R;
@@ -23,6 +27,8 @@ import com.example.running_app.databinding.ActivityMainBinding;
 import com.example.running_app.ui.fragments.RunFragment;
 import com.example.running_app.ui.fragments.RunHistoryFragment;
 import com.example.running_app.data.model.GpsTrackerService;
+import com.example.running_app.ui.viewmodels.RunViewModel;
+import com.example.running_app.ui.viewmodels.TimerViewModel;
 
 public class MainActivity extends AppCompatActivity {
     FragmentManager fragmentManager = getSupportFragmentManager();
@@ -39,12 +45,21 @@ public class MainActivity extends AppCompatActivity {
     public boolean isStartButtonVisible = true;
     public boolean isEndButtonVisible = false;
 
+    //timer, room DB
+    private TimerViewModel timerViewModel;
+    private RunViewModel runViewModel;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         View view = binding.getRoot();
         setContentView(view);
+
+        //timer - viewModel
+        timerViewModel = new ViewModelProvider(this).get(TimerViewModel.class);
+        runViewModel = new ViewModelProvider(this).get(RunViewModel.class);
+        timerViewModel.setRunViewModel(runViewModel);
 
         binding.runEndBtn.setVisibility(isEndButtonVisible ? View.VISIBLE : View.GONE);
         binding.runStartBtn.setVisibility(isStartButtonVisible ? View.VISIBLE : View.GONE);
@@ -75,8 +90,13 @@ public class MainActivity extends AppCompatActivity {
                 binding.runEndBtn.setVisibility(View.VISIBLE);
                 binding.stepcountTimerContainer.setVisibility(View.VISIBLE);
 
+                //timer
+                timerViewModel.startTimer();
             }
         });
+
+        //timer 관찰
+        timerViewModel.getTimeTextLiveData().observe(this, s -> binding.tvTime.setText(s));
 
         binding.runEndBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -84,6 +104,9 @@ public class MainActivity extends AppCompatActivity {
                 gpsTracker.stopUsingGPS();
                 gpsTracker.stopService(new Intent(MainActivity.this,GpsTrackerService.class));
                 gpsTracker.stopNotification();
+
+                //timer
+                timerViewModel.stopTimer();
 
             }
         });
