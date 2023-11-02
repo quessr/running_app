@@ -19,12 +19,14 @@ import android.view.View;
 import com.example.running_app.BuildConfig;
 import com.example.running_app.R;
 import com.example.running_app.data.model.GpsTrackerService;
+import com.example.running_app.data.model.StepCounter;
 import com.example.running_app.databinding.ActivityMainBinding;
 import com.example.running_app.ui.fragments.RunFragment;
 import com.example.running_app.ui.fragments.RunHistoryFragment;
 import com.example.running_app.data.model.GpsTrackerService;
 
 public class MainActivity extends AppCompatActivity {
+    public static Context mContext;
     FragmentManager fragmentManager = getSupportFragmentManager();
     FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
     RunFragment runFragment = new RunFragment();
@@ -35,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
     private NotificationManager notificationManager = null;
     String channelId = "gps_tacker_channel";
 
-    private ActivityMainBinding binding;
+    public ActivityMainBinding binding;
     public boolean isStartButtonVisible = true;
     public boolean isEndButtonVisible = false;
 
@@ -46,8 +48,13 @@ public class MainActivity extends AppCompatActivity {
         View view = binding.getRoot();
         setContentView(view);
 
-        binding.runEndBtn.setVisibility(isEndButtonVisible ? View.VISIBLE : View.GONE);
-        binding.runStartBtn.setVisibility(isStartButtonVisible ? View.VISIBLE : View.GONE);
+        mContext = this;
+
+//        binding.runEndBtn.setVisibility(isEndButtonVisible ? View.VISIBLE : View.GONE);
+//        binding.runStartBtn.setVisibility(isStartButtonVisible ? View.VISIBLE : View.GONE);
+        binding.runStartBtn.setVisibility(View.VISIBLE);
+        binding.runEndBtn.setVisibility(View.GONE);
+        binding.showRecordBtn.setVisibility(View.VISIBLE);
         binding.stepcountTimerContainer.setVisibility(View.GONE);
 
 
@@ -57,6 +64,8 @@ public class MainActivity extends AppCompatActivity {
 
         Intent gpsTrackerService = new Intent(getApplicationContext(), GpsTrackerService.class);
         bindService(gpsTrackerService, serviceGpsTrackerConnection, Context.BIND_AUTO_CREATE);
+
+        StepCounter stepCounter = new StepCounter(this);
 
 //        Intent serviceIntent = new Intent(this, GpsTracker.class);
 //        ContextCompat.startForegroundService(this, serviceIntent);
@@ -70,11 +79,20 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
 
                 gpsTracker.startLocationUpdate();
+                stepCounter.start();
 
                 binding.runStartBtn.setVisibility(View.GONE);
                 binding.runEndBtn.setVisibility(View.VISIBLE);
+                binding.showRecordBtn.setVisibility(View.GONE);
                 binding.stepcountTimerContainer.setVisibility(View.VISIBLE);
+                binding.tvStepCount.setText(String.valueOf(stepCounter.getStepCount()));
 
+                stepCounter.setStepCountListener(new StepCounter.StepCountListener() {
+                    @Override
+                    public void onStepCountChanged(int stepCount) {
+                        binding.tvStepCount.setText(String.valueOf(stepCounter.getStepCount()));
+                    }
+                });
             }
         });
 
@@ -84,6 +102,7 @@ public class MainActivity extends AppCompatActivity {
                 gpsTracker.stopUsingGPS();
                 gpsTracker.stopService(new Intent(MainActivity.this,GpsTrackerService.class));
                 gpsTracker.stopNotification();
+                stepCounter.stop();
 
             }
         });
