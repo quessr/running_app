@@ -126,9 +126,15 @@ public class MainActivity extends AppCompatActivity {
                 gpsTracker.stopNotification();
                 stepCounter.stop();
 
+                binding.stepcountTimerContainer.setVisibility(View.GONE);
+                binding.runEndBtn.setVisibility(View.GONE);
+
                 //timer
                 timerViewModel.stopTimer();
 
+                FragmentTransaction transaction = fragmentManager.beginTransaction();
+                transaction.replace(R.id.run_history, runHistoryFragment);
+                transaction.commit();
             }
         });
 
