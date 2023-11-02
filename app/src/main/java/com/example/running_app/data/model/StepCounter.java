@@ -1,6 +1,7 @@
 package com.example.running_app.data.model;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -26,6 +27,18 @@ public class StepCounter implements SensorEventListener {
         }
     }
 
+    public void saveStepCount(Context context) {
+        SharedPreferences sharedPreferences = context.getSharedPreferences("StepCounter", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putInt("stepCount", mStepDetector);
+        editor.apply();
+    }
+
+    public int loadStepCount(Context context) {
+        SharedPreferences sharedPreferences = context.getSharedPreferences("StepCounter", Context.MODE_PRIVATE);
+        return sharedPreferences.getInt("stepCount", 0);
+    }
+
     public void start() {
         if (stepCountSensor != null) {
             sensorManager.registerListener(this, stepCountSensor, SensorManager.SENSOR_DELAY_GAME);
@@ -34,26 +47,21 @@ public class StepCounter implements SensorEventListener {
 
     public void stop() {
         sensorManager.unregisterListener(this, stepCountSensor);
+        saveStepCount(MainActivity.mContext);
     }
 
     public int getStepCount() {
         return mStepDetector;
     }
 
-
-
     @Override
     public void onSensorChanged(SensorEvent event) {
         if (event.sensor.getType() == Sensor.TYPE_STEP_COUNTER) {
             mStepDetector = (int) event.values[0];
-            Toast.makeText(MainActivity.mContext, "onSensorChanged : " + mStepDetector, Toast.LENGTH_SHORT).show();
-            Toast.makeText(MainActivity.mContext, "onSensorChanged " + mStepDetector, Toast.LENGTH_SHORT).show();
 
         } else if (event.sensor.getType() == Sensor.TYPE_STEP_DETECTOR) {
             if(event.values[0] == 1.0f) {
                 mStepDetector += event.values[0];
-                Toast.makeText(MainActivity.mContext, "onSensorChanged : " + mStepDetector, Toast.LENGTH_SHORT).show();
-                Toast.makeText(MainActivity.mContext, "onSensorChanged " + mStepDetector, Toast.LENGTH_SHORT).show();
 
             }
         }

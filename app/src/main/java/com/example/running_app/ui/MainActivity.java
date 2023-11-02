@@ -78,6 +78,10 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(MainActivity.this, RunStartCountdownActivity.class);
                 startActivity(intent);
 
+                int savedStepCount = stepCounter.loadStepCount(mContext); // 저장된 걸음수를 불러옴
+//                int currentStepCount = stepCounter.getStepCount(); // 현재 측정된 걸음수
+//                int stepCountDifference = currentStepCount - savedStepCount;
+
                 gpsTracker.startLocationUpdate();
                 stepCounter.start();
 
@@ -85,12 +89,11 @@ public class MainActivity extends AppCompatActivity {
                 binding.runEndBtn.setVisibility(View.VISIBLE);
                 binding.showRecordBtn.setVisibility(View.GONE);
                 binding.stepcountTimerContainer.setVisibility(View.VISIBLE);
-                binding.tvStepCount.setText(String.valueOf(stepCounter.getStepCount()));
 
                 stepCounter.setStepCountListener(new StepCounter.StepCountListener() {
                     @Override
                     public void onStepCountChanged(int stepCount) {
-                        binding.tvStepCount.setText(String.valueOf(stepCounter.getStepCount()));
+                        binding.tvStepCount.setText(String.valueOf(stepCounter.getStepCount() - savedStepCount));
                     }
                 });
             }
@@ -137,7 +140,6 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            Log.d("HSR", "onServiceConnected()");
             if(service != null){
                 GpsTrackerService.LocalBinder mGpsTrackerServiceBinder = (GpsTrackerService.LocalBinder)service;
                 gpsTracker = mGpsTrackerServiceBinder.getService();
