@@ -69,7 +69,8 @@ public class RunningAdapter extends RecyclerView.Adapter<RunningAdapter.ViewHold
         public void bind(TB_Run data) {
             t_date.setText(data.getCreate_at());
             t_distance.setText("15km");
-            t_runTime.setText(format(String.valueOf(data.getTimer())));
+            t_runTime.setText(data.getTimer());
+//            t_runTime.setText(format(String.valueOf(data.getTimer())));
 //            t_runTime.setText((int) data.getTimer());
             t_speed.setText("5km");
             t_walkCount.setText(String.valueOf(data.getWalk_count()));

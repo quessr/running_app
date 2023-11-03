@@ -73,7 +73,8 @@ public class TimerViewModel extends ViewModel {
             //timer -> insert(데이터 삽입)
             TB_Run tbRun = new TB_Run();    //객체 인스턴스 생성
             tbRun.setWalk_count(150);
-            tbRun.setTimer(time);
+//            tbRun.setTimer(time);
+            tbRun.setTimer(getTimeStringFromDouble(time));
             tbRun.setCreate_at("2023/11/02");
             tbRun.setIs_active(1);
             runViewModel.setInsertRun(tbRun);
