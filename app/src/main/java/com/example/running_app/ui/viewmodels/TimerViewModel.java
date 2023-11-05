@@ -31,6 +31,9 @@ public class TimerViewModel extends ViewModel {
     private RunDao runDao;
     RunViewModel runViewModel;
 
+    //stepCounter
+    private int mStepDetector;
+
     private MutableLiveData<String> timeTextLiveData = new MutableLiveData<>();
 
     public LiveData<String> getTimeTextLiveData() {
@@ -41,6 +44,10 @@ public class TimerViewModel extends ViewModel {
         this.runViewModel = runViewModel;
     }
 
+
+    public void setStepCounter(int mStepDetector) {
+        this.mStepDetector = mStepDetector;
+    }
 
     public void startTimer() {
         start();
@@ -74,7 +81,7 @@ public class TimerViewModel extends ViewModel {
 
             //timer -> insert(데이터 삽입)
             TB_Run tbRun = new TB_Run();    //객체 인스턴스 생성
-            tbRun.setWalk_count(233);
+            tbRun.setWalk_count(mStepDetector);
             tbRun.setTimer(getTimeStringFromDouble(time));
             tbRun.setCreate_at("2023/11/03");
             tbRun.setIs_active(1);

@@ -10,6 +10,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Build;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
@@ -31,7 +32,9 @@ public class StepCounter implements SensorEventListener {
     RunViewModel runViewModel;
 
     @RequiresApi(api = Build.VERSION_CODES.Q)
-    public StepCounter(Context context) {
+    public StepCounter(Context context, TimerViewModel timerViewModel) {
+
+        this.timerViewModel = timerViewModel;
 
         // 활동 퍼미션 체크
         if(ActivityCompat.checkSelfPermission(context, Manifest.permission.ACTIVITY_RECOGNITION) == PackageManager.PERMISSION_DENIED){
@@ -85,6 +88,10 @@ public class StepCounter implements SensorEventListener {
     }
 
     public void stop() {
+        Log.d("카운트 수", String.valueOf(mStepDetector));
+        //mStepDetector DB insert
+        timerViewModel.setStepCounter(mStepDetector);
+
         sensorManager.unregisterListener(this, stepCountSensor);
         mStepDetector = 0;
         stepCountListener.onStepCountChanged(mStepDetector);

@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
         Intent gpsTrackerService = new Intent(getApplicationContext(), GpsTrackerService.class);
         bindService(gpsTrackerService, serviceGpsTrackerConnection, Context.BIND_AUTO_CREATE);
 
-        StepCounter stepCounter = new StepCounter(this);
+        StepCounter stepCounter = new StepCounter(this, timerViewModel);
 
 //        Intent serviceIntent = new Intent(this, GpsTracker.class);
 //        ContextCompat.startForegroundService(this, serviceIntent);
