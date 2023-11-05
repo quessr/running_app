@@ -1,14 +1,19 @@
 package com.example.running_app.ui.viewmodels;
 
+import android.annotation.SuppressLint;
 import android.app.Application;
+import android.content.Context;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 
+import com.example.running_app.data.database.dao.RunDao;
+import com.example.running_app.data.database.dao.RunDatabase;
 import com.example.running_app.data.database.dao.TB_GPS;
 import com.example.running_app.data.database.dao.TB_Run;
 import com.example.running_app.data.model.RunRepository;
+import com.example.running_app.data.model.StepCounter;
 
 import java.util.List;
 
@@ -41,7 +46,6 @@ public class RunViewModel extends AndroidViewModel {
     public void setInsertGps(TB_GPS tbGps) {
         runRepository.setInsertGps(tbGps);
     }
-
 
 
     //delete 함수
