@@ -37,18 +37,6 @@ public class RunRepository {
     //insert 문
     public void setInsertRun(TB_Run tbRun) {
         runDatabase.runDao().setInsertRun(tbRun);
-//        try {
-//            Thread thread = new Thread(new Runnable() { //별도 스레드를 통해 Room 데이터에 접근해야한다. 연산 시간이 오래 걸리는 작업은 메인 쓰레드가 아닌 별도의 쓰레드에서 하도록 되어있다. 그렇지 않으면 런타임에러 발생.
-//                @Override
-//                public void run() {
-////                    runDao.setInsertRun(tbRun);  //DAO의 메서드들 호출
-//                    runDatabase.runDao().setInsertRun(tbRun);
-//                }
-//            });
-//            thread.start();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
     }
 
     public void setInsertGps(TB_GPS tbGps) {
