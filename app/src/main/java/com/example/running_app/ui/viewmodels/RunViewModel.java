@@ -20,23 +20,28 @@ import java.util.List;
 public class RunViewModel extends AndroidViewModel {
     RunRepository runRepository;
     LiveData<List<TB_Run>> getRunAll;
+    LiveData<List<TB_GPS>> getGpsAll;
     List<TB_Run> getLatestActiveOne;
 
     public RunViewModel(@NonNull Application application){
         super(application);
         runRepository = new RunRepository(application);
         getRunAll = runRepository.getRunAll();
+        getGpsAll = runRepository.getGpsAll();
 //        getLatestActiveOne = runRepository.getLatestActiveOne();
     }
 
     public LiveData<List<TB_Run>> getRunAll(){
         return getRunAll;
     }
-
-    public List<TB_Run> getLatestActiveOne() {
-        getLatestActiveOne = runRepository.getLatestActiveOne();
-        return getLatestActiveOne;
+    public LiveData<List<TB_GPS>> getGpsAll(){
+        return getGpsAll;
     }
+
+//    public List<TB_Run> getLatestActiveOne() {
+//        getLatestActiveOne = runRepository.getLatestActiveOne();
+//        return getLatestActiveOne;
+//    }
 
     //insert 함수
     public void setInsertRun(TB_Run tbRun) {

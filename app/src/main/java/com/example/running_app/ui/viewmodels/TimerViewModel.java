@@ -84,20 +84,20 @@ public class TimerViewModel extends ViewModel {
             tbRun.setWalk_count(mStepDetector);
             tbRun.setTimer(getTimeStringFromDouble(time));
             tbRun.setCreate_at("2023/11/03");
-            tbRun.setIs_active(1);
+//            tbRun.setIs_active(1);
             runViewModel.setInsertRun(tbRun);
 
             runDao = RunDatabase.INSTANCE.runDao();
 
-            TB_Run latest = runViewModel.getLatestActiveOne().get(tbRun.getRun_id());
-
-            //GPS 데이터 삽입
-            TB_GPS tbGps = new TB_GPS();    //객체 인스턴스 생성
-            tbGps.setRun_id(latest.getRun_id());
-            tbGps.setLat((long) 37.5564036476463);
-            tbGps.setLon((long) 126.926735502823);
-            tbGps.setCreate_at("2023/11/02");
-            runViewModel.setInsertGps(tbGps);
+//            TB_Run latest = runViewModel.getLatestActiveOne().get(tbRun.getRun_id());
+//
+//            //GPS 데이터 삽입
+//            TB_GPS tbGps = new TB_GPS();    //객체 인스턴스 생성
+//            tbGps.setRun_id(latest.getRun_id());
+//            tbGps.setLat(latitude);
+//            tbGps.setLon(longitude);
+//            tbGps.setCreate_at("2023/11/02");
+//            runViewModel.setInsertGps(tbGps);
 
 
             //stop 버튼 클릭시 바로 0.0 초로 리셋

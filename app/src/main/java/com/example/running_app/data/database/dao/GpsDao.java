@@ -1,5 +1,6 @@
 package com.example.running_app.data.database.dao;
 
+import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
@@ -24,8 +25,8 @@ public interface GpsDao {
 
     //조회 쿼리
     @Query("SELECT * FROM TB_GPS") //쿼리 : 데이터베이스에 요청하는 명령문
-    List<TB_GPS> getGpsAll();
+    LiveData<List<TB_GPS>> getGpsAll();
 
-    @Query("SELECT * FROM TB_GPS WHERE run_id = :run_id") //쿼리 : 데이터베이스에 요청하는 명령문
-    List<TB_GPS> getGpsAllByRunId(int run_id);
+//    @Query("SELECT * FROM TB_GPS WHERE run_id = :run_id") //쿼리 : 데이터베이스에 요청하는 명령문
+//    List<TB_GPS> getGpsAllByRunId(int run_id);
 }
