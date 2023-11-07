@@ -25,6 +25,7 @@ import androidx.core.content.ContextCompat;
 
 import com.example.running_app.R;
 import com.example.running_app.data.database.dao.GpsDao;
+import com.example.running_app.data.database.dao.RunDao;
 import com.example.running_app.data.database.dao.RunDatabase;
 import com.example.running_app.data.database.dao.TB_GPS;
 import com.example.running_app.data.database.dao.TB_Run;
@@ -49,6 +50,7 @@ public class GpsTrackerService extends Service implements LocationListener {
     TimerViewModel timerViewModel;
     RunViewModel runViewModel;
     private GpsDao gpsDao;
+    private RunDao runDao;
 
     private final IBinder mBinder = new LocalBinder();
 
@@ -149,8 +151,13 @@ public class GpsTrackerService extends Service implements LocationListener {
 
             //location -> insert
             gpsDao = RunDatabase.INSTANCE.gpsDao();;
+//            runDao = RunDatabase.INSTANCE.runDao();
+
+            TB_Run tbRun = new TB_Run();
+//            TB_Run latest = runViewModel.getLatestActiveOne().get(tbRun.getRun_id());
 
             TB_GPS tbGps = new TB_GPS();
+//            tbGps.setRun_id(1);
             tbGps.setLat(latitude);
             tbGps.setLon(longitude);
             tbGps.setCreate_at("2023/11/06");

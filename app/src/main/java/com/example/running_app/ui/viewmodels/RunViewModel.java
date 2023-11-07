@@ -21,6 +21,8 @@ public class RunViewModel extends AndroidViewModel {
     RunRepository runRepository;
     LiveData<List<TB_Run>> getRunAll;
     LiveData<List<TB_GPS>> getGpsAll;
+    TB_GPS getFirstLocation;
+    TB_GPS getLastLocation;
     List<TB_Run> getLatestActiveOne;
 
     public RunViewModel(@NonNull Application application){
@@ -28,6 +30,9 @@ public class RunViewModel extends AndroidViewModel {
         runRepository = new RunRepository(application);
         getRunAll = runRepository.getRunAll();
         getGpsAll = runRepository.getGpsAll();
+
+        getFirstLocation = runRepository.getFirstLocation();
+        getLastLocation = runRepository.getLastLocation();
 //        getLatestActiveOne = runRepository.getLatestActiveOne();
     }
 
@@ -36,6 +41,14 @@ public class RunViewModel extends AndroidViewModel {
     }
     public LiveData<List<TB_GPS>> getGpsAll(){
         return getGpsAll;
+    }
+
+    public TB_GPS getFirstLocation(){
+        return getFirstLocation;
+    }
+
+    public TB_GPS getLastLocation(){
+        return getLastLocation;
     }
 
 //    public List<TB_Run> getLatestActiveOne() {

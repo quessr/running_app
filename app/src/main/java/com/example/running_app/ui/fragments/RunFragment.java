@@ -34,7 +34,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrackerService.updateMap {
     private FragmentRunBinding binding;
-    private GpsTrackerService gpsTracker;
     public GoogleMap mGoogleMap;
     SupportMapFragment mapFragment;
 

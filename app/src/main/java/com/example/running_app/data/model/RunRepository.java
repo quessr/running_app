@@ -20,12 +20,17 @@ public class RunRepository {
 
     LiveData<List<TB_GPS>> getGpsAll;
 
+    TB_GPS getFirstLocation;
+    TB_GPS getLastLocation;
     List<TB_Run> getLatestActiveOne;
 
     public RunRepository(Application application){
         runDatabase = RunDatabase.getInstance(application);
         getRunAll = runDatabase.runDao().getRunAll();
         getGpsAll = runDatabase.gpsDao().getGpsAll();
+
+        getFirstLocation = runDatabase.gpsDao().getFirstLocation();
+        getLastLocation = runDatabase.gpsDao().getLastLocation();
 //        getLatestActiveOne = runDatabase.runDao().getLatestActiveOne();
     }
 
@@ -34,6 +39,14 @@ public class RunRepository {
     }
     public LiveData<List<TB_GPS>> getGpsAll(){
         return getGpsAll;
+    }
+
+    public TB_GPS getFirstLocation(){
+        return getFirstLocation;
+    }
+
+    public TB_GPS getLastLocation(){
+        return getLastLocation;
     }
 
 //    public List<TB_Run> getLatestActiveOne() {

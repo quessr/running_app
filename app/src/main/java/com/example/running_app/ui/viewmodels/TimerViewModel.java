@@ -112,6 +112,8 @@ public class TimerViewModel extends ViewModel {
         int minutes = resultInt % 86400 % 3600 / 60;
         int seconds = resultInt % 86400 % 3600 % 60;
 
+//        System.currentTimeMillis();
+
         return makeTimeString(hours, minutes, seconds);
     }
 

@@ -66,6 +66,23 @@ public class RunHistoryFragment extends Fragment {
             }
         });
 
+        TB_GPS f_tbGps = viewModel.getFirstLocation();
+        TB_GPS l_tbGps = viewModel.getLastLocation();
+
+        if (f_tbGps != null){
+            double firstLat = f_tbGps.getLat();
+            double firstLon = f_tbGps.getLon();
+
+            Log.d("처음 좌표: ", firstLat + " | " + firstLon);
+        }
+
+        if (l_tbGps != null){
+            double lastLat = l_tbGps.getLat();
+            double lastLon = l_tbGps.getLon();
+
+            Log.d("마지막 좌표: ", lastLat + " | " + lastLon);
+        }
+
 
 //        RunDatabase database = Room.databaseBuilder(requireContext(), RunDatabase.class, "running_db")
 //                .fallbackToDestructiveMigration()   //스키마(= database) 버전 변경 가능
