@@ -10,11 +10,14 @@
     app:cardCornerRadius="12dp"
     app:cardMaxElevation="2dp"
     app:cardUseCompatPadding="true"
-    app:cardPreventCornerOverlap="true">
+    app:cardPreventCornerOverlap="true"
+    android:layout_marginHorizontal="16dp"
+    android:layout_marginVertical="2dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:padding="16dp">
 
         <TextView
             android:id="@+id/date"
