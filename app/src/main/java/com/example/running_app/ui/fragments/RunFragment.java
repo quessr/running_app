@@ -186,7 +186,7 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
                     .position(lastKnownLocation)
                     .title("마포")
                     .snippet("처음위치")
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN)));
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
 
             // 지도 회전
             CameraPosition cameraPosition = new CameraPosition.Builder()

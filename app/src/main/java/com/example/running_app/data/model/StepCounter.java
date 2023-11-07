@@ -50,24 +50,6 @@ public class StepCounter implements SensorEventListener {
         }
     }
 
-
-//    public void saveStepCount(Context context) {
-//        SharedPreferences sharedPreferences = context.getSharedPreferences("StepCounter", Context.MODE_PRIVATE);
-//        SharedPreferences.Editor editor = sharedPreferences.edit();
-//        editor.putInt("stepCount", mStepDetector);
-//        editor.apply();
-//    }
-
-//    public int loadStepCount(Context context) {
-//        SharedPreferences sharedPreferences = context.getSharedPreferences("StepCounter", Context.MODE_PRIVATE);
-//
-//        int result = sharedPreferences.getInt("stepCount", 0);
-//        timerViewModel.setStepCount(result);
-////        return sharedPreferences.getInt("stepCount", 0);
-//        return result;
-//    }
-
-
     public void start() {
         if(stepCountSensor !=null) {
             // 센서 속도 설정
@@ -89,28 +71,11 @@ public class StepCounter implements SensorEventListener {
         sensorManager.unregisterListener(this, stepCountSensor);
         mStepDetector = 0;
         stepCountListener.onStepCountChanged(mStepDetector);
-//        saveStepCount(MainActivity.mContext);
     }
 
-//    public int getStepCount() {
-//        return mStepDetector;
-//    }
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-//        if (event.sensor.getType() == Sensor.TYPE_STEP_COUNTER) {
-//            mStepDetector = (int) event.values[0];
-//
-//        } else if (event.sensor.getType() == Sensor.TYPE_STEP_DETECTOR) {
-//            if(event.values[0] == 1.0f) {
-//                mStepDetector += event.values[0];
-//
-//            }
-//        }
-//
-//        if (stepCountListener != null) {
-//            stepCountListener.onStepCountChanged(mStepDetector);
-//        }
 
         // 걸음 센서 이벤트 발생시
         if(event.sensor.getType() == Sensor.TYPE_STEP_DETECTOR){
@@ -118,7 +83,6 @@ public class StepCounter implements SensorEventListener {
             if(event.values[0]==1.0f){
                 // 센서 이벤트가 발생할때 마다 걸음수 증가
                 mStepDetector++;
-//                stepCountView.setText(String.valueOf(mStepDetector));
                 stepCountListener.onStepCountChanged(mStepDetector);
             }
 
