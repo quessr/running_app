@@ -89,8 +89,10 @@ public class StepCounter implements SensorEventListener {
 
     public void stop() {
         Log.d("카운트 수", String.valueOf(mStepDetector));
-        //mStepDetector DB insert
-        timerViewModel.setStepCounter(mStepDetector);
+
+
+//        //mStepDetector DB insert
+//        timerViewModel.setStepCounter(mStepDetector);
 
         sensorManager.unregisterListener(this, stepCountSensor);
         mStepDetector = 0;

@@ -135,10 +135,12 @@ public class MainActivity extends AppCompatActivity {
                 timerViewModel.stopTimer();
 
                 FragmentTransaction transaction = fragmentManager.beginTransaction();
-                transaction.replace(R.id.run_history, runHistoryFragment);
+//                transaction.replace(R.id.run_history, runHistoryFragment);
+                transaction.replace(R.id.run_history, new MainHistoryFragment());
                 transaction.commit();
 
 //                binding.stepcountTimerContainer.setVisibility(View.GONE);
+                binding.mainConstraintLayout.setVisibility(View.GONE);
 
             }
         });

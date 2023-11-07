@@ -18,11 +18,15 @@ import com.example.running_app.data.database.dao.RunDatabase;
 import com.example.running_app.data.database.dao.TB_GPS;
 import com.example.running_app.data.database.dao.TB_Run;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
 public class TimerViewModel extends ViewModel {
-    private double time = 0.0;
+//    private double time = 0.0;
+    private long time = 0;
+    private SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
     private Timer timer;
     private TimerTask timerTask;
     private boolean handler;
@@ -62,12 +66,17 @@ public class TimerViewModel extends ViewModel {
                     @Override
                     public void run() {
                         time++;
-                        timeTextLiveData.postValue(getTimeStringFromDouble(time));
+                        timeTextLiveData.postValue(getTimeStringFromLong(time));
                     }
                 };
                 timer.scheduleAtFixedRate(timerTask, 0, 1000);
             }
         }, 3000);
+
+        //시작시 테이블 생성
+        TB_Run tbRun = new TB_Run();
+        runViewModel.setInsertRun(tbRun);
+
     }
 
     public void stopTimer() {
@@ -75,48 +84,64 @@ public class TimerViewModel extends ViewModel {
             timerTask.cancel();
             timerTask = null;
 
-            Log.d("Stop Data", getTimeStringFromDouble(time));
+            Log.d("Stop Data", getTimeStringFromLong(time));
 
 //            runViewModel.insertRun(getTimeStringFromDouble(time));
 
-            //timer -> insert(데이터 삽입)
-            TB_Run tbRun = new TB_Run();    //객체 인스턴스 생성
-            tbRun.setWalk_count(mStepDetector);
-            tbRun.setTimer(getTimeStringFromDouble(time));
-            tbRun.setCreate_at("2023/11/03");
-            tbRun.setIs_active(1);
-            runViewModel.setInsertRun(tbRun);
-
-            runDao = RunDatabase.INSTANCE.runDao();
-
-            TB_Run latest = runViewModel.getLatestActiveOne().get(tbRun.getRun_id());
-
-            //GPS 데이터 삽입
-            TB_GPS tbGps = new TB_GPS();    //객체 인스턴스 생성
-            tbGps.setRun_id(latest.getRun_id());
-            tbGps.setLat((long) 37.5564036476463);
-            tbGps.setLon((long) 126.926735502823);
-            tbGps.setCreate_at("2023/11/02");
-            runViewModel.setInsertGps(tbGps);
+//            //timer -> insert(데이터 삽입)
+//            TB_Run tbRun = new TB_Run();    //객체 인스턴스 생성
+//            tbRun.setWalk_count(mStepDetector);
+////            tbRun.setTimer(getTimeStringFromLong(time));
+//            tbRun.setTimer(time);
+//            tbRun.setCreate_at("2023/11/03");
+////            tbRun.setIs_active(1);
+//            runViewModel.setInsertRun(tbRun);
+//
+//            runDao = RunDatabase.INSTANCE.runDao();
+//
+////            TB_Run latest = runViewModel.getLatestActiveOne().get(tbRun.getRun_id());
+////
+////            //GPS 데이터 삽입
+////            TB_GPS tbGps = new TB_GPS();    //객체 인스턴스 생성
+////            tbGps.setRun_id(latest.getRun_id());
+////            tbGps.setLat(latitude);
+////            tbGps.setLon(longitude);
+////            tbGps.setCreate_at("2023/11/02");
+////            runViewModel.setInsertGps(tbGps);
 
 
             //stop 버튼 클릭시 바로 0.0 초로 리셋
-            time = 0.0;
-            timeTextLiveData.postValue(getTimeStringFromDouble(time));
+//            time = 0.0;
+            time = 0;
+//            timeTextLiveData.postValue(getTimeStringFromLong(time));
+            timeTextLiveData.postValue(getTimeStringFromLong(time));
         }
     }
 
-    private String getTimeStringFromDouble(double time) {
+
+    //SimpleDateFormat 함수 사용
+    private String getTimeStringFromLong(long time) {
         int resultInt = (int) Math.round(time);
-        int hours = resultInt % 86400 / 3600;
-        int minutes = resultInt % 86400 % 3600 / 60;
-        int seconds = resultInt % 86400 % 3600 % 60;
+        int hours = resultInt / 3600;
+        int minutes = (resultInt % 3600) / 60;
+        int seconds = resultInt % 60;
 
-        return makeTimeString(hours, minutes, seconds);
+        Date date = new Date(0, 0, 0, hours, minutes, seconds);
+
+        return timeFormat.format(date);
     }
 
-    @SuppressLint("DefaultLocale")
-    private String makeTimeString(int hours, int minutes, int seconds) {
-        return String.format("%02d:%02d:%02d", hours, minutes, seconds);
-    }
+//    private String getTimeStringFromLong(long time) {
+//        int resultInt = (int) Math.round(time);
+//        int hours = resultInt / 3600;
+//        int minutes = (resultInt % 3600) / 60;
+//        int seconds = resultInt % 60;
+//
+//        return makeTimeString(hours, minutes, seconds);
+//    }
+//
+//    @SuppressLint("DefaultLocale")
+//    private String makeTimeString(int hours, int minutes, int seconds) {
+//        return String.format("%02d:%02d:%02d", hours, minutes, seconds);
+//    }
 }

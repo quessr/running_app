@@ -67,13 +67,28 @@ public class RunningAdapter extends RecyclerView.Adapter<RunningAdapter.ViewHold
 
         @SuppressLint("SetTextI18n")
         public void bind(TB_Run data) {
+            //timer -> string 형태로 변환
+            long timeValue = data.getTimer();
+            timeFormat(timeValue);
+
             t_date.setText(data.getCreate_at());
             t_distance.setText("15km");
-            t_runTime.setText(data.getTimer());
+//            t_runTime.setText(String.valueOf(data.getTimer()));
+            t_runTime.setText(timeFormat(timeValue));
 //            t_runTime.setText(format(String.valueOf(data.getTimer())));
 //            t_runTime.setText((int) data.getTimer());
             t_speed.setText("5km");
             t_walkCount.setText(String.valueOf(data.getWalk_count()));
+        }
+
+        @SuppressLint("DefaultLocale")
+        private String timeFormat(long timeValue) {
+
+            int hours = (int) (timeValue / 3600);
+            int minutes = (int) ((timeValue % 3600) / 60);
+            int seconds = (int) (timeValue % 60);
+
+            return String.format("%02d:%02d:%02d", hours, minutes, seconds);
         }
     }
 }

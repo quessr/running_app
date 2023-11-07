@@ -24,6 +24,14 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 
 import com.example.running_app.R;
+import com.example.running_app.data.database.dao.GpsDao;
+import com.example.running_app.data.database.dao.RunDao;
+import com.example.running_app.data.database.dao.RunDatabase;
+import com.example.running_app.data.database.dao.TB_GPS;
+import com.example.running_app.data.database.dao.TB_Run;
+import com.example.running_app.ui.MainActivity;
+import com.example.running_app.ui.viewmodels.RunViewModel;
+import com.example.running_app.ui.viewmodels.TimerViewModel;
 
 public class GpsTrackerService extends Service implements LocationListener {
 
@@ -38,16 +46,22 @@ public class GpsTrackerService extends Service implements LocationListener {
     private NotificationManager notificationManager;
     int notificationId = 0;
 
+    //location -> DB insert
+    TimerViewModel timerViewModel;
+    RunViewModel runViewModel;
+    private GpsDao gpsDao;
+    private RunDao runDao;
+
     private final IBinder mBinder = new LocalBinder();
+
+    public GpsTrackerService() {
+        mContext = this;
+    }
 
     public class LocalBinder extends Binder {
         public GpsTrackerService getService() {
             return GpsTrackerService.this;
         }
-    }
-
-    public GpsTrackerService() {
-        mContext = this;
     }
 
     @Override
@@ -56,6 +70,8 @@ public class GpsTrackerService extends Service implements LocationListener {
         Log.d("HSR", "onCreate");
 //        getLocation();
 
+        //RunViewModel 초기화
+        runViewModel = new RunViewModel(this.getApplication());
     }
 
     public void startLocationUpdate() {
@@ -132,6 +148,20 @@ public class GpsTrackerService extends Service implements LocationListener {
             longitude = location.getLongitude();
             Log.d("GPS@@", "latitude" + latitude);
             Log.d("GPS@@", "longitude" + longitude);
+
+            //location -> insert
+            gpsDao = RunDatabase.INSTANCE.gpsDao();;
+//            runDao = RunDatabase.INSTANCE.runDao();
+
+            TB_Run tbRun = new TB_Run();
+//            TB_Run latest = runViewModel.getLatestActiveOne().get(tbRun.getRun_id());
+
+            TB_GPS tbGps = new TB_GPS();
+//            tbGps.setRun_id(1);
+            tbGps.setLat(latitude);
+            tbGps.setLon(longitude);
+            tbGps.setCreate_at("2023/11/06");
+            runViewModel.setInsertGps(tbGps);
         }
     }
 

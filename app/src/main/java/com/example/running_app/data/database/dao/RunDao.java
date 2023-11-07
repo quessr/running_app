@@ -24,7 +24,7 @@ public interface RunDao {
 
     //조회 쿼리
     @Query("SELECT * FROM TB_Run") //쿼리 : 데이터베이스에 요청하는 명령문
-    LiveData<List<TB_Run>> getRunAll();
+    List<TB_Run> getRunAll();
 
     /**
      * 현재 활성화된 달리기 레코드를 반환합니다.
@@ -32,7 +32,7 @@ public interface RunDao {
      *
      * @return : 활성화 달리기 정보 (달리기가 완료되지 않는 레코드)
      */
-    @Query("SELECT * FROM TB_Run WHERE is_active == 1 ORDER BY run_id DESC LIMIT 1") //쿼리 : 데이터베이스에 요청하는 명령문
-    List<TB_Run> getLatestActiveOne();
+//    @Query("SELECT * FROM TB_Run WHERE is_active == 1 ORDER BY run_id DESC LIMIT 1") //쿼리 : 데이터베이스에 요청하는 명령문
+//    List<TB_Run> getLatestActiveOne();
 
 }
