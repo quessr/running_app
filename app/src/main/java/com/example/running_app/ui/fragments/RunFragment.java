@@ -1,11 +1,13 @@
 package com.example.running_app.ui.fragments;
 
 import android.Manifest;
+import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -34,6 +36,8 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -51,6 +55,7 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
     private Marker runStartMapMarker;
 
     protected LocationManager locationManager;
+    Circle circle;
 
 
     @Override
@@ -59,18 +64,6 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
 
         locationManager = (LocationManager) MainActivity.mContext.getSystemService(Context.LOCATION_SERVICE);
 
-        // 권한 체크
-        if (ContextCompat.checkSelfPermission(MainActivity.mContext, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-
-            locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1, 1, this);
-
-
-
-        } else {
-            // 권한이 없다면 권한을 요청해야 합니다.
-            ActivityCompat.requestPermissions((Activity) MainActivity.mContext, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
-        }
     }
 
     @Nullable
@@ -90,24 +83,17 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
             Log.e("RunFragment", "mapFragment is null");
         }
 
-        if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.FOREGROUND_SERVICE) != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACTIVITY_RECOGNITION) != PackageManager.PERMISSION_GRANTED) {
         // 권한 체크
         if (ContextCompat.checkSelfPermission(MainActivity.mContext, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED
                 || ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_DENIED
                 || ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_DENIED
                 || ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACTIVITY_RECOGNITION) == PackageManager.PERMISSION_DENIED) {
             // 권한이 없는 경우 사용자에게 권한을 요청하는 다이얼로그 띄우기
-            ActivityCompat.requestPermissions(requireActivity(),
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_BACKGROUND_LOCATION, Manifest.permission.FOREGROUND_SERVICE, Manifest.permission.ACTIVITY_RECOGNITION},
-                    MY_PERMISSIONS_REQUEST_LOCATION);
-        } else {
-
             ActivityCompat.requestPermissions((Activity) MainActivity.mContext, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_BACKGROUND_LOCATION, Manifest.permission.ACTIVITY_RECOGNITION}, MY_PERMISSIONS_REQUEST_LOCATION);
         }
+
+        locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1, 1, this);
 
         return view;
     }
@@ -145,13 +131,40 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
         if (runStartMapMarker == null) {
             mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(lastKnownLocation, 15));
 
+//            runStartMapMarker = mGoogleMap.addMarker(new MarkerOptions()
+//                    .position(lastKnownLocation)
+//                    .title("마포")
+//                    .snippet("처음위치")
+//                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+
             runStartMapMarker = mGoogleMap.addMarker(new MarkerOptions()
                     .position(lastKnownLocation)
                     .title("마포")
                     .snippet("처음위치")
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
+
+            CircleOptions circleOptions = new CircleOptions()
+                    .center(lastKnownLocation)
+                    .radius(100)
+                    .strokeWidth(0)// 원의 반지름 설정 (미터 단위)
+                    .fillColor(Color.parseColor("#33FF0000")); // 내부 색상 설정
+            circle = mGoogleMap.addCircle(circleOptions);
+
+            // Circle 깜빡임 애니메이션 적용
+            ValueAnimator animator = new ValueAnimator();
+            animator.setRepeatCount(ValueAnimator.INFINITE);
+            animator.setRepeatMode(ValueAnimator.RESTART);
+            animator.setIntValues(0, 100);
+            animator.setDuration(2000); // 애니메이션 속도를 조절합니다.
+            animator.addUpdateListener(valueAnimator -> {
+                int value = (int) valueAnimator.getAnimatedValue();
+                circle.setRadius(value); // 원의 반지름을 변경하여 깜빡이는 효과를 줍니다.
+            });
+            animator.start();
+
         } else {
             runStartMapMarker.setPosition(lastKnownLocation);
+            circle.setCenter(lastKnownLocation);
             polylineMarkerUpdater.updatePolyline(location);
         }
 
@@ -173,19 +186,19 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
                     .position(lastKnownLocation)
                     .title("마포")
                     .snippet("처음위치")
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN)));
 
             // 지도 회전
             CameraPosition cameraPosition = new CameraPosition.Builder()
                     .target(lastKnownLocation)
                     .bearing(180)                  // 180도 회전
-                    .zoom(18)
+                    .zoom(15)
                     .build();
 
 
             mGoogleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
         } else {
-            initialMapMarker.setPosition(lastKnownLocation);
+//            initialMapMarker.setPosition(lastKnownLocation);
         }
 
     }
