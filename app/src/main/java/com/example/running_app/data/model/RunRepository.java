@@ -18,7 +18,9 @@ public class RunRepository {
     // TB_GPS getLastLocation;
     // List<TB_Run> getLatestActiveOne;
 
-    public RunRepository(Application application){
+
+    //생성자 부분 수정
+    public RunRepository(Application application) {
         db = RunDatabase.getInstance(application);
 //        getRunAll = runDatabase.runDao().getRunAll();
 //        getGpsAll = runDatabase.gpsDao().getGpsAll();
@@ -28,18 +30,19 @@ public class RunRepository {
 //        getLatestActiveOne = runDatabase.runDao().getLatestActiveOne();
     }
 
-   public List<TB_Run> getRunAll(){
+    public List<TB_Run> getRunAll() {
         return db.runDao().getRunAll();
     }
-    public List<TB_GPS> getGpsAll(){
+
+    public List<TB_GPS> getGpsAll() {
         return db.gpsDao().getGpsAll();
     }
 
-    public TB_GPS getFirstLocation(){
+    public TB_GPS getFirstLocation() {
         return db.gpsDao().getFirstLocation();
     }
 
-    public TB_GPS getLastLocation(){
+    public TB_GPS getLastLocation() {
         return db.gpsDao().getLastLocation();
     }
 

@@ -72,6 +72,11 @@ public class TimerViewModel extends ViewModel {
                 timer.scheduleAtFixedRate(timerTask, 0, 1000);
             }
         }, 3000);
+
+        //시작시 테이블 생성
+        TB_Run tbRun = new TB_Run();
+        runViewModel.setInsertRun(tbRun);
+
     }
 
     public void stopTimer() {
@@ -83,26 +88,26 @@ public class TimerViewModel extends ViewModel {
 
 //            runViewModel.insertRun(getTimeStringFromDouble(time));
 
-            //timer -> insert(데이터 삽입)
-            TB_Run tbRun = new TB_Run();    //객체 인스턴스 생성
-            tbRun.setWalk_count(mStepDetector);
-//            tbRun.setTimer(getTimeStringFromLong(time));
-            tbRun.setTimer(time);
-            tbRun.setCreate_at("2023/11/03");
-//            tbRun.setIs_active(1);
-            runViewModel.setInsertRun(tbRun);
-
-            runDao = RunDatabase.INSTANCE.runDao();
-
-//            TB_Run latest = runViewModel.getLatestActiveOne().get(tbRun.getRun_id());
+//            //timer -> insert(데이터 삽입)
+//            TB_Run tbRun = new TB_Run();    //객체 인스턴스 생성
+//            tbRun.setWalk_count(mStepDetector);
+////            tbRun.setTimer(getTimeStringFromLong(time));
+//            tbRun.setTimer(time);
+//            tbRun.setCreate_at("2023/11/03");
+////            tbRun.setIs_active(1);
+//            runViewModel.setInsertRun(tbRun);
 //
-//            //GPS 데이터 삽입
-//            TB_GPS tbGps = new TB_GPS();    //객체 인스턴스 생성
-//            tbGps.setRun_id(latest.getRun_id());
-//            tbGps.setLat(latitude);
-//            tbGps.setLon(longitude);
-//            tbGps.setCreate_at("2023/11/02");
-//            runViewModel.setInsertGps(tbGps);
+//            runDao = RunDatabase.INSTANCE.runDao();
+//
+////            TB_Run latest = runViewModel.getLatestActiveOne().get(tbRun.getRun_id());
+////
+////            //GPS 데이터 삽입
+////            TB_GPS tbGps = new TB_GPS();    //객체 인스턴스 생성
+////            tbGps.setRun_id(latest.getRun_id());
+////            tbGps.setLat(latitude);
+////            tbGps.setLon(longitude);
+////            tbGps.setCreate_at("2023/11/02");
+////            runViewModel.setInsertGps(tbGps);
 
 
             //stop 버튼 클릭시 바로 0.0 초로 리셋

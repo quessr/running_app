@@ -6,18 +6,18 @@ import androidx.room.ForeignKey;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
-//@Entity(indices = {@Index("run_id")},
-//        tableName = "TB_GPS",
-//        foreignKeys = @ForeignKey(entity = TB_Run.class,
-//                parentColumns = "run_id",
-//                childColumns = "run_id",
-//                onDelete = ForeignKey.CASCADE))
-@Entity(tableName = "TB_GPS")
+@Entity(indices = {@Index("run_id")},
+        tableName = "TB_GPS",
+        foreignKeys = @ForeignKey(entity = TB_Run.class,
+                parentColumns = "run_id",
+                childColumns = "run_id",
+                onDelete = ForeignKey.CASCADE))
+//@Entity(tableName = "TB_GPS")
 public class TB_GPS {
     @PrimaryKey(autoGenerate = true)
     private int gps_id;
-//    @ColumnInfo(name = "run_id")
-//    private int run_id;
+    @ColumnInfo(name = "run_id")
+    private int run_id;
     @ColumnInfo(name = "lat")
     private double lat;
     @ColumnInfo(name = "lon")
@@ -33,13 +33,13 @@ public class TB_GPS {
         this.gps_id = gps_id;
     }
 
-//    public int getRun_id() {
-//        return run_id;
-//    }
-//
-//    public void setRun_id(int run_id) {
-//        this.run_id = run_id;
-//    }
+    public int getRun_id() {
+        return run_id;
+    }
+
+    public void setRun_id(int run_id) {
+        this.run_id = run_id;
+    }
 
     public double getLat() {
         return lat;
