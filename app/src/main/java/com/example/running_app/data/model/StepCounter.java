@@ -36,12 +36,6 @@ public class StepCounter implements SensorEventListener {
 
         this.timerViewModel = timerViewModel;
 
-        // 활동 퍼미션 체크
-        if(ActivityCompat.checkSelfPermission(context, Manifest.permission.ACTIVITY_RECOGNITION) == PackageManager.PERMISSION_DENIED){
-
-            ActivityCompat.requestPermissions((Activity) context, new String[]{Manifest.permission.ACTIVITY_RECOGNITION}, 0);
-        }
-
         // 걸음 센서 연결
         // * 옵션
         // - TYPE_STEP_DETECTOR:  리턴 값이 무조건 1, 앱이 종료되면 다시 0부터 시작
