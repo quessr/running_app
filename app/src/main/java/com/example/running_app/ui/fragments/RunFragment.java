@@ -41,7 +41,7 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
     private int MY_PERMISSIONS_REQUEST_LOCATION = 1;
 
     private PolylineMarkerUpdater polylineMarkerUpdater;
-    private Marker currentLocationMarker;
+    private Marker initialMapMarker;
 
 
     @Override
@@ -150,19 +150,26 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
     @Override
     public void updateMap(Location location) {
         Log.d("HSR", "RunFragment : " + location);
-        if (location.getProvider().equals("gps")) {
-            polylineMarkerUpdater.updatePolyline(location);
-            polylineMarkerUpdater.updateMarker(location);
-        }
+//        if (location.getProvider().equals("gps")) {
+//            polylineMarkerUpdater.updatePolyline(location);
+//            polylineMarkerUpdater.updateMarker(location);
+//        }
 
         LatLng lastKnownLocation = new LatLng(location.getLatitude(), location.getLongitude());
-        mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(lastKnownLocation, 15));
 
-        mGoogleMap.addMarker(new MarkerOptions()
-                .position(lastKnownLocation)
-                .title("마포")
-                .snippet("처음위치")
-                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+        if (initialMapMarker == null) {
+            mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(lastKnownLocation, 15));
+
+            initialMapMarker = mGoogleMap.addMarker(new MarkerOptions()
+                    .position(lastKnownLocation)
+                    .title("마포")
+                    .snippet("처음위치")
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+        } else {
+            initialMapMarker.setPosition(lastKnownLocation);
+            polylineMarkerUpdater.updatePolyline(location);
+        }
+
     }
 
 
