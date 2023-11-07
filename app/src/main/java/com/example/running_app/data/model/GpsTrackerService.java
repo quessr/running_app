@@ -8,6 +8,7 @@ import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -24,10 +25,11 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 
 import com.example.running_app.R;
+import com.example.running_app.ui.MainActivity;
 
 public class GpsTrackerService extends Service implements LocationListener {
 
-    private final Context mContext;
+//    private final Context mContext;
     protected LocationManager locationManager;
     private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 1;
     private static final long MIN_TIME_BW_UPDATES = 1000 * 1 * 1;
@@ -47,7 +49,7 @@ public class GpsTrackerService extends Service implements LocationListener {
     }
 
     public GpsTrackerService() {
-        mContext = this;
+//        mContext = this;
     }
 
     @Override
@@ -65,7 +67,7 @@ public class GpsTrackerService extends Service implements LocationListener {
     @SuppressLint("ServiceCast")
     public Location getLocation() {
         try {
-            locationManager = (LocationManager) mContext.getSystemService(LOCATION_SERVICE);
+            locationManager = (LocationManager) MainActivity.mContext.getSystemService(LOCATION_SERVICE);
 
             boolean isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
             boolean isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
@@ -76,8 +78,8 @@ public class GpsTrackerService extends Service implements LocationListener {
             if (!isGPSEnabled && !isNetworkEnabled) {
 
             } else {
-                int hasFineLocationPermission = ContextCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_FINE_LOCATION);
-                int hasCoarseLocationPermission = ContextCompat.checkSelfPermission(mContext, Manifest.permission.ACCESS_COARSE_LOCATION);
+                int hasFineLocationPermission = ContextCompat.checkSelfPermission(MainActivity.mContext, Manifest.permission.ACCESS_FINE_LOCATION);
+                int hasCoarseLocationPermission = ContextCompat.checkSelfPermission(MainActivity.mContext, Manifest.permission.ACCESS_COARSE_LOCATION);
 
                 if (hasFineLocationPermission == PackageManager.PERMISSION_GRANTED && hasCoarseLocationPermission == PackageManager.PERMISSION_GRANTED) {
 
@@ -92,7 +94,7 @@ public class GpsTrackerService extends Service implements LocationListener {
                             longitude = location.getLongitude();
 
                         } else {
-                            Toast.makeText(mContext, "location 정보가 없습니다.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(MainActivity.mContext, "location 정보가 없습니다.", Toast.LENGTH_SHORT).show();
                         }
                     }
                 }
@@ -139,7 +141,7 @@ public class GpsTrackerService extends Service implements LocationListener {
     public void onLocationChanged(@NonNull Location location) {
         updateLocation(location);
 
-        Toast.makeText(mContext, "현재위치 "+location.getProvider()+" \n위도 " + location.getLatitude() + "\n경도 " + longitude, Toast.LENGTH_LONG).show();
+        Toast.makeText(MainActivity.mContext, "현재위치 "+location.getProvider()+" \n위도 " + location.getLatitude() + "\n경도 " + longitude, Toast.LENGTH_LONG).show();
         if (mListener != null) mListener.updateMap(location);
     }
 
@@ -214,7 +216,7 @@ public class GpsTrackerService extends Service implements LocationListener {
 
     @Override
     public boolean stopService(Intent name) {
-        Toast.makeText(mContext, "서비스가 중지 되었습니다.", Toast.LENGTH_SHORT).show();
+        Toast.makeText(MainActivity.mContext, "서비스가 중지 되었습니다.", Toast.LENGTH_SHORT).show();
 
         return super.stopService(name);
     }
