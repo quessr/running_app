@@ -25,7 +25,7 @@ public interface GpsDao {
 
     //조회 쿼리
     @Query("SELECT * FROM TB_GPS") //쿼리 : 데이터베이스에 요청하는 명령문
-    LiveData<List<TB_GPS>> getGpsAll();
+    List<TB_GPS> getGpsAll();
 
     //처음 좌표 데이터 조회
     @Query("SELECT * FROM TB_GPS WHERE gps_id = (SELECT MIN(gps_id) FROM TB_GPS)")

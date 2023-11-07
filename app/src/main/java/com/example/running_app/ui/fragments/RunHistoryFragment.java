@@ -66,6 +66,8 @@ public class RunHistoryFragment extends Fragment {
             }
         });
 
+
+
         TB_GPS f_tbGps = viewModel.getFirstLocation();
         TB_GPS l_tbGps = viewModel.getLastLocation();
 

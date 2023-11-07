@@ -11,7 +11,7 @@ public class TB_Run {
     @ColumnInfo(name = "walk_count")
     private int walk_count;
     @ColumnInfo(name = "timer")
-    private String timer;
+    private long timer;
     @ColumnInfo(name = "create_at")
     private String create_at;
 
@@ -44,11 +44,11 @@ public class TB_Run {
         this.walk_count = walk_count;
     }
 
-    public String getTimer() {
+    public long getTimer() {
         return timer;
     }
 
-    public void setTimer(String timer) {
+    public void setTimer(long timer) {
         this.timer = timer;
     }
 
