@@ -36,12 +36,6 @@ public class StepCounter implements SensorEventListener {
 
         this.timerViewModel = timerViewModel;
 
-        // 활동 퍼미션 체크
-        if(ActivityCompat.checkSelfPermission(context, Manifest.permission.ACTIVITY_RECOGNITION) == PackageManager.PERMISSION_DENIED){
-
-            ActivityCompat.requestPermissions((Activity) context, new String[]{Manifest.permission.ACTIVITY_RECOGNITION}, 0);
-        }
-
         // 걸음 센서 연결
         // * 옵션
         // - TYPE_STEP_DETECTOR:  리턴 값이 무조건 1, 앱이 종료되면 다시 0부터 시작
@@ -55,24 +49,6 @@ public class StepCounter implements SensorEventListener {
             Toast.makeText(context, "No Step Sensor", Toast.LENGTH_SHORT).show();
         }
     }
-
-
-//    public void saveStepCount(Context context) {
-//        SharedPreferences sharedPreferences = context.getSharedPreferences("StepCounter", Context.MODE_PRIVATE);
-//        SharedPreferences.Editor editor = sharedPreferences.edit();
-//        editor.putInt("stepCount", mStepDetector);
-//        editor.apply();
-//    }
-
-//    public int loadStepCount(Context context) {
-//        SharedPreferences sharedPreferences = context.getSharedPreferences("StepCounter", Context.MODE_PRIVATE);
-//
-//        int result = sharedPreferences.getInt("stepCount", 0);
-//        timerViewModel.setStepCount(result);
-////        return sharedPreferences.getInt("stepCount", 0);
-//        return result;
-//    }
-
 
     public void start() {
         if(stepCountSensor !=null) {
@@ -97,28 +73,11 @@ public class StepCounter implements SensorEventListener {
         sensorManager.unregisterListener(this, stepCountSensor);
         mStepDetector = 0;
         stepCountListener.onStepCountChanged(mStepDetector);
-//        saveStepCount(MainActivity.mContext);
     }
 
-//    public int getStepCount() {
-//        return mStepDetector;
-//    }
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-//        if (event.sensor.getType() == Sensor.TYPE_STEP_COUNTER) {
-//            mStepDetector = (int) event.values[0];
-//
-//        } else if (event.sensor.getType() == Sensor.TYPE_STEP_DETECTOR) {
-//            if(event.values[0] == 1.0f) {
-//                mStepDetector += event.values[0];
-//
-//            }
-//        }
-//
-//        if (stepCountListener != null) {
-//            stepCountListener.onStepCountChanged(mStepDetector);
-//        }
 
         // 걸음 센서 이벤트 발생시
         if(event.sensor.getType() == Sensor.TYPE_STEP_DETECTOR){
@@ -126,7 +85,6 @@ public class StepCounter implements SensorEventListener {
             if(event.values[0]==1.0f){
                 // 센서 이벤트가 발생할때 마다 걸음수 증가
                 mStepDetector++;
-//                stepCountView.setText(String.valueOf(mStepDetector));
                 stepCountListener.onStepCountChanged(mStepDetector);
             }
 
