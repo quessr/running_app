@@ -2,8 +2,11 @@ package com.example.running_app.ui.fragments;
 
 import android.Manifest;
 import android.animation.ValueAnimator;
+import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -11,14 +14,19 @@ import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
@@ -54,6 +62,7 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
     private Marker runStartMapMarker;
 
     protected LocationManager locationManager;
+
     Circle circle;
 
 
@@ -65,6 +74,7 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
 
     }
 
+    @SuppressLint("MissingPermission")
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -83,19 +93,51 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
         }
 
         // 권한 체크
-        if (ContextCompat.checkSelfPermission(MainActivity.mContext, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED
-                || ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_DENIED
-                || ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_DENIED
-                || ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACTIVITY_RECOGNITION) == PackageManager.PERMISSION_DENIED) {
-            // 권한이 없는 경우 사용자에게 권한을 요청하는 다이얼로그 띄우기
-            ActivityCompat.requestPermissions((Activity) MainActivity.mContext, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_BACKGROUND_LOCATION, Manifest.permission.ACTIVITY_RECOGNITION}, MY_PERMISSIONS_REQUEST_LOCATION);
-        }
+//        if (ContextCompat.checkSelfPermission(MainActivity.mContext, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED
+//                || ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_DENIED
+//                || ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_DENIED
+//                || ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACTIVITY_RECOGNITION) == PackageManager.PERMISSION_DENIED) {
+//            // 권한이 없는 경우 사용자에게 권한을 요청하는 다이얼로그 띄우기
+//            ActivityCompat.requestPermissions((Activity) MainActivity.mContext, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_BACKGROUND_LOCATION, Manifest.permission.ACTIVITY_RECOGNITION}, MY_PERMISSIONS_REQUEST_LOCATION);
+//        }
+
+        requestPermission();
+
 
         locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
         locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1, 1, this);
 
         return view;
     }
+
+    private void backgroundPermission() {
+        ActivityCompat.requestPermissions(
+                requireActivity(),
+                new String[]{android.Manifest.permission.ACCESS_BACKGROUND_LOCATION},
+                2
+        );
+    }
+
+    private void permissionDialog(Context context) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle("백그라운드 위치 권한을 위해 항상 허용으로 설정해주세요.");
+
+        DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                if (i == DialogInterface.BUTTON_POSITIVE) {
+                    backgroundPermission();
+                }
+            }
+        };
+
+        builder.setPositiveButton("네", listener);
+        builder.setNegativeButton("아니오", null);
+
+        builder.show();
+    }
+
+
 
 
     @Override
@@ -115,6 +157,46 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
             googleMap.setMyLocationEnabled(true);
         }
     }
+
+    private void requestPermission() {
+        // 이미 권한이 있으면 그냥 리턴
+        if (hasLocationPermissions(requireContext())) {
+            return;
+        } else {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                ActivityCompat.requestPermissions(
+                        requireActivity(),
+                        new String[]{
+                                android.Manifest.permission.ACCESS_COARSE_LOCATION,
+                                android.Manifest.permission.ACCESS_FINE_LOCATION,
+                                android.Manifest.permission.ACTIVITY_RECOGNITION
+                        },
+                        1
+                );
+                permissionDialog(requireContext());
+            } else {
+                ActivityCompat.requestPermissions(
+                        requireActivity(),
+                        new String[]{
+                                android.Manifest.permission.ACCESS_COARSE_LOCATION,
+                                android.Manifest.permission.ACCESS_FINE_LOCATION,
+                                android.Manifest.permission.ACTIVITY_RECOGNITION
+                        },
+                        1
+                );
+            }
+        }
+    }
+
+
+        public static boolean hasLocationPermissions(Context context) {
+            int fineLocationPermission = ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
+            int coarseLocationPermission = ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION);
+            int backgroundLocationPermission = ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_BACKGROUND_LOCATION);
+            int recognitionPermission = ActivityCompat.checkSelfPermission(context, Manifest.permission.ACTIVITY_RECOGNITION);
+
+            return fineLocationPermission == PackageManager.PERMISSION_GRANTED && coarseLocationPermission == PackageManager.PERMISSION_GRANTED && backgroundLocationPermission == PackageManager.PERMISSION_GRANTED && recognitionPermission == PackageManager.PERMISSION_GRANTED;
+        }
 
 
     @Override
