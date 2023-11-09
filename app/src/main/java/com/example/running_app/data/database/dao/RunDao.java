@@ -26,13 +26,8 @@ public interface RunDao {
     @Query("SELECT * FROM TB_Run") //쿼리 : 데이터베이스에 요청하는 명령문
     List<TB_Run> getRunAll();
 
-    /**
-     * 현재 활성화된 달리기 레코드를 반환합니다.
-     * run_id를 이용하여 TB_GPS 테이블에 달리기 정보를 채워주세요.
-     *
-     * @return : 활성화 달리기 정보 (달리기가 완료되지 않는 레코드)
-     */
-//    @Query("SELECT * FROM TB_Run WHERE is_active == 1 ORDER BY run_id DESC LIMIT 1") //쿼리 : 데이터베이스에 요청하는 명령문
-//    List<TB_Run> getLatestActiveOne();
+    //run_id 한개를 뽑아 내기 위한 조회 쿼리 -> Gps 테이블에 run_id 사용하기 위함
+    @Query("SELECT run_id FROM TB_Run ORDER BY run_id DESC LIMIT 1")
+    int getLatestRunId();
 
 }

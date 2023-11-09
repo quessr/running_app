@@ -35,6 +35,10 @@ public interface GpsDao {
     @Query("SELECT * FROM TB_GPS WHERE gps_id = (SELECT MAX(gps_id) FROM TB_GPS)")
     TB_GPS getLastLocation();
 
-//    @Query("SELECT * FROM TB_GPS WHERE run_id = :run_id") //쿼리 : 데이터베이스에 요청하는 명령문
-//    List<TB_GPS> getGpsAllByRunId(int run_id);
+
+//    @Query("SELECT * FROM TB_GPS INNER JOIN TB_Run ON TB_GPS.run_id = TB_RUN.run_id")
+//    List<TB_GPS> getLatestRunId();
+
+    @Query("SELECT * FROM TB_GPS WHERE run_id = :run_id") //쿼리 : 데이터베이스에 요청하는 명령문
+    List<TB_GPS> getGpsAllByRunId(int run_id);
 }
