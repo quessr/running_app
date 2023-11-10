@@ -48,5 +48,8 @@ public interface GpsDao {
     @Query("SELECT * FROM TB_GPS INNER JOIN TB_Run ON TB_GPS.run_id = TB_Run.run_id WHERE TB_GPS.run_id = :runId ORDER BY TB_GPS.gps_id DESC LIMIT 1")
     TB_GPS getMaxGpsIdByRunId(int runId);
 
+    //전체 좌표 조회
+    @Query("SELECT * FROM TB_GPS WHERE TB_GPS.run_id = :runId")
+    List<TB_GPS> getAllGpsByRunId(int runId);
 
 }

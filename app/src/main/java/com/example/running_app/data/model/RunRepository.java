@@ -40,6 +40,9 @@ public class RunRepository {
     public TB_GPS getMaxGpsIdByRunId(int runId){
         return  db.gpsDao().getMaxGpsIdByRunId(runId);
     }
+    public List<TB_GPS> getAllGpsByRunId(int runId){
+        return db.gpsDao().getAllGpsByRunId(runId);
+    }
 
     //insert 문
     public void setInsertRun(TB_Run tbRun) {

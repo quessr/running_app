@@ -3,6 +3,7 @@ package com.example.running_app.ui;
 import static java.lang.String.format;
 
 import android.annotation.SuppressLint;
+import android.app.Application;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,18 +17,43 @@ import com.example.running_app.R;
 import com.example.running_app.data.database.dao.RunDatabase;
 import com.example.running_app.data.database.dao.TB_GPS;
 import com.example.running_app.data.database.dao.TB_Run;
+import com.example.running_app.data.model.RunRepository;
+import com.example.running_app.ui.viewmodels.RunViewModel;
+import com.example.running_app.ui.viewmodels.TimerViewModel;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 public class RunningAdapter extends RecyclerView.Adapter<RunningAdapter.ViewHolder> {
+
+
     private List<TB_Run> runItems = new ArrayList<>();
-    private List<TB_GPS> gpsItems;
+    private List<TB_GPS> gpsItems = new ArrayList<>();
     private Context context;
     private RunDatabase runDatabase;
 
-    public RunningAdapter(Context context){
-        this.context = context;
+
+    private static final int VIEW_TYPE_RUN = 0;
+    private static final int VIEW_TYPE_GPS = 1;
+    private RunViewModel viewModel;
+    private RunRepository repository;
+    // private int activeRunId;
+
+    public RunningAdapter(Application application){
+        super();
+        viewModel = new RunViewModel(application);
+        repository = new RunRepository(application);
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        // 위치에 따라 어떤 종류의 뷰홀더를 보여줄 지 결정
+        if (position < runItems.size()) {
+            return VIEW_TYPE_RUN;
+        } else {
+            return VIEW_TYPE_GPS;
+        }
     }
 
     @NonNull
@@ -71,14 +97,27 @@ public class RunningAdapter extends RecyclerView.Adapter<RunningAdapter.ViewHold
             long timeValue = data.getTimer();
             timeFormat(timeValue);
 
+            // activeRunId = repository.getLatestRunId();
+            int runId = data.getRun_id();
+            List<TB_GPS> allGps = viewModel.getAllGpsByRunId(runId);
+            double tDistance = totalDistance(allGps);
+//            // DecimalFormat을 사용하여 소수점 이하 세 자리까지 반올림
+//            DecimalFormat df = new DecimalFormat("#.###");
+//            String formatDistance = df.format(tDistance);
+
             t_date.setText(data.getCreate_at());
-            t_distance.setText("15km");
+            t_distance.setText(distanceFormat(tDistance) + " Km");
 //            t_runTime.setText(String.valueOf(data.getTimer()));
             t_runTime.setText(timeFormat(timeValue));
 //            t_runTime.setText(format(String.valueOf(data.getTimer())));
 //            t_runTime.setText((int) data.getTimer());
             t_speed.setText("5km");
             t_walkCount.setText(String.valueOf(data.getWalk_count()));
+        }
+
+        private String distanceFormat(double tDistance) {
+            DecimalFormat df = new DecimalFormat("#.##");
+            return df.format(tDistance);
         }
 
         @SuppressLint("DefaultLocale")
@@ -90,5 +129,45 @@ public class RunningAdapter extends RecyclerView.Adapter<RunningAdapter.ViewHold
 
             return String.format("%02d:%02d:%02d", hours, minutes, seconds);
         }
+    }
+
+    private double totalDistance(List<TB_GPS> allGps) {
+        double totalDistance = 0;
+        TB_GPS prevGps = null;
+
+        for (TB_GPS currentGps : allGps) {
+            if (prevGps != null){
+                // 이전 GPS와 현재 GPS 사이의 거리 계산하여 누적
+                double segmentDistance = haversine(prevGps.getLat(), prevGps.getLon(), currentGps.getLat(), currentGps.getLon());
+                totalDistance += segmentDistance;
+            }
+            prevGps = currentGps;   // 현재 GPS를 이전 GPS로 설정하여 다음 순회에 사용
+        }
+
+        return totalDistance;
+    }
+
+    private double haversine(double lat1, double lon1, double lat2, double lon2) {
+        // 지구의 반경 (단위: km)
+        final double R = 6371.0;
+
+        // 라디안으로 변환
+        lat1 = Math.toRadians(lat1);
+        lon1 = Math.toRadians(lon1);
+        lat2 = Math.toRadians(lat2);
+        lon2 = Math.toRadians(lon2);
+
+        // 위도와 경도의 차이 계산
+        double dLat = lat2 - lat1;
+        double dLon = lon2 - lon1;
+
+        // Haversine 공식 적용
+        double a = Math.pow(Math.sin(dLat / 2), 2) + Math.cos(lat1) * Math.cos(lat2) * Math.pow(Math.sin(dLon / 2), 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+        // 거리 계산
+        double distance = R * c;
+
+        return distance;
     }
 }

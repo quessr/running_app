@@ -52,7 +52,9 @@ public class RunViewModel extends AndroidViewModel {
     public TB_GPS getMaxGpsIdByRunId(int runId){
         return runRepository.getMaxGpsIdByRunId(runId);
     }
-
+    public List<TB_GPS> getAllGpsByRunId(int runId){
+        return runRepository.getAllGpsByRunId(runId);
+    }
     //insert 함수
     public void setInsertRun(TB_Run tbRun) {
         runRepository.setInsertRun(tbRun);
