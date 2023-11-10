@@ -128,18 +128,4 @@ public class TimerViewModel extends AndroidViewModel {
         return timeFormat.format(date);
     }
 
-
-//    private String getTimeStringFromLong(long time) {
-//        int resultInt = (int) Math.round(time);
-//        int hours = resultInt / 3600;
-//        int minutes = (resultInt % 3600) / 60;
-//        int seconds = resultInt % 60;
-//
-//        return makeTimeString(hours, minutes, seconds);
-//    }
-//
-//    @SuppressLint("DefaultLocale")
-//    private String makeTimeString(int hours, int minutes, int seconds) {
-//        return String.format("%02d:%02d:%02d", hours, minutes, seconds);
-//    }
 }

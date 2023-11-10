@@ -2,8 +2,6 @@ package com.example.running_app.data.model;
 
 import android.app.Application;
 
-import androidx.lifecycle.LiveData;
-
 import com.example.running_app.data.database.dao.RunDatabase;
 import com.example.running_app.data.database.dao.TB_GPS;
 import com.example.running_app.data.database.dao.TB_Run;
@@ -34,9 +32,14 @@ public class RunRepository {
     public int getLatestRunId() {
         return db.runDao().getLatestRunId();
     }   //Run테이블에서 run_id값 가져오기 위함
-    public List<TB_GPS> getGpsAllByRunId(int runId) {
-        return  db.gpsDao().getGpsAllByRunId(runId);
-    }   //해당 run_id 값에 대해서 gps_id 전체 가져오기 위함
+
+    public TB_GPS getMinGpsIdByRunId(int runId) {
+        return db.gpsDao().getMinGpsIdByRunId(runId);
+    }   //해당 run_id 값에 대해서 gps_id 최대 최소 가져오기 위함
+
+    public TB_GPS getMaxGpsIdByRunId(int runId){
+        return  db.gpsDao().getMaxGpsIdByRunId(runId);
+    }
 
     //insert 문
     public void setInsertRun(TB_Run tbRun) {

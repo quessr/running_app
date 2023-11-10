@@ -26,6 +26,7 @@ import com.example.running_app.data.database.dao.RunDao;
 import com.example.running_app.data.database.dao.RunDatabase;
 import com.example.running_app.data.database.dao.TB_GPS;
 import com.example.running_app.data.database.dao.TB_Run;
+import com.example.running_app.data.model.RunRepository;
 import com.example.running_app.ui.RunningAdapter;
 import com.example.running_app.ui.viewmodels.RunViewModel;
 
@@ -43,13 +44,16 @@ public class RunHistoryFragment extends Fragment {
     RunViewModel viewModel;
     RecyclerView recyclerView;
     RunningAdapter runningAdapter;
+    RunRepository repository;
+
+    private int activeRunId;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_run_history, container, false);
-
+        Log.d("onCreateView", "onCreateView 화면");
         findID(view);
 
         runningAdapter = new RunningAdapter(requireContext());
@@ -67,23 +71,39 @@ public class RunHistoryFragment extends Fragment {
         });
 
 
+        repository = new RunRepository(requireActivity().getApplication());
+        activeRunId = repository.getLatestRunId();
 
-        TB_GPS f_tbGps = viewModel.getFirstLocation();
-        TB_GPS l_tbGps = viewModel.getLastLocation();
 
-        if (f_tbGps != null){
-            double firstLat = f_tbGps.getLat();
-            double firstLon = f_tbGps.getLon();
+        TB_GPS minGps = viewModel.getMinGpsIdByRunId(activeRunId);
+        TB_GPS maxGps = viewModel.getMaxGpsIdByRunId(activeRunId);
 
-            Log.d("처음 좌표: ", firstLat + " | " + firstLon);
-        }
+        double firstLat = minGps.getLat();
+        double firstLon = minGps.getLon();
 
-        if (l_tbGps != null){
-            double lastLat = l_tbGps.getLat();
-            double lastLon = l_tbGps.getLon();
+        double lastLat = maxGps.getLat();
+        double lastLon = maxGps.getLon();
 
-            Log.d("마지막 좌표: ", lastLat + " | " + lastLon);
-        }
+        Log.d("onCreateView", "처음좌표 : " + firstLat + " | " + firstLon);
+        Log.d("onCreateView", "마지막좌표 : " + lastLat + " | " + lastLon);
+
+
+        double theta = firstLon - lastLon;
+        double dist = Math.sin(deg2rad(firstLat))* Math.sin(deg2rad(lastLat)) + Math.cos(deg2rad(firstLat))*Math.cos(deg2rad(lastLat))*Math.cos(deg2rad(theta));
+        dist = Math.acos(dist);
+        dist = rad2deg(dist);
+        dist = dist * 60 * 1.1515 * 1.609344;   //단위 : km
+
+        Log.d("onCreateView", "두 좌표 사이 거리 : " + dist);
+
+
+//        double dLat = Math.toRadians(lastLat - firstLat);
+//        double dLon = Math.toRadians(lastLon - firstLon);
+//        double dist = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(Math.toRadians(firstLat)) * Math.cos(Math.toRadians(lastLat)) * Math.sin(dLon/2) * Math.sin(dLon/2);
+//        double dist = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+//        double dist = EARTH_RADIUS * c * 1000;    // Distance in m
+
+
 
 
 //        RunDatabase database = Room.databaseBuilder(requireContext(), RunDatabase.class, "running_db")
@@ -94,7 +114,6 @@ public class RunHistoryFragment extends Fragment {
 
 //        runDao = RunDatabase.runDao(); //인터페이스 사용 준비 완료(객체 할당)
 //        gpsDao = database.gpsDao();
-
 
 
 //        //데이터 삽입
@@ -125,8 +144,6 @@ public class RunHistoryFragment extends Fragment {
 //        tbGps.setLon((long) 126.926735502823);
 //        tbGps.setCreate_at("2023/10/30");
 //        viewModel.setInsertGps(tbGps);
-
-
 
 
 //        //데이터 조회
@@ -161,6 +178,14 @@ public class RunHistoryFragment extends Fragment {
 
 
         return view;
+    }
+
+    private double deg2rad(double deg) {
+        return (deg * Math.PI/180.0);
+    }
+
+    private double rad2deg(double rad) {
+        return (rad * 180 / Math.PI);
     }
 
     private void findID(View view) {

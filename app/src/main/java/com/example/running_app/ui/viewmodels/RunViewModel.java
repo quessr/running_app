@@ -1,14 +1,11 @@
 package com.example.running_app.ui.viewmodels;
 
 import android.app.Application;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
-import com.example.running_app.data.database.dao.RunDao;
 import com.example.running_app.data.database.dao.TB_GPS;
 import com.example.running_app.data.database.dao.TB_Run;
 import com.example.running_app.data.model.RunRepository;
@@ -21,7 +18,6 @@ public class RunViewModel extends AndroidViewModel {
     MutableLiveData<List<TB_GPS>> gpsList = new MutableLiveData<>();;
     TB_GPS getFirstLocation;
     TB_GPS getLastLocation;
-
     public RunViewModel(@NonNull Application application){
         super(application);
         runRepository = new RunRepository(application);
@@ -48,10 +44,14 @@ public class RunViewModel extends AndroidViewModel {
     public TB_GPS getLastLocation(){
         return getLastLocation;
     }
-    public List<TB_GPS> getGpsAllByRunId(int runId) {
-        return runRepository.getGpsAllByRunId(runId);
+
+    public TB_GPS getMinGpsIdByRunId(int runId) {
+        return runRepository.getMinGpsIdByRunId(runId);
     }
 
+    public TB_GPS getMaxGpsIdByRunId(int runId){
+        return runRepository.getMaxGpsIdByRunId(runId);
+    }
 
     //insert 함수
     public void setInsertRun(TB_Run tbRun) {

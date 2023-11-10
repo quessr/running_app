@@ -22,8 +22,8 @@ public class TB_GPS {
     private double lat;
     @ColumnInfo(name = "lon")
     private double lon;
-    @ColumnInfo(name = "create_at")
-    private String create_at;
+//    @ColumnInfo(name = "create_at")
+//    private String create_at;
 
     public int getGps_id() {
         return gps_id;
@@ -57,11 +57,11 @@ public class TB_GPS {
         this.lon = lon;
     }
 
-    public String getCreate_at() {
-        return create_at;
-    }
-
-    public void setCreate_at(String create_at) {
-        this.create_at = create_at;
-    }
+//    public String getCreate_at() {
+//        return create_at;
+//    }
+//
+//    public void setCreate_at(String create_at) {
+//        this.create_at = create_at;
+//    }
 }
