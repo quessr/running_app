@@ -3,12 +3,10 @@ package com.example.running_app.ui.fragments;
 import android.Manifest;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
@@ -17,8 +15,6 @@ import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -26,18 +22,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.running_app.R;
 import com.example.running_app.data.model.GpsTrackerService;
+import com.example.running_app.data.model.PermissionManager;
 import com.example.running_app.data.model.PolylineMarkerUpdater;
 import com.example.running_app.databinding.FragmentRunBinding;
 import com.example.running_app.ui.MainActivity;
@@ -70,14 +65,45 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
 
     Circle circle;
     private AlertDialog permissionDeniedDialog;
+    //    PermissionManager permissionManager = new PermissionManager();
+    PermissionManager permissionManager;
+    public ActivityResultLauncher<String[]> requestPermissionLauncher;
 
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        permissionManager = new PermissionManager();
+        permissionManager.requestPermission(getContext(), this);
+
+
         Log.d("HSR", "onCreate()");
         locationManager = (LocationManager) MainActivity.mContext.getSystemService(Context.LOCATION_SERVICE);
+
+        requestPermissionLauncher = registerForActivityResult(
+                new ActivityResultContracts.RequestMultiplePermissions(), new ActivityResultCallback<Map<String, Boolean>>() {
+                    @Override
+                    public void onActivityResult(Map<String, Boolean> result) {
+                        for (Map.Entry<String, Boolean> entry : result.entrySet()) {
+                            String permission = entry.getKey();
+                            boolean isGranted = entry.getValue();
+
+                            if (isGranted) {
+                                // 권한이 허용된 경우 처리할 코드
+                                // ...
+                                Toast.makeText(getContext(), permission + " 권한이 허용되었습니다.", Toast.LENGTH_SHORT).show();
+                            } else {
+                                // 권한이 거부된 경우 처리할 코드
+                                // ...
+                                Toast.makeText(getContext(), permission + " 권한이 거부되었습니다.", Toast.LENGTH_SHORT).show();
+                                Log.d("HHH", "onActivityResult fail");
+                                permissionManager.showPermissionDeniedNotification(getActivity());
+
+                            }
+                        }
+                    }
+                });
 
 
     }
@@ -93,6 +119,7 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
 
         try {
             Log.e("HSR", "onCreateView try");
+
 
             // 구글 맵 띄우기
             mapFragment = new SupportMapFragment();
@@ -114,11 +141,13 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
 //            ActivityCompat.requestPermissions((Activity) MainActivity.mContext, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_BACKGROUND_LOCATION, Manifest.permission.ACTIVITY_RECOGNITION}, MY_PERMISSIONS_REQUEST_LOCATION);
 //        }
 
-            requestPermission();
+//            permissionManager.requestPermission(getContext(), permissionManager);
 
 
             locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
             locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1, 1, this);
+
+
         } catch (Exception e) {
             Log.d("HHH", e.toString());
         }
@@ -132,7 +161,7 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-
+        permissionManager.requestPermission(requireContext(), this);
     }
 
     @SuppressLint("MissingPermission")
@@ -141,7 +170,7 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
         super.onStart();
         Log.d("HSR", "onStart()");
 
-        if (hasLocationPermissions(requireContext())) {
+        if (permissionManager.hasLocationPermissions(requireContext())) {
             // 위치 권한이 허용된 경우 처리할 코드
             // ...
             Log.d("HSR", "onStart() hasLocationPermissions");
@@ -154,10 +183,10 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
             locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
             locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1, 1, this);
 
-            if(permissionDeniedDialog != null && permissionDeniedDialog.isShowing()) {
+            if (permissionDeniedDialog != null && permissionDeniedDialog.isShowing()) {
                 permissionDeniedDialog.dismiss();
                 permissionDeniedDialog.cancel();
-                Log.d("HSR", "onStart() permissionDeniedDialog.dismiss()" );
+                Log.d("HSR", "onStart() permissionDeniedDialog.dismiss()");
 
 
             }
@@ -220,103 +249,95 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
         }
     }
 
-    private void requestPermission() {
-        // 이미 권한이 있으면 그냥 리턴
-        if (hasLocationPermissions(requireContext())) {
-            return;
-        } else {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                requestPermissions.launch(new String[]{
-                        android.Manifest.permission.ACCESS_COARSE_LOCATION,
-                        android.Manifest.permission.ACCESS_FINE_LOCATION,
-                        android.Manifest.permission.ACTIVITY_RECOGNITION
-                });
-
-//                permissionDialog(requireContext());
-            } else {
-                requestPermissions.launch(new String[]{
-                        android.Manifest.permission.ACCESS_COARSE_LOCATION,
-                        android.Manifest.permission.ACCESS_FINE_LOCATION,
-                        android.Manifest.permission.ACTIVITY_RECOGNITION
-                });
-            }
-        }
-
-    }
-
-
-    private ActivityResultLauncher<String[]> requestPermissions = registerForActivityResult(
-            new ActivityResultContracts.RequestMultiplePermissions(), new ActivityResultCallback<Map<String, Boolean>>() {
-                @Override
-                public void onActivityResult(Map<String, Boolean> result) {
-                    for (Map.Entry<String, Boolean> entry : result.entrySet()) {
-                        String permission = entry.getKey();
-                        boolean isGranted = entry.getValue();
-
-                        if (isGranted) {
-                            // 권한이 허용된 경우 처리할 코드
-                            // ...
-                            Toast.makeText(getContext(), permission + " 권한이 허용되었습니다.", Toast.LENGTH_SHORT).show();
-                        } else {
-                            // 권한이 거부된 경우 처리할 코드
-                            // ...
-                            Toast.makeText(getContext(), permission + " 권한이 거부되었습니다.", Toast.LENGTH_SHORT).show();
-                            Log.d("HHH", "onActivityResult fail");
-                            showPermissionDeniedNotification();
-
-                        }
-                    }
-                }
-            });
+//    private void requestPermission(Context context) {
+//        // 이미 권한이 있으면 그냥 리턴
+//        if (hasLocationPermissions(requireContext())) {
+//            return;
+//        } else {
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+//                requestPermissions.launch(new String[]{
+//                        android.Manifest.permission.ACCESS_COARSE_LOCATION,
+//                        android.Manifest.permission.ACCESS_FINE_LOCATION,
+//                        android.Manifest.permission.ACTIVITY_RECOGNITION
+//                });
+//
+////                permissionDialog(requireContext());
+//            } else {
+//                requestPermissions.launch(new String[]{
+//                        android.Manifest.permission.ACCESS_COARSE_LOCATION,
+//                        android.Manifest.permission.ACCESS_FINE_LOCATION,
+//                        android.Manifest.permission.ACTIVITY_RECOGNITION
+//                });
+//            }
+//        }
+//
+//    }
 
 
-
-    private void showPermissionDeniedNotification() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-        builder.setTitle("위치 권한 거부")
-                .setMessage("앱을 사용하기 위해서는 위치 권한이 필요합니다. 위치 권한을 허용해주세요.")
-                .setPositiveButton("설정으로 이동", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        // 설정 화면으로 이동
-                        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                        Uri uri = Uri.fromParts("package", requireContext().getPackageName(), null);
-                        intent.setData(uri);
-                        startActivity(intent);
-                    }
-                })
-                .setNegativeButton("종료", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-//                        requireActivity().finish();
-                        permissionDeniedDialog.dismiss();
-                    }
-                })
-                .setCancelable(false);
-
-
-        permissionDeniedDialog = builder.create();
-
-        permissionDeniedDialog.show();
-    }
+//    public ActivityResultLauncher<String[]> requestPermissions = registerForActivityResult(
+//            new ActivityResultContracts.RequestMultiplePermissions(), new ActivityResultCallback<Map<String, Boolean>>() {
+//                @Override
+//                public void onActivityResult(Map<String, Boolean> result) {
+//                    for (Map.Entry<String, Boolean> entry : result.entrySet()) {
+//                        String permission = entry.getKey();
+//                        boolean isGranted = entry.getValue();
+//
+//                        if (isGranted) {
+//                            // 권한이 허용된 경우 처리할 코드
+//                            // ...
+//                            Toast.makeText(getContext(), permission + " 권한이 허용되었습니다.", Toast.LENGTH_SHORT).show();
+//                        } else {
+//                            // 권한이 거부된 경우 처리할 코드
+//                            // ...
+//                            Toast.makeText(getContext(), permission + " 권한이 거부되었습니다.", Toast.LENGTH_SHORT).show();
+//                            Log.d("HHH", "onActivityResult fail");
+//                            permissionManager.showPermissionDeniedNotification(getActivity());
+//
+//                        }
+//                    }
+//                }
+//            });
 
 
-    public static boolean hasLocationPermissions(Context context) {
-        int fineLocationPermission = ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
-        int coarseLocationPermission = ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION);
-        int backgroundLocationPermission = ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_BACKGROUND_LOCATION);
-        int recognitionPermission = ActivityCompat.checkSelfPermission(context, Manifest.permission.ACTIVITY_RECOGNITION);
+//    private void showPermissionDeniedNotification() {
+//        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+//        builder.setTitle("위치 권한 거부")
+//                .setMessage("앱을 사용하기 위해서는 위치 권한이 필요합니다. 위치 권한을 허용해주세요.")
+//                .setPositiveButton("설정으로 이동", new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        // 설정 화면으로 이동
+//                        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+//                        Uri uri = Uri.fromParts("package", requireContext().getPackageName(), null);
+//                        intent.setData(uri);
+//                        startActivity(intent);
+//                    }
+//                })
+//                .setNegativeButton("종료", new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+////                        requireActivity().finish();
+//                        permissionDeniedDialog.dismiss();
+//                    }
+//                })
+//                .setCancelable(false);
+//
+//
+//        permissionDeniedDialog = builder.create();
+//
+//        permissionDeniedDialog.show();
+//    }
 
-        return fineLocationPermission == PackageManager.PERMISSION_GRANTED && coarseLocationPermission == PackageManager.PERMISSION_GRANTED && backgroundLocationPermission == PackageManager.PERMISSION_GRANTED && recognitionPermission == PackageManager.PERMISSION_GRANTED;
-    }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        Log.d("HSR", "onResume() permissionDeniedDialog" + permissionDeniedDialog);
+//    public static boolean hasLocationPermissions(Context context) {
+//        int fineLocationPermission = ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
+//        int coarseLocationPermission = ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION);
+//        int backgroundLocationPermission = ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_BACKGROUND_LOCATION);
+//        int recognitionPermission = ActivityCompat.checkSelfPermission(context, Manifest.permission.ACTIVITY_RECOGNITION);
+//
+//        return fineLocationPermission == PackageManager.PERMISSION_GRANTED && coarseLocationPermission == PackageManager.PERMISSION_GRANTED && backgroundLocationPermission == PackageManager.PERMISSION_GRANTED && recognitionPermission == PackageManager.PERMISSION_GRANTED;
+//    }
 
-
-    }
 
     @Override
     public void updateMap(Location location) {
