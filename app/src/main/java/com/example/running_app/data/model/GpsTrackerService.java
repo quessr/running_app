@@ -6,9 +6,7 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -63,15 +61,10 @@ public class GpsTrackerService extends Service implements LocationListener {
         }
     }
 
-//    public GpsTrackerService() {
-////        mContext = this;
-//    }
-
     @Override
     public void onCreate() {
         super.onCreate();
         Log.d("HSR", "onCreate");
-//        getLocation();
 
         //RunViewModel 초기화
         runViewModel = new RunViewModel(this.getApplication());
@@ -112,6 +105,7 @@ public class GpsTrackerService extends Service implements LocationListener {
 
                         } else {
                             Toast.makeText(MainActivity.mContext, "location 정보가 없습니다.", Toast.LENGTH_SHORT).show();
+                            // 네트워크 기반 위치 정보 비활성화 상태에서의 예외 처리
                         }
                     }
                 }

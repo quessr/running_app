@@ -1,20 +1,29 @@
 package com.example.running_app.ui;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 
+import android.Manifest;
+import android.app.AlertDialog;
 import android.app.NotificationManager;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.pm.PackageManager;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 
@@ -35,16 +44,10 @@ public class MainActivity extends AppCompatActivity {
     FragmentManager fragmentManager = getSupportFragmentManager();
     FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
     RunFragment runFragment = new RunFragment();
-    RunHistoryFragment runHistoryFragment = new RunHistoryFragment();
     public GpsTrackerService gpsTracker;
 
-    private static final int NOTIFICATION_ID = 0;
-    private NotificationManager notificationManager = null;
-    String channelId = "gps_tacker_channel";
 
     public ActivityMainBinding binding;
-    public boolean isStartButtonVisible = true;
-    public boolean isEndButtonVisible = false;
 
     //timer, room DB
     private TimerViewModel timerViewModel;
@@ -52,6 +55,12 @@ public class MainActivity extends AppCompatActivity {
 
     //StepCounter
     private StepCounter stepCounter;
+
+    private String[] permissions = {
+            android.Manifest.permission.ACCESS_COARSE_LOCATION,
+            android.Manifest.permission.ACCESS_FINE_LOCATION,
+            android.Manifest.permission.ACTIVITY_RECOGNITION
+    };
 
     @RequiresApi(api = Build.VERSION_CODES.Q)
     @Override
@@ -68,8 +77,6 @@ public class MainActivity extends AppCompatActivity {
 
         mContext = this;
 
-//        binding.runEndBtn.setVisibility(isEndButtonVisible ? View.VISIBLE : View.GONE);
-//        binding.runStartBtn.setVisibility(isStartButtonVisible ? View.VISIBLE : View.GONE);
         binding.runStartBtn.setVisibility(View.VISIBLE);
         binding.runEndBtn.setVisibility(View.GONE);
         binding.showRecordBtn.setVisibility(View.VISIBLE);
@@ -84,8 +91,6 @@ public class MainActivity extends AppCompatActivity {
 
         StepCounter stepCounter = new StepCounter(this, timerViewModel);
 
-//        Intent serviceIntent = new Intent(this, GpsTracker.class);
-//        ContextCompat.startForegroundService(this, serviceIntent);
 
         Log.d("HSR", "" + BuildConfig.GOOGLE_MAP_API_KEY );
 
@@ -110,7 +115,6 @@ public class MainActivity extends AppCompatActivity {
                 stepCounter.setStepCountListener(new StepCounter.StepCountListener() {
                     @Override
                     public void onStepCountChanged(int stepCount) {
-//                        binding.tvStepCount.setText(String.valueOf(stepCounter.getStepCount() - savedStepCount));
                         binding.tvStepCount.setText(String.valueOf(stepCount));
                     }
                 });
@@ -135,11 +139,9 @@ public class MainActivity extends AppCompatActivity {
                 timerViewModel.stopTimer();
 
                 FragmentTransaction transaction = fragmentManager.beginTransaction();
-//                transaction.replace(R.id.run_history, runHistoryFragment);
                 transaction.replace(R.id.run_history, new MainHistoryFragment());
                 transaction.commit();
 
-//                binding.stepcountTimerContainer.setVisibility(View.GONE);
                 binding.mainConstraintLayout.setVisibility(View.GONE);
 
             }
@@ -148,9 +150,6 @@ public class MainActivity extends AppCompatActivity {
         binding.showRecordBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                FragmentTransaction transaction = fragmentManager.beginTransaction();
-//                transaction.replace(R.id.run_history, runHistoryFragment);
-//                transaction.commit();
 
                 FragmentTransaction transaction = fragmentManager.beginTransaction();
                 transaction.replace(R.id.run_history, new MainHistoryFragment());
@@ -159,7 +158,6 @@ public class MainActivity extends AppCompatActivity {
                 binding.runStartBtn.setVisibility(View.GONE);
                 binding.showRecordBtn.setVisibility(View.GONE);
 
-//                binding.stepcountTimerContainer.setVisibility(View.GONE);
                 binding.mainConstraintLayout.setVisibility(View.GONE);
             }
         });
@@ -192,11 +190,4 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    public Location getGpsTrackerLocation(){
-        if (gpsTracker != null) {
-            return gpsTracker.getLocation();
-        } else {
-            return null; // 또는 다른 적절한 값
-        }
-    }
 }
