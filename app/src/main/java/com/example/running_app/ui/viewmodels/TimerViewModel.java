@@ -1,5 +1,6 @@
 package com.example.running_app.ui.viewmodels;
 
+import android.annotation.SuppressLint;
 import android.app.Application;
 import android.content.Context;
 import android.location.Location;
@@ -14,18 +15,20 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.example.running_app.data.database.dao.RunDao;
+import com.example.running_app.data.database.dao.RunDatabase;
 import com.example.running_app.data.database.dao.TB_GPS;
 import com.example.running_app.data.database.dao.TB_Run;
 import com.example.running_app.data.model.RunRepository;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
 public class TimerViewModel extends AndroidViewModel {
-//    private double time = 0.0;
+    public static final String DATE_FORMAT = "yyyy-MM-dd";
     private long time = 0;
     private SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
     private Timer timer;
@@ -54,6 +57,7 @@ public class TimerViewModel extends AndroidViewModel {
     public TimerViewModel(@NonNull Application application) {
         super(application);
         runRepository = new RunRepository(application);
+        runDao = RunDatabase.INSTANCE.runDao();
     }
 
     public void setRunViewModel(RunViewModel runViewModel){
@@ -106,6 +110,16 @@ public class TimerViewModel extends AndroidViewModel {
 
             Log.d("Stop Data", getTimeStringFromLong(time));
 
+            //update 함수 호출하면서 비어있던 데이터 저장
+            activeRunId = runRepository.getLatestRunId();
+
+            tbRun.setRun_id(activeRunId);
+            tbRun.setWalk_count(mStepDetector);
+            tbRun.setTimer(time);
+            tbRun.setCreate_at(currentDate());
+            runViewModel.setUpdateRun(tbRun);
+
+
             //stop 버튼 클릭시 바로 0.0 초로 리셋
             time = 0;
             timeTextLiveData.postValue(getTimeStringFromLong(time));
@@ -113,6 +127,13 @@ public class TimerViewModel extends AndroidViewModel {
 
         //종료 버튼 누를시 다시 -1 상태로 초기화
         activeRunId = -1;
+    }
+
+    private String currentDate() {
+        @SuppressLint("SimpleDateFormat")
+        SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
+        Date today = Calendar.getInstance().getTime();
+        return dateFormat.format(today);
     }
 
 

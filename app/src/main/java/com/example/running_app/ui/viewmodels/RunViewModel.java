@@ -25,36 +25,16 @@ public class RunViewModel extends AndroidViewModel {
         runList.postValue(runRepository.getRunAll());
         gpsList.postValue(runRepository.getGpsAll());
 
-        // todo: 로그 확인용 변수 (추후 삭제 예정)
-        getFirstLocation = runRepository.getFirstLocation();
-        getLastLocation = runRepository.getLastLocation();
     }
 
+    //select 함수
     public MutableLiveData<List<TB_Run>> getRunAll(){
         return runList;
-    }
-    public List<TB_GPS> getGpsAll(){
-        return gpsList.getValue();
-    }
-
-    public TB_GPS getFirstLocation(){
-        return getFirstLocation;
-    }
-
-    public TB_GPS getLastLocation(){
-        return getLastLocation;
-    }
-
-    public TB_GPS getMinGpsIdByRunId(int runId) {
-        return runRepository.getMinGpsIdByRunId(runId);
-    }
-
-    public TB_GPS getMaxGpsIdByRunId(int runId){
-        return runRepository.getMaxGpsIdByRunId(runId);
     }
     public List<TB_GPS> getAllGpsByRunId(int runId){
         return runRepository.getAllGpsByRunId(runId);
     }
+
     //insert 함수
     public void setInsertRun(TB_Run tbRun) {
         runRepository.setInsertRun(tbRun);
@@ -62,12 +42,15 @@ public class RunViewModel extends AndroidViewModel {
         //바로 TimerViewModel 에서 작업
 //        int runid = runRepository.getLatestRunId();
     }
-
     public void setInsertGps(TB_GPS tbGps) {
         runRepository.setInsertGps(tbGps);
     }
 
+    //update 함수
+    public void setUpdateRun(TB_Run tbRun){
+        runRepository.setUpdateRun(tbRun);
+    }
+
 
     //delete 함수
-    //update 함수
 }

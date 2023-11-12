@@ -29,32 +29,17 @@ public class RunningAdapter extends RecyclerView.Adapter<RunningAdapter.ViewHold
 
 
     private List<TB_Run> runItems = new ArrayList<>();
-    private List<TB_GPS> gpsItems = new ArrayList<>();
     private Context context;
     private RunDatabase runDatabase;
 
-
-    private static final int VIEW_TYPE_RUN = 0;
-    private static final int VIEW_TYPE_GPS = 1;
     private RunViewModel viewModel;
-    private RunRepository repository;
     // private int activeRunId;
 
     public RunningAdapter(Application application){
         super();
         viewModel = new RunViewModel(application);
-        repository = new RunRepository(application);
     }
 
-    @Override
-    public int getItemViewType(int position) {
-        // 위치에 따라 어떤 종류의 뷰홀더를 보여줄 지 결정
-        if (position < runItems.size()) {
-            return VIEW_TYPE_RUN;
-        } else {
-            return VIEW_TYPE_GPS;
-        }
-    }
 
     @NonNull
     @Override
