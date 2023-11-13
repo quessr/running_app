@@ -7,9 +7,7 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
@@ -38,22 +36,16 @@ import com.example.running_app.ui.viewmodels.TimerViewModel;
 
 public class GpsTrackerService extends Service implements LocationListener {
 
-//    private final Context mContext;
+    //    private final Context mContext;
     protected LocationManager locationManager;
     private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 1;
     private static final long MIN_TIME_BW_UPDATES = 1000 * 1 * 1;
-    // Location location;
-    // double latitude;
-    // double longitude;
+     Location location;
+     double latitude;
+     double longitude;
     private updateMap mListener;
     private NotificationManager notificationManager;
     int notificationId = 0;
-
-    //location -> DB insert
-    // TimerViewModel timerViewModel;
-    // RunViewModel runViewModel;
-    // private GpsDao gpsDao;
-    // private RunDao runDao;
 
     private final IBinder mBinder = new LocalBinder();
 
@@ -63,24 +55,6 @@ public class GpsTrackerService extends Service implements LocationListener {
             return GpsTrackerService.this;
         }
     }
-
-    public GpsTrackerService() {
-//        mContext = this;
-    }
-
-    /*
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        Log.d("HSR", "onCreate");
-//        getLocation();
-
-        //RunViewModel 초기화
-        // runViewModel = new RunViewModel(this.getApplication());
-
-        // timerViewModel = new TimerViewModel();
-    }
-    */
 
     public void startLocationUpdate() {
         getLocation();
@@ -97,13 +71,6 @@ public class GpsTrackerService extends Service implements LocationListener {
             Log.d("GPS@@", "isGPSEnabled : " + isGPSEnabled + " isNetworkEnabled : " + isNetworkEnabled);
 
 
-            // error 1 : 권한 없음
-            // error 2 : 네트워크 이용불가
-            // error 3 : GPS 사용불가
-
-
-
-
             if (!isGPSEnabled && !isNetworkEnabled) {
 
             } else {
@@ -111,80 +78,72 @@ public class GpsTrackerService extends Service implements LocationListener {
                 int hasCoarseLocationPermission = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION);
 
                 if (hasFineLocationPermission == PackageManager.PERMISSION_GRANTED && hasCoarseLocationPermission == PackageManager.PERMISSION_GRANTED) {
+                    if (isNetworkEnabled) {
+                        if (locationManager != null) {
+                            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
 
-                } else {
-                    // return null;
+                            if (location == null) {
+                                location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                            }
+
+                            if (location != null) {
+                                latitude = location.getLatitude();
+                                longitude = location.getLongitude();
+
+                            } else {
+                                Toast.makeText(MainActivity.mContext, "location 정보가 없습니다.", Toast.LENGTH_SHORT).show();
+                                // 네트워크 기반 위치 정보 비활성화 상태에서의 예외 처리
+                            }
+                        }
+                    }
                 }
 
-                if (isNetworkEnabled && isGPSEnabled) {
-                    locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
-//                    if (location == null) {
-//
-//
-//                        if (location != null) {
-//                            latitude = location.getLatitude();
-//                            longitude = location.getLongitude();
-//
-//                        } else {
-//                            Toast.makeText(MainActivity.mContext, "location 정보가 없습니다.", Toast.LENGTH_SHORT).show();
-//                        }
-//                    }
-                } else {
-//                    // 위치 정보를 줄 수 없음.
-//                    if(!isNetworkEnabled) {
-//                        mListener.occurError(2);
-//                        return;
-//                    }
-//
-//                    if(!isGPSEnabled) {
-//                        mListener.occurError(3);
-//                        return;
-//                    }
+                if (isGPSEnabled) {
+                    if (location == null) {
+                        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+
+                        if (locationManager != null) {
+                            location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+
+                            if (location == null) {
+                                location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                            }
+
+                            if (location != null) {
+                                latitude = location.getLatitude();
+                                longitude = location.getLongitude();
+                            }
+                        }
+
+                    }
                 }
             }
 
-//            if (isGPSEnabled) {
-//                if (location == null) {
-//                    locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
-//
-//                    if (locationManager != null) {
-//                        Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-//
-//                        if (location == null) {
-//                            location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-//                        }
-//
-//                        if (location != null) {
-//                            latitude = location.getLatitude();
-//                            longitude = location.getLongitude();
-//                        }
-//                    }
-//
-//                }
-//            }
+
         } catch (Exception e) {
             Log.d("GPS@@", "" + e.toString());
         }
-
-        // return location;
     }
 
 
-//    public void updateLocation(Location location) {
-//        if (location != null) {
-//            this.location = location;
-//            latitude = location.getLatitude();
-//            longitude = location.getLongitude();
-//            Log.d("GPS@@", "latitude" + latitude);
-//            Log.d("GPS@@", "longitude" + longitude);
-//        }
-//    }
+
+
+    public void updateLocation(Location location) {
+        if (location != null) {
+            this.location = location;
+            latitude = location.getLatitude();
+            longitude = location.getLongitude();
+            Log.d("GPS@@", "latitude" + latitude);
+            Log.d("GPS@@", "longitude" + longitude);
+        }
+    }
 
     @Override
     public void onLocationChanged(@NonNull Location location) {
         // updateLocation(location);
 
-        Toast.makeText(getApplicationContext(), "현재위치 "+location.getProvider()+" \n위도 " + location.getLatitude() + "\n경도 " + location.getLongitude(), Toast.LENGTH_LONG).show();
+
+        Toast.makeText(getApplicationContext(), "현재위치 " + location.getProvider() + " \n위도 " + location.getLatitude() + "\n경도 " + longitude, Toast.LENGTH_LONG).show();
         if (mListener != null) mListener.updateMap(location);
     }
 
@@ -211,7 +170,7 @@ public class GpsTrackerService extends Service implements LocationListener {
         }
     }
 
-    public void setListener(updateMap listener){
+    public void setListener(updateMap listener) {
         mListener = listener;
     }
 
@@ -229,7 +188,7 @@ public class GpsTrackerService extends Service implements LocationListener {
         return START_STICKY;
     }
 
-    public void startForeground(){
+    public void startForeground() {
         startForeground(1, createNotification());
     }
 
@@ -258,7 +217,7 @@ public class GpsTrackerService extends Service implements LocationListener {
 //
 //        // notificationId is a unique int for each notification that you must define
 //        notificationManager.notify(notificationId, builder.build());
-        return  builder.build();
+        return builder.build();
     }
 
     @Override
