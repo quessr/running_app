@@ -44,7 +44,8 @@ public class RunRepository {
         db.runDao().setUpdateRun(tbRun);
     }
 
-
-
     //delete 문
+    public void setDeleteRun(TB_Run tbRun){
+        db.runDao().setDeleteRun(tbRun);
+    }
 }

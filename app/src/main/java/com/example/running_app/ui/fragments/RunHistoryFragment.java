@@ -1,5 +1,6 @@
 package com.example.running_app.ui.fragments;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 
 import android.app.Application;
@@ -63,9 +64,11 @@ public class RunHistoryFragment extends Fragment {
 
         viewModel = new ViewModelProvider(this).get(RunViewModel.class);
         viewModel.getRunAll().observe(getViewLifecycleOwner(), new Observer<List<TB_Run>>() {
+            @SuppressLint("NotifyDataSetChanged")
             @Override
             public void onChanged(List<TB_Run> tbRuns) {
                 runningAdapter.setRunItems(tbRuns);
+                runningAdapter.notifyDataSetChanged();
             }
         });
 

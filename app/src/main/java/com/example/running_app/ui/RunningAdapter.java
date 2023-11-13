@@ -3,12 +3,18 @@ package com.example.running_app.ui;
 import static java.lang.String.format;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
+import android.widget.PopupMenu;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -30,13 +36,16 @@ public class RunningAdapter extends RecyclerView.Adapter<RunningAdapter.ViewHold
 
     private List<TB_Run> runItems = new ArrayList<>();
     private Context context;
+    private Application application;
     private RunDatabase runDatabase;
 
     private RunViewModel viewModel;
-    // private int activeRunId;
+
+    int runId;
 
     public RunningAdapter(Application application){
         super();
+        this.application = application;
         viewModel = new RunViewModel(application);
     }
 
@@ -52,6 +61,39 @@ public class RunningAdapter extends RecyclerView.Adapter<RunningAdapter.ViewHold
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         TB_Run data = runItems.get(position);
         holder.bind(data);
+
+        //popUpMenu
+        holder.list_setting.setImageResource(R.drawable.baseline_list_24);
+        holder.list_setting.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(application.getApplicationContext(), "클릭", Toast.LENGTH_SHORT).show();
+
+                PopupMenu popupMenu = new PopupMenu(application, holder.list_setting);
+                popupMenu.inflate(R.menu.detail_menu);
+                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        if (item.getItemId() == R.id.delete){
+                            Toast.makeText(application.getApplicationContext(), "삭제 버튼 클릭", Toast.LENGTH_SHORT).show();
+
+                            //delete
+                            TB_Run tbRun = new TB_Run();
+                            runId = data.getRun_id();
+                            tbRun.setRun_id(runId);
+                            viewModel.setDeleteRun(tbRun);
+
+                            //현재 list 화면에서 삭제시 바로 화면 반영
+                            runItems.remove(holder.getAbsoluteAdapterPosition());
+                            notifyItemRemoved(holder.getAbsoluteAdapterPosition());
+                        }
+                        return false;
+                    }
+                });
+                popupMenu.show();
+            }
+        });
+
     }
 
     @Override
@@ -67,6 +109,9 @@ public class RunningAdapter extends RecyclerView.Adapter<RunningAdapter.ViewHold
     public class ViewHolder extends RecyclerView.ViewHolder{
         TextView t_date, t_distance, t_runTime, t_speed, t_walkCount;
 
+        //popUpMenu
+        ImageButton list_setting;
+
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             t_date = itemView.findViewById(R.id.date);
@@ -74,6 +119,7 @@ public class RunningAdapter extends RecyclerView.Adapter<RunningAdapter.ViewHold
             t_runTime = itemView.findViewById(R.id.run_time);
             t_speed = itemView.findViewById(R.id.speed);
             t_walkCount = itemView.findViewById(R.id.walk_count);
+            list_setting = itemView.findViewById(R.id.setting);
         }
 
         @SuppressLint("SetTextI18n")
@@ -83,7 +129,7 @@ public class RunningAdapter extends RecyclerView.Adapter<RunningAdapter.ViewHold
             timeFormat(timeValue);
 
             // activeRunId = repository.getLatestRunId();
-            int runId = data.getRun_id();
+            runId = data.getRun_id();
             List<TB_GPS> allGps = viewModel.getAllGpsByRunId(runId);
             double tDistance = totalDistance(allGps);
 //            // DecimalFormat을 사용하여 소수점 이하 세 자리까지 반올림

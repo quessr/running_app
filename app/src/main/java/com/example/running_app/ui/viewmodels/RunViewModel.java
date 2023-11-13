@@ -51,6 +51,8 @@ public class RunViewModel extends AndroidViewModel {
         runRepository.setUpdateRun(tbRun);
     }
 
-
     //delete 함수
+    public void setDeleteRun(TB_Run tbRun){
+        runRepository.setDeleteRun(tbRun);
+    }
 }
