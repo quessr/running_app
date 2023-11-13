@@ -2,31 +2,34 @@ package com.example.running_app.ui.fragments;
 
 import android.Manifest;
 import android.animation.ValueAnimator;
-import android.app.Activity;
+import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.running_app.R;
 import com.example.running_app.data.model.GpsTrackerService;
+import com.example.running_app.data.model.PermissionManager;
 import com.example.running_app.data.model.PolylineMarkerUpdater;
 import com.example.running_app.databinding.FragmentRunBinding;
 import com.example.running_app.ui.MainActivity;
@@ -35,12 +38,16 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrackerService.updateMap, LocationListener {
     private FragmentRunBinding binding;
@@ -54,49 +61,127 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
     private Marker runStartMapMarker;
 
     protected LocationManager locationManager;
+
     Circle circle;
+    private AlertDialog permissionDeniedDialog;
+    PermissionManager permissionManager;
+    public ActivityResultLauncher<String[]> requestPermissionLauncher;
 
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        permissionManager = new PermissionManager();
+        permissionManager.requestPermission(getContext(), this);
+
+
+        Log.d("HSR", "onCreate()");
         locationManager = (LocationManager) MainActivity.mContext.getSystemService(Context.LOCATION_SERVICE);
+
+        requestPermissionLauncher = registerForActivityResult(
+                new ActivityResultContracts.RequestMultiplePermissions(), new ActivityResultCallback<Map<String, Boolean>>() {
+                    @Override
+                    public void onActivityResult(Map<String, Boolean> result) {
+                        for (Map.Entry<String, Boolean> entry : result.entrySet()) {
+                            String permission = entry.getKey();
+                            boolean isGranted = entry.getValue();
+
+                            if (isGranted) {
+                                // 권한이 허용된 경우 처리할 코드
+                                Toast.makeText(getContext(), permission + " 권한이 허용되었습니다.", Toast.LENGTH_SHORT).show();
+                            } else {
+                                // 권한이 거부된 경우 처리할 코드
+                                Toast.makeText(getContext(), permission + " 권한이 거부되었습니다.", Toast.LENGTH_SHORT).show();
+                                Log.d("HHH", "onActivityResult fail");
+                                permissionManager.showPermissionDeniedNotification(getActivity());
+
+                            }
+                        }
+                    }
+                });
+
 
     }
 
+    @SuppressLint("MissingPermission")
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding = FragmentRunBinding.inflate(inflater, container, false);
         View view = binding.getRoot();
+        Log.e("HSR", "onCreateView");
 
-        // 구글 맵 띄우기
-        mapFragment = new SupportMapFragment();
-        getChildFragmentManager().beginTransaction().replace(R.id.map, mapFragment).commit();
 
-        if (mapFragment != null) {
-            mapFragment.getMapAsync(this);
+        try {
+            Log.e("HSR", "onCreateView try");
 
-        } else {
-            Log.e("RunFragment", "mapFragment is null");
+
+            // 구글 맵 띄우기
+            mapFragment = new SupportMapFragment();
+            getChildFragmentManager().beginTransaction().replace(R.id.map, mapFragment).commit();
+
+            if (mapFragment != null) {
+                mapFragment.getMapAsync(this);
+
+            } else {
+                Log.e("RunFragment", "mapFragment is null");
+            }
+
+
+            locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1, 1, this);
+
+
+        } catch (Exception e) {
+            Log.d("HHH", e.toString());
         }
-
-        // 권한 체크
-        if (ContextCompat.checkSelfPermission(MainActivity.mContext, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_DENIED
-                || ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_DENIED
-                || ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_BACKGROUND_LOCATION) == PackageManager.PERMISSION_DENIED
-                || ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACTIVITY_RECOGNITION) == PackageManager.PERMISSION_DENIED) {
-            // 권한이 없는 경우 사용자에게 권한을 요청하는 다이얼로그 띄우기
-            ActivityCompat.requestPermissions((Activity) MainActivity.mContext, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_BACKGROUND_LOCATION, Manifest.permission.ACTIVITY_RECOGNITION}, MY_PERMISSIONS_REQUEST_LOCATION);
-        }
-
-        locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1, 1, this);
 
         return view;
     }
 
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        permissionManager.requestPermission(requireContext(), this);
+    }
+
+    @SuppressLint("MissingPermission")
+    @Override
+    public void onStart() {
+        super.onStart();
+        Log.d("HSR", "onStart()");
+
+        if (permissionManager.hasLocationPermissions(requireContext())) {
+            // 위치 권한이 허용된 경우 처리할 코드
+            // ...
+            Log.d("HSR", "onStart() hasLocationPermissions");
+            Log.d("HSR", "onStart() permissionDeniedDialog" + permissionDeniedDialog);
+
+            Toast.makeText(getContext(), "권한이 모두 허용되었습니다.", Toast.LENGTH_SHORT).show();
+
+            locationManager = (LocationManager) MainActivity.mContext.getSystemService(Context.LOCATION_SERVICE);
+
+            locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1, 1, this);
+
+            if (permissionDeniedDialog != null && permissionDeniedDialog.isShowing()) {
+                permissionDeniedDialog.dismiss();
+                permissionDeniedDialog.cancel();
+                Log.d("HSR", "onStart() permissionDeniedDialog.dismiss()");
+
+            }
+
+        } else {
+            // 위치 권한이 거부된 경우 처리할 코드
+            // 다이얼로그가 표시된 후 권한을 허용한 경우 처리할 코드
+            Log.d("HSR", "onStart() permissionDeniedDialog" + permissionDeniedDialog);
+
+            Toast.makeText(getContext(), "백그라운드 위치 권한을 위해 항상 허용으로 설정해주세요.", Toast.LENGTH_SHORT).show();
+        }
+    }
 
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
@@ -116,7 +201,6 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
         }
     }
 
-
     @Override
     public void updateMap(Location location) {
         Log.d("HSR", "RunFragment : " + location);
@@ -128,18 +212,14 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
         LatLng lastKnownLocation = new LatLng(location.getLatitude(), location.getLongitude());
 
         if (runStartMapMarker == null) {
-            mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(lastKnownLocation, 15));
+            String currentMarkerTitle = (getAddress(getContext(), location.getLatitude(), location.getLongitude()));
 
-//            runStartMapMarker = mGoogleMap.addMarker(new MarkerOptions()
-//                    .position(lastKnownLocation)
-//                    .title("마포")
-//                    .snippet("처음위치")
-//                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
+            mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(lastKnownLocation, 15));
 
             runStartMapMarker = mGoogleMap.addMarker(new MarkerOptions()
                     .position(lastKnownLocation)
-                    .title("마포")
-                    .snippet("처음위치")
+                    .title(currentMarkerTitle)
+                    .snippet(getResources().getString(R.string.map_marker_current_location))
                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
 
             CircleOptions circleOptions = new CircleOptions()
@@ -179,26 +259,37 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
         LatLng lastKnownLocation = new LatLng(lastLatitude, lastLongitude);
 
         if (initialMapMarker == null) {
+            String initialMarkerTitle = (getAddress(getContext(), lastLatitude, lastLongitude));
+
             mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(lastKnownLocation, 15));
 
             initialMapMarker = mGoogleMap.addMarker(new MarkerOptions()
                     .position(lastKnownLocation)
-                    .title("마포")
-                    .snippet("처음위치")
+                    .title(initialMarkerTitle)
+                    .snippet(getResources().getString(R.string.map_marker_first_position))
                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
 
-            // 지도 회전
-            CameraPosition cameraPosition = new CameraPosition.Builder()
-                    .target(lastKnownLocation)
-                    .bearing(180)                  // 180도 회전
-                    .zoom(15)
-                    .build();
-
-
-            mGoogleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
         } else {
-//            initialMapMarker.setPosition(lastKnownLocation);
         }
 
+    }
+
+    public String getAddress(Context mContext, double lat, double lng) {
+        String nowAddr = "현재 위치를 확인 할 수 없습니다.";
+        Geocoder geocoder = new Geocoder(mContext, Locale.KOREA);
+        List<Address> address;
+
+        try {
+            if (geocoder != null) {
+                address = geocoder.getFromLocation(lat, lng, 1);
+                if (address != null && address.size() > 0) {
+                    nowAddr = address.get(0).getAddressLine(0).toString();
+                }
+            }
+        } catch (IOException e) {
+            Toast.makeText(mContext, "주소를 가져 올 수 없습니다.", Toast.LENGTH_LONG).show();
+            e.printStackTrace();
+        }
+        return nowAddr;
     }
 }
