@@ -66,47 +66,34 @@ public class RunningAdapter extends RecyclerView.Adapter<RunningAdapter.ViewHold
         TB_Run data = runItems.get(position);
         holder.bind(data);
 
-        //popUpMenu
         holder.list_setting.setImageResource(R.drawable.baseline_delete_24);
         holder.list_setting.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Toast.makeText(application.getApplicationContext(), "클릭", Toast.LENGTH_SHORT).show();
 
-                PopupMenu popupMenu = new PopupMenu(application, holder.list_setting);
-                popupMenu.inflate(R.menu.detail_menu);
-                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                //Alert 창
+                AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+                builder.setMessage("운동기록을 삭제하시겠습니까?");
+                builder.setNegativeButton("취소", null);
+                builder.setPositiveButton("확인", new DialogInterface.OnClickListener() {
                     @Override
-                    public boolean onMenuItemClick(MenuItem item) {
-                        if (item.getItemId() == R.id.delete) {
-                            Toast.makeText(application.getApplicationContext(), "삭제 버튼 클릭", Toast.LENGTH_SHORT).show();
+                    public void onClick(DialogInterface dialog, int which) {
 
-                            //Alert 창
-                            AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-                            builder.setMessage("운동기록을 삭제하시겠습니까?");
-                            builder.setNegativeButton("취소", null);
-                            builder.setPositiveButton("확인", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
+                        Toast.makeText(application.getApplicationContext(), "삭제 완료", Toast.LENGTH_SHORT).show();
 
-                                    //delete
-                                    TB_Run tbRun = new TB_Run();
-                                    runId = data.getRun_id();
-                                    tbRun.setRun_id(runId);
-                                    viewModel.setDeleteRun(tbRun);
-                                    //현재 list 화면에서 삭제시 바로 화면 반영
-                                    runItems.remove(holder.getAbsoluteAdapterPosition());
-                                    notifyItemRemoved(holder.getAbsoluteAdapterPosition());
-                                }
-                            });
-                            AlertDialog dialog = builder.create();
-                            dialog.show();
-
-                        }
-                        return false;
+                        //delete
+                        TB_Run tbRun = new TB_Run();
+                        runId = data.getRun_id();
+                        tbRun.setRun_id(runId);
+                        viewModel.setDeleteRun(tbRun);
+                        //현재 list 화면에서 삭제시 바로 화면 반영
+                        runItems.remove(holder.getAbsoluteAdapterPosition());
+                        notifyItemRemoved(holder.getAbsoluteAdapterPosition());
                     }
                 });
-                popupMenu.show();
+                AlertDialog dialog = builder.create();
+                dialog.show();
             }
         });
 
