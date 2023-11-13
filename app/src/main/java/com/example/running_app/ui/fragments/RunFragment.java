@@ -212,7 +212,7 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
             runStartMapMarker = mGoogleMap.addMarker(new MarkerOptions()
                     .position(lastKnownLocation)
                     .title("마포")
-                    .snippet("처음위치")
+                    .snippet(getResources().getString(R.string.map_marker_current_location))
                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
 
             CircleOptions circleOptions = new CircleOptions()
@@ -257,7 +257,7 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
             initialMapMarker = mGoogleMap.addMarker(new MarkerOptions()
                     .position(lastKnownLocation)
                     .title("마포")
-                    .snippet("처음위치")
+                    .snippet(getResources().getString(R.string.map_marker_first_position))
                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
 
         } else {
