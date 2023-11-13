@@ -57,7 +57,7 @@ public class RunHistoryFragment extends Fragment {
         Log.d("onCreateView", "onCreateView 화면");
         findID(view);
 
-        runningAdapter = new RunningAdapter(requireActivity().getApplication());
+        runningAdapter = new RunningAdapter(requireActivity().getApplication(), getActivity());
         recyclerView.setAdapter(runningAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false));
         recyclerView.setHasFixedSize(true);

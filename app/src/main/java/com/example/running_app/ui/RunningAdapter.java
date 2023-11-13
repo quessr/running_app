@@ -4,8 +4,10 @@ import static java.lang.String.format;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Application;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -37,14 +39,16 @@ public class RunningAdapter extends RecyclerView.Adapter<RunningAdapter.ViewHold
     private List<TB_Run> runItems = new ArrayList<>();
     private Context context;
     private Application application;
+    private Activity activity;
     private RunDatabase runDatabase;
 
     private RunViewModel viewModel;
 
     int runId;
 
-    public RunningAdapter(Application application){
+    public RunningAdapter(Application application, Activity activity) {
         super();
+        this.activity = activity;
         this.application = application;
         viewModel = new RunViewModel(application);
     }
@@ -63,7 +67,7 @@ public class RunningAdapter extends RecyclerView.Adapter<RunningAdapter.ViewHold
         holder.bind(data);
 
         //popUpMenu
-        holder.list_setting.setImageResource(R.drawable.baseline_list_24);
+        holder.list_setting.setImageResource(R.drawable.baseline_delete_24);
         holder.list_setting.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -74,18 +78,30 @@ public class RunningAdapter extends RecyclerView.Adapter<RunningAdapter.ViewHold
                 popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
-                        if (item.getItemId() == R.id.delete){
+                        if (item.getItemId() == R.id.delete) {
                             Toast.makeText(application.getApplicationContext(), "삭제 버튼 클릭", Toast.LENGTH_SHORT).show();
 
-                            //delete
-                            TB_Run tbRun = new TB_Run();
-                            runId = data.getRun_id();
-                            tbRun.setRun_id(runId);
-                            viewModel.setDeleteRun(tbRun);
+                            //Alert 창
+                            AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+                            builder.setMessage("운동기록을 삭제하시겠습니까?");
+                            builder.setNegativeButton("취소", null);
+                            builder.setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
 
-                            //현재 list 화면에서 삭제시 바로 화면 반영
-                            runItems.remove(holder.getAbsoluteAdapterPosition());
-                            notifyItemRemoved(holder.getAbsoluteAdapterPosition());
+                                    //delete
+                                    TB_Run tbRun = new TB_Run();
+                                    runId = data.getRun_id();
+                                    tbRun.setRun_id(runId);
+                                    viewModel.setDeleteRun(tbRun);
+                                    //현재 list 화면에서 삭제시 바로 화면 반영
+                                    runItems.remove(holder.getAbsoluteAdapterPosition());
+                                    notifyItemRemoved(holder.getAbsoluteAdapterPosition());
+                                }
+                            });
+                            AlertDialog dialog = builder.create();
+                            dialog.show();
+
                         }
                         return false;
                     }
@@ -106,7 +122,7 @@ public class RunningAdapter extends RecyclerView.Adapter<RunningAdapter.ViewHold
         notifyDataSetChanged();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder{
+    public class ViewHolder extends RecyclerView.ViewHolder {
         TextView t_date, t_distance, t_runTime, t_speed, t_walkCount;
 
         //popUpMenu
@@ -149,7 +165,7 @@ public class RunningAdapter extends RecyclerView.Adapter<RunningAdapter.ViewHold
         }
 
         private double resultAvgSpeed(long timeValue, double tDistance) {
-            if (timeValue <= 0){
+            if (timeValue <= 0) {
                 return 0.0;
             } else {
                 return tDistance / timeValue * 1000;    // m/s로 변환
@@ -177,7 +193,7 @@ public class RunningAdapter extends RecyclerView.Adapter<RunningAdapter.ViewHold
         TB_GPS prevGps = null;
 
         for (TB_GPS currentGps : allGps) {
-            if (prevGps != null){
+            if (prevGps != null) {
                 // 이전 GPS와 현재 GPS 사이의 거리 계산하여 누적
                 double segmentDistance = haversine(prevGps.getLat(), prevGps.getLon(), currentGps.getLat(), currentGps.getLon());
                 totalDistance += segmentDistance;
