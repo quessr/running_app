@@ -72,14 +72,6 @@ public class RunHistoryFragment extends Fragment {
             }
         });
 
-//        repository = new RunRepository(requireActivity().getApplication());
-//        activeRunId = repository.getLatestRunId();
-//
-//        List<TB_GPS> allGps = viewModel.getAllGpsByRunId(activeRunId);
-//        double tDistance = totalDistance(allGps);
-//
-//        Log.d("onCreateView", "총 거리 : " + tDistance);
-
 
 
 //        RunDatabase database = Room.databaseBuilder(requireContext(), RunDatabase.class, "running_db")

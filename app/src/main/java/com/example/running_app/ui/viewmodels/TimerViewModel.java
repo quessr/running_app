@@ -110,6 +110,7 @@ public class TimerViewModel extends AndroidViewModel {
 
             Log.d("Stop Data", getTimeStringFromLong(time));
 
+            //UpDate
             //update 함수 호출하면서 비어있던 데이터 저장
             activeRunId = runRepository.getLatestRunId();
 

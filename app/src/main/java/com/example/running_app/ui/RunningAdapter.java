@@ -132,18 +132,28 @@ public class RunningAdapter extends RecyclerView.Adapter<RunningAdapter.ViewHold
             runId = data.getRun_id();
             List<TB_GPS> allGps = viewModel.getAllGpsByRunId(runId);
             double tDistance = totalDistance(allGps);
-//            // DecimalFormat을 사용하여 소수점 이하 세 자리까지 반올림
-//            DecimalFormat df = new DecimalFormat("#.###");
-//            String formatDistance = df.format(tDistance);
+
+            //평균 속력
+            double avgSpeed = resultAvgSpeed(timeValue, tDistance);
 
             t_date.setText(data.getCreate_at());
             t_distance.setText(distanceFormat(tDistance) + " Km");
-//            t_runTime.setText(String.valueOf(data.getTimer()));
             t_runTime.setText(timeFormat(timeValue));
-//            t_runTime.setText(format(String.valueOf(data.getTimer())));
-//            t_runTime.setText((int) data.getTimer());
-            t_speed.setText("5km");
+            t_speed.setText(speedFormat(avgSpeed) + " m/s");
             t_walkCount.setText(String.valueOf(data.getWalk_count()));
+        }
+
+        private String speedFormat(double avgSpeed) {
+            DecimalFormat df = new DecimalFormat("#.##");
+            return df.format(avgSpeed);
+        }
+
+        private double resultAvgSpeed(long timeValue, double tDistance) {
+            if (timeValue <= 0){
+                return 0.0;
+            } else {
+                return tDistance / timeValue * 1000;    // m/s로 변환
+            }
         }
 
         private String distanceFormat(double tDistance) {
