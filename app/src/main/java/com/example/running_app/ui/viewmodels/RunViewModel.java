@@ -4,7 +4,6 @@ import android.app.Application;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
-import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 
 import com.example.running_app.data.database.dao.TB_GPS;
@@ -19,8 +18,6 @@ public class RunViewModel extends AndroidViewModel {
     MutableLiveData<List<TB_GPS>> gpsList = new MutableLiveData<>();;
     TB_GPS getFirstLocation;
     TB_GPS getLastLocation;
-    List<TB_Run> getLatestActiveOne;
-
     public RunViewModel(@NonNull Application application){
         super(application);
         runRepository = new RunRepository(application);
@@ -28,42 +25,34 @@ public class RunViewModel extends AndroidViewModel {
         runList.postValue(runRepository.getRunAll());
         gpsList.postValue(runRepository.getGpsAll());
 
-        // todo: 로그 확인용 변수 (추후 삭제 예정)
-        getFirstLocation = runRepository.getFirstLocation();
-        getLastLocation = runRepository.getLastLocation();
-//        getLatestActiveOne = runRepository.getLatestActiveOne();
     }
 
+    //select 함수
     public MutableLiveData<List<TB_Run>> getRunAll(){
         return runList;
     }
-    public List<TB_GPS> getGpsAll(){
-        return gpsList.getValue();
+    public List<TB_GPS> getAllGpsByRunId(int runId){
+        return runRepository.getAllGpsByRunId(runId);
     }
-
-    public TB_GPS getFirstLocation(){
-        return getFirstLocation;
-    }
-
-    public TB_GPS getLastLocation(){
-        return getLastLocation;
-    }
-
-//    public List<TB_Run> getLatestActiveOne() {
-//        getLatestActiveOne = runRepository.getLatestActiveOne();
-//        return getLatestActiveOne;
-//    }
 
     //insert 함수
     public void setInsertRun(TB_Run tbRun) {
         runRepository.setInsertRun(tbRun);
-    }
 
+        //바로 TimerViewModel 에서 작업
+//        int runid = runRepository.getLatestRunId();
+    }
     public void setInsertGps(TB_GPS tbGps) {
         runRepository.setInsertGps(tbGps);
     }
 
+    //update 함수
+    public void setUpdateRun(TB_Run tbRun){
+        runRepository.setUpdateRun(tbRun);
+    }
 
     //delete 함수
-    //update 함수
+    public void setDeleteRun(TB_Run tbRun){
+        runRepository.setDeleteRun(tbRun);
+    }
 }

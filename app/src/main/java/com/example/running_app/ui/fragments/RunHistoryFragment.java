@@ -1,5 +1,6 @@
 package com.example.running_app.ui.fragments;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 
 import android.app.Application;
@@ -26,10 +27,12 @@ import com.example.running_app.data.database.dao.RunDao;
 import com.example.running_app.data.database.dao.RunDatabase;
 import com.example.running_app.data.database.dao.TB_GPS;
 import com.example.running_app.data.database.dao.TB_Run;
+import com.example.running_app.data.model.RunRepository;
 import com.example.running_app.ui.RunningAdapter;
 import com.example.running_app.ui.viewmodels.RunViewModel;
 
 import java.util.List;
+import java.util.Objects;
 
 import com.example.running_app.R;
 import com.example.running_app.ui.viewmodels.TimerViewModel;
@@ -43,47 +46,32 @@ public class RunHistoryFragment extends Fragment {
     RunViewModel viewModel;
     RecyclerView recyclerView;
     RunningAdapter runningAdapter;
+    RunRepository repository;
+    private int activeRunId;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_run_history, container, false);
-
+        Log.d("onCreateView", "onCreateView 화면");
         findID(view);
 
-        runningAdapter = new RunningAdapter(requireContext());
+        runningAdapter = new RunningAdapter(requireActivity().getApplication(), getActivity());
         recyclerView.setAdapter(runningAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false));
         recyclerView.setHasFixedSize(true);
 
-
         viewModel = new ViewModelProvider(this).get(RunViewModel.class);
         viewModel.getRunAll().observe(getViewLifecycleOwner(), new Observer<List<TB_Run>>() {
+            @SuppressLint("NotifyDataSetChanged")
             @Override
             public void onChanged(List<TB_Run> tbRuns) {
                 runningAdapter.setRunItems(tbRuns);
+                runningAdapter.notifyDataSetChanged();
             }
         });
 
-
-
-        TB_GPS f_tbGps = viewModel.getFirstLocation();
-        TB_GPS l_tbGps = viewModel.getLastLocation();
-
-        if (f_tbGps != null){
-            double firstLat = f_tbGps.getLat();
-            double firstLon = f_tbGps.getLon();
-
-            Log.d("처음 좌표: ", firstLat + " | " + firstLon);
-        }
-
-        if (l_tbGps != null){
-            double lastLat = l_tbGps.getLat();
-            double lastLon = l_tbGps.getLon();
-
-            Log.d("마지막 좌표: ", lastLat + " | " + lastLon);
-        }
 
 
 //        RunDatabase database = Room.databaseBuilder(requireContext(), RunDatabase.class, "running_db")
@@ -94,7 +82,6 @@ public class RunHistoryFragment extends Fragment {
 
 //        runDao = RunDatabase.runDao(); //인터페이스 사용 준비 완료(객체 할당)
 //        gpsDao = database.gpsDao();
-
 
 
 //        //데이터 삽입
@@ -125,8 +112,6 @@ public class RunHistoryFragment extends Fragment {
 //        tbGps.setLon((long) 126.926735502823);
 //        tbGps.setCreate_at("2023/10/30");
 //        viewModel.setInsertGps(tbGps);
-
-
 
 
 //        //데이터 조회
@@ -162,6 +147,48 @@ public class RunHistoryFragment extends Fragment {
 
         return view;
     }
+
+    private double totalDistance(List<TB_GPS> allGps) {
+          double totalDistance = 0;
+          TB_GPS prevGps = null;
+
+        for (TB_GPS currentGps : allGps) {
+            if (prevGps != null){
+                // 이전 GPS와 현재 GPS 사이의 거리 계산하여 누적
+//                double segmentDistance = haversine(prevGps.getLatitude(), prevGps.getLongitude(), currentGps.getLatitude(), currentGps.getLongitude());
+                double segmentDistance = haversine(prevGps.getLat(), prevGps.getLon(), currentGps.getLat(), currentGps.getLon());
+                totalDistance += segmentDistance;
+            }
+            prevGps = currentGps;   // 현재 GPS를 이전 GPS로 설정하여 다음 순회에 사용
+        }
+
+        return totalDistance;
+    }
+
+    private double haversine(double lat1, double lon1, double lat2, double lon2) {
+        // 지구의 반경 (단위: km)
+        final double R = 6371.0;
+
+        // 라디안으로 변환
+        lat1 = Math.toRadians(lat1);
+        lon1 = Math.toRadians(lon1);
+        lat2 = Math.toRadians(lat2);
+        lon2 = Math.toRadians(lon2);
+
+        // 위도와 경도의 차이 계산
+        double dLat = lat2 - lat1;
+        double dLon = lon2 - lon1;
+
+        // Haversine 공식 적용
+        double a = Math.pow(Math.sin(dLat / 2), 2) + Math.cos(lat1) * Math.cos(lat2) * Math.pow(Math.sin(dLon / 2), 2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+        // 거리 계산
+        double distance = R * c;
+
+        return distance;
+    }
+
 
     private void findID(View view) {
         recyclerView = view.findViewById(R.id.recyclerview);

@@ -65,7 +65,6 @@ public class MainActivity extends AppCompatActivity {
         timerViewModel = new ViewModelProvider(this).get(TimerViewModel.class);
         runViewModel = new ViewModelProvider(this).get(RunViewModel.class);
         timerViewModel.setRunViewModel(runViewModel);
-
         mContext = this;
 
 //        binding.runEndBtn.setVisibility(isEndButtonVisible ? View.VISIBLE : View.GONE);
@@ -170,8 +169,17 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void updateMap(Location location) {
             Log.d("HSR", "MainActivity.updateMap : "+location);
+
+            timerViewModel.setGpsLocation(location);
+
             runFragment.updateMap(location);
         }
+
+        //오류 발생 될 경우
+//        @Override
+//        public void occurError(int errorCode) {
+//            Log.d("HSR", "occurError : "+errorCode);
+//        }
     };
     ServiceConnection serviceGpsTrackerConnection = new ServiceConnection() {
         @Override
@@ -192,11 +200,11 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    public Location getGpsTrackerLocation(){
-        if (gpsTracker != null) {
-            return gpsTracker.getLocation();
-        } else {
-            return null; // 또는 다른 적절한 값
-        }
-    }
+//    public Location getGpsTrackerLocation(){
+//        if (gpsTracker != null) {
+//            return gpsTracker.getLocation();
+//        } else {
+//            return null; // 또는 다른 적절한 값
+//        }
+//    }
 }
