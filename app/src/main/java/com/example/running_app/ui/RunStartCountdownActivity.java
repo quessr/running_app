@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.widget.TextView;
 
@@ -12,6 +13,7 @@ import com.example.running_app.R;
 public class RunStartCountdownActivity extends AppCompatActivity {
     private TextView countdownText;
     private int countdownValue = 3;
+    CountDownTimer timer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -19,24 +21,30 @@ public class RunStartCountdownActivity extends AppCompatActivity {
         setContentView(R.layout.activity_run_start_countdown);
 
         countdownText = findViewById(R.id.countdown_text);
-        startCountdown();
-    }
 
-    private void startCountdown() {
-        final Handler handler = new Handler();
-
-        Runnable runnable = new Runnable() {
+        timer = new CountDownTimer(3000, 1000) {
             @Override
-            public void run() {
+            public void onTick(long millisUntilFinished) {
                 if (countdownValue >= 1) {
                     countdownText.setText(String.valueOf(countdownValue));
                     countdownValue--;
-                    handler.postDelayed(this, 1000);
-                } else {
-                    finish();
                 }
             }
+
+            @Override
+            public void onFinish() {
+                finish();
+            }
         };
-        handler.post(runnable);
+        timer.start();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (timer != null) {
+            timer.cancel();
+        }
     }
 }
+
