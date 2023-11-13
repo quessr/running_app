@@ -7,6 +7,8 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -42,6 +44,9 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrackerService.updateMap, LocationListener {
@@ -207,11 +212,13 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
         LatLng lastKnownLocation = new LatLng(location.getLatitude(), location.getLongitude());
 
         if (runStartMapMarker == null) {
+            String currentMarkerTitle = (getAddress(getContext(), location.getLatitude(), location.getLongitude()));
+
             mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(lastKnownLocation, 15));
 
             runStartMapMarker = mGoogleMap.addMarker(new MarkerOptions()
                     .position(lastKnownLocation)
-                    .title("마포")
+                    .title(currentMarkerTitle)
                     .snippet(getResources().getString(R.string.map_marker_current_location))
                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
 
@@ -252,16 +259,37 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
         LatLng lastKnownLocation = new LatLng(lastLatitude, lastLongitude);
 
         if (initialMapMarker == null) {
+            String initialMarkerTitle = (getAddress(getContext(), lastLatitude, lastLongitude));
+
             mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(lastKnownLocation, 15));
 
             initialMapMarker = mGoogleMap.addMarker(new MarkerOptions()
                     .position(lastKnownLocation)
-                    .title("마포")
+                    .title(initialMarkerTitle)
                     .snippet(getResources().getString(R.string.map_marker_first_position))
                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
 
         } else {
         }
 
+    }
+
+    public String getAddress(Context mContext, double lat, double lng) {
+        String nowAddr = "현재 위치를 확인 할 수 없습니다.";
+        Geocoder geocoder = new Geocoder(mContext, Locale.KOREA);
+        List<Address> address;
+
+        try {
+            if (geocoder != null) {
+                address = geocoder.getFromLocation(lat, lng, 1);
+                if (address != null && address.size() > 0) {
+                    nowAddr = address.get(0).getAddressLine(0).toString();
+                }
+            }
+        } catch (IOException e) {
+            Toast.makeText(mContext, "주소를 가져 올 수 없습니다.", Toast.LENGTH_LONG).show();
+            e.printStackTrace();
+        }
+        return nowAddr;
     }
 }
