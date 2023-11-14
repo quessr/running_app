@@ -30,7 +30,7 @@ import androidx.fragment.app.Fragment;
 import com.example.running_app.R;
 import com.example.running_app.data.model.GpsTrackerService;
 import com.example.running_app.data.model.PermissionManager;
-import com.example.running_app.data.model.PolylineMarkerUpdater;
+import com.example.running_app.data.model.PolylineUpdater;
 import com.example.running_app.databinding.FragmentRunBinding;
 import com.example.running_app.ui.MainActivity;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -53,10 +53,11 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
     private FragmentRunBinding binding;
     public GoogleMap mGoogleMap;
     SupportMapFragment mapFragment;
+    Geocoder geocoder;
 
     private int MY_PERMISSIONS_REQUEST_LOCATION = 1;
 
-    private PolylineMarkerUpdater polylineMarkerUpdater;
+    private PolylineUpdater polylineMarkerUpdater;
     private Marker initialMapMarker;
     private Marker runStartMapMarker;
 
@@ -78,6 +79,8 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
 
         Log.d("HSR", "onCreate()");
         locationManager = (LocationManager) MainActivity.mContext.getSystemService(Context.LOCATION_SERVICE);
+
+        geocoder = new Geocoder(getContext(), Locale.KOREA);
 
         requestPermissionLauncher = registerForActivityResult(
                 new ActivityResultContracts.RequestMultiplePermissions(), new ActivityResultCallback<Map<String, Boolean>>() {
@@ -192,7 +195,7 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
         mGoogleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         mGoogleMap.setBuildingsEnabled(true);
 
-        polylineMarkerUpdater = new PolylineMarkerUpdater(mGoogleMap);
+        polylineMarkerUpdater = new PolylineUpdater(mGoogleMap);
 
         if (ActivityCompat.checkSelfPermission(this.requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this.requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this.requireContext(), Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED
@@ -204,23 +207,23 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
     @Override
     public void updateMap(Location location) {
         Log.d("HSR", "RunFragment : " + location);
-//        if (location.getProvider().equals("gps")) {
-//            polylineMarkerUpdater.updatePolyline(location);
-//            polylineMarkerUpdater.updateMarker(location);
-//        }
 
         LatLng lastKnownLocation = new LatLng(location.getLatitude(), location.getLongitude());
 
         if (runStartMapMarker == null) {
-            String currentMarkerTitle = (getAddress(getContext(), location.getLatitude(), location.getLongitude()));
-
             mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(lastKnownLocation, 15));
 
-            runStartMapMarker = mGoogleMap.addMarker(new MarkerOptions()
-                    .position(lastKnownLocation)
-                    .title(currentMarkerTitle)
-                    .snippet(getResources().getString(R.string.map_marker_current_location))
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
+            if (geocoder != null) {
+                String currentMarkerTitle = (getAddress(getContext(), location.getLatitude(), location.getLongitude()));
+
+
+                runStartMapMarker = mGoogleMap.addMarker(new MarkerOptions()
+                        .position(lastKnownLocation)
+                        .title(currentMarkerTitle)
+                        .snippet(getResources().getString(R.string.map_marker_current_location))
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
+            }
+
 
             CircleOptions circleOptions = new CircleOptions()
                     .center(lastKnownLocation)
@@ -242,9 +245,12 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
             animator.start();
 
         } else {
-            runStartMapMarker.setPosition(lastKnownLocation);
-            circle.setCenter(lastKnownLocation);
-            polylineMarkerUpdater.updatePolyline(location);
+            if (location.getProvider().equals("gps")) {
+                runStartMapMarker.setPosition(lastKnownLocation);
+                circle.setCenter(lastKnownLocation);
+                polylineMarkerUpdater.updatePolyline(location);
+            }
+
         }
 
     }
@@ -259,24 +265,29 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
         LatLng lastKnownLocation = new LatLng(lastLatitude, lastLongitude);
 
         if (initialMapMarker == null) {
-            String initialMarkerTitle = (getAddress(getContext(), lastLatitude, lastLongitude));
-
             mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(lastKnownLocation, 15));
+            Log.d("HSR", "geocoder :" + geocoder);
 
-            initialMapMarker = mGoogleMap.addMarker(new MarkerOptions()
-                    .position(lastKnownLocation)
-                    .title(initialMarkerTitle)
-                    .snippet(getResources().getString(R.string.map_marker_first_position))
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
+            if (geocoder != null) {
+                String initialMarkerTitle = (getAddress(getContext(), lastLatitude, lastLongitude));
 
+                if (isAdded()) {
+                    initialMapMarker = mGoogleMap.addMarker(new MarkerOptions()
+                            .position(lastKnownLocation)
+                            .title(initialMarkerTitle)
+                            .snippet(getActivity().getResources().getString(R.string.map_marker_first_position))
+                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
+                }
+
+            }
         } else {
         }
 
     }
 
     public String getAddress(Context mContext, double lat, double lng) {
+
         String nowAddr = "현재 위치를 확인 할 수 없습니다.";
-        Geocoder geocoder = new Geocoder(mContext, Locale.KOREA);
         List<Address> address;
 
         try {
@@ -291,5 +302,12 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
             e.printStackTrace();
         }
         return nowAddr;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.d("HSR", "onDestroy()");
+
     }
 }
