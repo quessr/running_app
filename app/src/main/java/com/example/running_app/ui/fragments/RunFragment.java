@@ -30,7 +30,7 @@ import androidx.fragment.app.Fragment;
 import com.example.running_app.R;
 import com.example.running_app.data.model.GpsTrackerService;
 import com.example.running_app.data.model.PermissionManager;
-import com.example.running_app.data.model.PolylineMarkerUpdater;
+import com.example.running_app.data.model.PolylineUpdater;
 import com.example.running_app.databinding.FragmentRunBinding;
 import com.example.running_app.ui.MainActivity;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -57,7 +57,7 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
 
     private int MY_PERMISSIONS_REQUEST_LOCATION = 1;
 
-    private PolylineMarkerUpdater polylineMarkerUpdater;
+    private PolylineUpdater polylineMarkerUpdater;
     private Marker initialMapMarker;
     private Marker runStartMapMarker;
 
@@ -195,7 +195,7 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
         mGoogleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         mGoogleMap.setBuildingsEnabled(true);
 
-        polylineMarkerUpdater = new PolylineMarkerUpdater(mGoogleMap);
+        polylineMarkerUpdater = new PolylineUpdater(mGoogleMap);
 
         if (ActivityCompat.checkSelfPermission(this.requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this.requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
                 && ActivityCompat.checkSelfPermission(this.requireContext(), Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED

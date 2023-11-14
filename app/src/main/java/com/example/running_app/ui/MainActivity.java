@@ -175,11 +175,6 @@ public class MainActivity extends AppCompatActivity {
             runFragment.updateMap(location);
         }
 
-        //오류 발생 될 경우
-//        @Override
-//        public void occurError(int errorCode) {
-//            Log.d("HSR", "occurError : "+errorCode);
-//        }
     };
     ServiceConnection serviceGpsTrackerConnection = new ServiceConnection() {
         @Override
