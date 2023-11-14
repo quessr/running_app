@@ -70,8 +70,6 @@ public class RunningAdapter extends RecyclerView.Adapter<RunningAdapter.ViewHold
         holder.list_setting.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(application.getApplicationContext(), "클릭", Toast.LENGTH_SHORT).show();
-
                 //Alert 창
                 AlertDialog.Builder builder = new AlertDialog.Builder(activity);
                 builder.setMessage("운동기록을 삭제하시겠습니까?");
