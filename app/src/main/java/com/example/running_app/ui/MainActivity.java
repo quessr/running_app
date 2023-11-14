@@ -87,6 +87,8 @@ public class MainActivity extends AppCompatActivity {
 
         Intent gpsTrackerService = new Intent(getApplicationContext(), GpsTrackerService.class);
         bindService(gpsTrackerService, serviceGpsTrackerConnection, Context.BIND_AUTO_CREATE);
+        Log.d("HSR", "MainActivity onCreate");
+
 
         StepCounter stepCounter = new StepCounter(this, timerViewModel);
 
@@ -184,6 +186,8 @@ public class MainActivity extends AppCompatActivity {
         public void onServiceDisconnected(ComponentName name) {
             gpsTracker.setListener(null);
             gpsTracker = null;
+            Log.d("HSR", "MainActivity onServiceDisconnected");
+
         }
 
         @Override
@@ -193,8 +197,23 @@ public class MainActivity extends AppCompatActivity {
                 gpsTracker = mGpsTrackerServiceBinder.getService();
                 gpsTracker.startForeground();
                 gpsTracker.setListener(listener);
+                Log.d("HSR", "MainActivity onServiceConnected");
 
             }
         }
     };
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unbindService(serviceGpsTrackerConnection);
+        Log.d("HSR", "MainActivity onDestroy");
+
+    }
+        @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Log.d("HSR", "MainActivity onBackPressed");
+        finish();
+    }
 }
