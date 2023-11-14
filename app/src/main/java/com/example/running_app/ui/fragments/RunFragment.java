@@ -53,6 +53,7 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
     private FragmentRunBinding binding;
     public GoogleMap mGoogleMap;
     SupportMapFragment mapFragment;
+    Geocoder geocoder;
 
     private int MY_PERMISSIONS_REQUEST_LOCATION = 1;
 
@@ -78,6 +79,8 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
 
         Log.d("HSR", "onCreate()");
         locationManager = (LocationManager) MainActivity.mContext.getSystemService(Context.LOCATION_SERVICE);
+
+        geocoder = new Geocoder(getContext(), Locale.KOREA);
 
         requestPermissionLauncher = registerForActivityResult(
                 new ActivityResultContracts.RequestMultiplePermissions(), new ActivityResultCallback<Map<String, Boolean>>() {
@@ -204,23 +207,23 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
     @Override
     public void updateMap(Location location) {
         Log.d("HSR", "RunFragment : " + location);
-//        if (location.getProvider().equals("gps")) {
-//            polylineMarkerUpdater.updatePolyline(location);
-//            polylineMarkerUpdater.updateMarker(location);
-//        }
 
         LatLng lastKnownLocation = new LatLng(location.getLatitude(), location.getLongitude());
 
         if (runStartMapMarker == null) {
-            String currentMarkerTitle = (getAddress(getContext(), location.getLatitude(), location.getLongitude()));
-
             mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(lastKnownLocation, 15));
 
-            runStartMapMarker = mGoogleMap.addMarker(new MarkerOptions()
-                    .position(lastKnownLocation)
-                    .title(currentMarkerTitle)
-                    .snippet(getResources().getString(R.string.map_marker_current_location))
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
+            if (geocoder != null) {
+                String currentMarkerTitle = (getAddress(getContext(), location.getLatitude(), location.getLongitude()));
+
+
+                runStartMapMarker = mGoogleMap.addMarker(new MarkerOptions()
+                        .position(lastKnownLocation)
+                        .title(currentMarkerTitle)
+                        .snippet(getResources().getString(R.string.map_marker_current_location))
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
+            }
+
 
             CircleOptions circleOptions = new CircleOptions()
                     .center(lastKnownLocation)
@@ -262,24 +265,29 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
         LatLng lastKnownLocation = new LatLng(lastLatitude, lastLongitude);
 
         if (initialMapMarker == null) {
-            String initialMarkerTitle = (getAddress(getContext(), lastLatitude, lastLongitude));
-
             mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(lastKnownLocation, 15));
+            Log.d("HSR", "geocoder :" + geocoder);
 
-            initialMapMarker = mGoogleMap.addMarker(new MarkerOptions()
-                    .position(lastKnownLocation)
-                    .title(initialMarkerTitle)
-                    .snippet(getResources().getString(R.string.map_marker_first_position))
-                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
+            if (geocoder != null) {
+                String initialMarkerTitle = (getAddress(getContext(), lastLatitude, lastLongitude));
 
+                if (isAdded()) {
+                    initialMapMarker = mGoogleMap.addMarker(new MarkerOptions()
+                            .position(lastKnownLocation)
+                            .title(initialMarkerTitle)
+                            .snippet(getActivity().getResources().getString(R.string.map_marker_first_position))
+                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
+                }
+
+            }
         } else {
         }
 
     }
 
     public String getAddress(Context mContext, double lat, double lng) {
+
         String nowAddr = "현재 위치를 확인 할 수 없습니다.";
-        Geocoder geocoder = new Geocoder(mContext, Locale.KOREA);
         List<Address> address;
 
         try {
