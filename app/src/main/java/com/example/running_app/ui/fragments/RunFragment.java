@@ -242,9 +242,12 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
             animator.start();
 
         } else {
-            runStartMapMarker.setPosition(lastKnownLocation);
-            circle.setCenter(lastKnownLocation);
-            polylineMarkerUpdater.updatePolyline(location);
+            if (location.getProvider().equals("gps")) {
+                runStartMapMarker.setPosition(lastKnownLocation);
+                circle.setCenter(lastKnownLocation);
+                polylineMarkerUpdater.updatePolyline(location);
+            }
+
         }
 
     }
@@ -291,5 +294,12 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
             e.printStackTrace();
         }
         return nowAddr;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.d("HSR", "onDestroy()");
+
     }
 }

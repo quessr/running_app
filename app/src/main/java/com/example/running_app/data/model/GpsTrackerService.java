@@ -96,27 +96,25 @@ public class GpsTrackerService extends Service implements LocationListener {
                             }
                         }
                     }
-                }
+                    if (isGPSEnabled) {
 
-                if (isGPSEnabled) {
-                    if (location == null) {
-                        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+                            if (locationManager != null) {
+                                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
 
-                        if (locationManager != null) {
-                            location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                                if (location == null) {
+                                    location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                                }
 
-                            if (location == null) {
-                                location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                                if (location != null) {
+                                    latitude = location.getLatitude();
+                                    longitude = location.getLongitude();
+                                }
                             }
 
-                            if (location != null) {
-                                latitude = location.getLatitude();
-                                longitude = location.getLongitude();
-                            }
                         }
-
                     }
-                }
+
+
             }
 
 
@@ -147,22 +145,22 @@ public class GpsTrackerService extends Service implements LocationListener {
         if (mListener != null) mListener.updateMap(location);
     }
 
-//    public double getLongitude() {
-//        if (location != null) {
-//            longitude = location.getLongitude();
-//        }
-//
-//        return longitude;
-//    }
+    public double getLongitude() {
+        if (location != null) {
+            longitude = location.getLongitude();
+        }
 
-//    public double getLatitude() {
-//        if (location != null) {
-//            latitude = location.getLatitude();
-//
-//        }
-//
-//        return latitude;
-//    }
+        return longitude;
+    }
+
+    public double getLatitude() {
+        if (location != null) {
+            latitude = location.getLatitude();
+
+        }
+
+        return latitude;
+    }
 
     public void stopUsingGPS() {
         if (locationManager != null) {
