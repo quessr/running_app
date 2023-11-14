@@ -36,6 +36,11 @@ import com.example.running_app.ui.viewmodels.TimerViewModel;
 
 public class GpsTrackerService extends Service implements LocationListener {
 
+    public static final int ERROR_CODE_GPS_DISABLE = 0;
+    public static final int ERROR_CODE_NETWORK_DISABLE = 1;
+    public static final int ERROR_CODE_GPS_ENABLE = 2;
+    public static final int ERROR_CODE_NETWORK_ENABLE = 3;
+
     //    private final Context mContext;
     protected LocationManager locationManager;
     private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 1;
@@ -71,9 +76,13 @@ public class GpsTrackerService extends Service implements LocationListener {
             Log.d("GPS@@", "isGPSEnabled : " + isGPSEnabled + " isNetworkEnabled : " + isNetworkEnabled);
 
 
-            if (!isGPSEnabled && !isNetworkEnabled) {
+            if (!isGPSEnabled && !isNetworkEnabled) {   //gps랑 네트워크 둘다 안될때 예외처리
+
+                mListener.occurError(ERROR_CODE_GPS_DISABLE);
+                mListener.occurError(ERROR_CODE_NETWORK_DISABLE);
 
             } else {
+
                 int hasFineLocationPermission = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION);
                 int hasCoarseLocationPermission = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION);
 
@@ -95,6 +104,8 @@ public class GpsTrackerService extends Service implements LocationListener {
                                 // 네트워크 기반 위치 정보 비활성화 상태에서의 예외 처리
                             }
                         }
+                    } else {
+                        mListener.occurError(ERROR_CODE_NETWORK_DISABLE);
                     }
                 }
 
@@ -116,6 +127,8 @@ public class GpsTrackerService extends Service implements LocationListener {
                         }
 
                     }
+                } else {
+                    mListener.occurError(ERROR_CODE_GPS_DISABLE);
                 }
             }
 
@@ -178,7 +191,7 @@ public class GpsTrackerService extends Service implements LocationListener {
         void updateMap(Location location);
 
         //오류 발생 될 경우
-//        void occurError(int errorCode);
+        void occurError(int errorCode);
 
     }
 
