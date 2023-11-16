@@ -145,7 +145,7 @@ public class RunningAdapter extends RecyclerView.Adapter<RunningAdapter.ViewHold
         }
 
         private String speedFormat(double avgSpeed) {
-            DecimalFormat df = new DecimalFormat("#.###");
+            DecimalFormat df = new DecimalFormat("#");
             return df.format(avgSpeed);
         }
 
@@ -153,7 +153,8 @@ public class RunningAdapter extends RecyclerView.Adapter<RunningAdapter.ViewHold
             if (timeValue <= 0) {
                 return 0.0;
             } else {
-                return tDistance / timeValue;  //   Km/h
+                double totalTimeInHours = timeValue / 3600.0;   //초 -> 시간 변환
+                return tDistance / totalTimeInHours;  //   Km/h
             }
         }
 
