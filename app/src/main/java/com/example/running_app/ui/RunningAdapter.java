@@ -142,12 +142,12 @@ public class RunningAdapter extends RecyclerView.Adapter<RunningAdapter.ViewHold
             t_date.setText(data.getCreate_at());
             t_distance.setText(distanceFormat(tDistance) + " Km");
             t_runTime.setText(timeFormat(timeValue));
-            t_speed.setText(speedFormat(avgSpeed) + " m/s");
+            t_speed.setText(speedFormat(avgSpeed) + " Km/h");
             t_walkCount.setText(String.valueOf(data.getWalk_count()));
         }
 
         private String speedFormat(double avgSpeed) {
-            DecimalFormat df = new DecimalFormat("#.##");
+            DecimalFormat df = new DecimalFormat("#.###");
             return df.format(avgSpeed);
         }
 
@@ -155,7 +155,7 @@ public class RunningAdapter extends RecyclerView.Adapter<RunningAdapter.ViewHold
             if (timeValue <= 0) {
                 return 0.0;
             } else {
-                return tDistance / timeValue * 1000;    // m/s로 변환
+                return tDistance / timeValue;  //   Km/h
             }
         }
 

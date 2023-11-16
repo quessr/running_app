@@ -173,6 +173,55 @@ public class MainActivity extends AppCompatActivity {
             timerViewModel.setGpsLocation(location);
 
             runFragment.updateMap(location);
+
+        }
+
+        @Override
+        public void occurError(int errorCode) {
+            Log.d("HSR", "occurError : " + errorCode);
+
+
+            if (errorCode == GpsTrackerService.ERROR_CODE_GPS_DISABLE) {
+                AlertDialog.Builder alertDialog = new AlertDialog.Builder(mContext);
+                alertDialog.setTitle("GPS 설정");
+                alertDialog.setMessage("GPS 비활성화되어 있습니다. 설정으로 이동하시겠습니까?");
+                alertDialog.setPositiveButton("이동", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                        mContext.startActivity(intent);
+//                    activityResultLauncher.launch(intent);
+                    }
+                });
+                alertDialog.setNegativeButton("취소", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+
+                        // 취소 클릭시 앱 종료
+                    }
+                });
+                alertDialog.show();
+            }
+
+            if (errorCode == GpsTrackerService.ERROR_CODE_NETWORK_DISABLE) {
+                AlertDialog.Builder alertDialog = new AlertDialog.Builder(mContext);
+                alertDialog.setTitle("네트워크 설정");
+                alertDialog.setMessage("네트워크 비활성화되어 있습니다. 설정으로 이동하시겠습니까?");
+                alertDialog.setPositiveButton("설정으로 이동", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent intent = new Intent(Settings.ACTION_WIFI_SETTINGS);
+                        mContext.startActivity(intent);
+                    }
+                });
+                alertDialog.setNegativeButton("취소", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+
+                        // 취소 클릭시 앱 종료
+                    }
+                });
+
+                alertDialog.show();
+            }
         }
 
     };

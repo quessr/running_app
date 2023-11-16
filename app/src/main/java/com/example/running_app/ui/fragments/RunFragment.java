@@ -255,6 +255,11 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
 
     }
 
+    @Override
+    public void occurError(int errorCode) {
+
+    }
+
 
     @Override
     public void onLocationChanged(@NonNull Location location) {

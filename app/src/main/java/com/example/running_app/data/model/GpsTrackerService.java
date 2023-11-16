@@ -35,14 +35,15 @@ import com.example.running_app.ui.viewmodels.TimerViewModel;
 
 
 public class GpsTrackerService extends Service implements LocationListener {
-
+    public static final int ERROR_CODE_GPS_DISABLE = 0;
+    public static final int ERROR_CODE_NETWORK_DISABLE = 1;
     //    private final Context mContext;
     protected LocationManager locationManager;
     private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 1;
     private static final long MIN_TIME_BW_UPDATES = 1000 * 1 * 1;
-     Location location;
-     double latitude;
-     double longitude;
+    Location location;
+    double latitude;
+    double longitude;
     private updateMap mListener;
     private NotificationManager notificationManager;
     int notificationId = 0;
@@ -73,46 +74,49 @@ public class GpsTrackerService extends Service implements LocationListener {
 
             if (!isGPSEnabled && !isNetworkEnabled) {
 
+//                mListener.occurError(ERROR_CODE_GPS_DISABLE);
+//                mListener.occurError(ERROR_CODE_NETWORK_DISABLE);
+
             } else {
-                int hasFineLocationPermission = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION);
-                int hasCoarseLocationPermission = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION);
+            int hasFineLocationPermission = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION);
+            int hasCoarseLocationPermission = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION);
 
-                if (hasFineLocationPermission == PackageManager.PERMISSION_GRANTED && hasCoarseLocationPermission == PackageManager.PERMISSION_GRANTED) {
-                    if (isNetworkEnabled) {
-                        if (locationManager != null) {
-                            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+            if (hasFineLocationPermission == PackageManager.PERMISSION_GRANTED && hasCoarseLocationPermission == PackageManager.PERMISSION_GRANTED) {
+                if (isNetworkEnabled) {
+                    if (locationManager != null) {
+                        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
 
-                            if (location == null) {
-                                location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-                            }
+                        if (location == null) {
+                            location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                        }
 
-                            if (location != null) {
-                                latitude = location.getLatitude();
-                                longitude = location.getLongitude();
+                        if (location != null) {
+                            latitude = location.getLatitude();
+                            longitude = location.getLongitude();
 
-                            } else {
-                                Toast.makeText(MainActivity.mContext, "location 정보가 없습니다.", Toast.LENGTH_SHORT).show();
-                                // 네트워크 기반 위치 정보 비활성화 상태에서의 예외 처리
-                            }
+                        } else {
+                            Toast.makeText(MainActivity.mContext, "location 정보가 없습니다.", Toast.LENGTH_SHORT).show();
+                            // 네트워크 기반 위치 정보 비활성화 상태에서의 예외 처리
                         }
                     }
-                    if (isGPSEnabled) {
+                }
+                if (isGPSEnabled) {
 
-                            if (locationManager != null) {
-                                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+                    if (locationManager != null) {
+                        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
 
-                                if (location == null) {
-                                    location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-                                }
+                        if (location == null) {
+                            location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                        }
 
-                                if (location != null) {
-                                    latitude = location.getLatitude();
-                                    longitude = location.getLongitude();
-                                }
-                            }
-
+                        if (location != null) {
+                            latitude = location.getLatitude();
+                            longitude = location.getLongitude();
                         }
                     }
+
+                }
+            }
 
 
             }
@@ -122,8 +126,6 @@ public class GpsTrackerService extends Service implements LocationListener {
             Log.d("GPS@@", "" + e.toString());
         }
     }
-
-
 
 
     public void updateLocation(Location location) {
@@ -176,7 +178,7 @@ public class GpsTrackerService extends Service implements LocationListener {
         void updateMap(Location location);
 
         //오류 발생 될 경우
-//        void occurError(int errorCode);
+        void occurError(int errorCode);
 
     }
 
