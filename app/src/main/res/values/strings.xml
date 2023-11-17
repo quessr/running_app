@@ -3,4 +3,15 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="map_marker_current_location">현재 위치</string>
     <string name="map_marker_first_position">처음 위치</string>
+
+    <string name="permission_denied_notification_location_recognition">앱을 사용하기 위해서는 위치 및 신체 활동 권한이 필요합니다. \n거부된 권한을 허용해주시기 바랍니다.</string>
+    <string name="permission_location_off">위치 권한을 허용해 주세요.</string>
+
+    <string name="show_permission_denied_notification_title">필수 권한 거부</string>
+    <string name="show_permission_denied_notification_positive_button">설정으로 이동</string>
+    <string name="show_permission_denied_notification_negative_button">종료</string>
+
+    <string name="background_permission_denied_dialog_title">백그라운드 위치 권한을 위해 항상 허용으로 설정해주세요.</string>
+    <string name="background_permission_denied_dialog_positive_button">네</string>
+    <string name="background_permission_denied_dialog_negative_button">아니오</string>
 </resources>
