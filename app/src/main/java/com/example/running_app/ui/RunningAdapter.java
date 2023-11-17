@@ -8,13 +8,10 @@ import android.app.AlertDialog;
 import android.app.Application;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
-import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,17 +22,15 @@ import com.example.running_app.R;
 import com.example.running_app.data.database.dao.RunDatabase;
 import com.example.running_app.data.database.dao.TB_GPS;
 import com.example.running_app.data.database.dao.TB_Run;
-import com.example.running_app.data.model.RunRepository;
+import com.example.running_app.data.model.OnRunHistoryItemClickListener;
 import com.example.running_app.ui.viewmodels.RunViewModel;
-import com.example.running_app.ui.viewmodels.TimerViewModel;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RunningAdapter extends RecyclerView.Adapter<RunningAdapter.ViewHolder> {
-
-
+public class RunningAdapter extends RecyclerView.Adapter<RunningAdapter.ViewHolder> implements OnRunHistoryItemClickListener {
+    private OnRunHistoryItemClickListener clickListener;
     private List<TB_Run> runItems = new ArrayList<>();
     private Context context;
     private Application application;
@@ -107,6 +102,19 @@ public class RunningAdapter extends RecyclerView.Adapter<RunningAdapter.ViewHold
         notifyDataSetChanged();
     }
 
+    //Adapter onClick 설정
+    @Override
+    public void onItemClickListener(TB_Run item, String distanceFormat, String speedFormat, String timeFormat) {
+        if (clickListener != null){
+            clickListener.onItemClickListener(item, distanceFormat, speedFormat, timeFormat);
+        }
+    }
+
+    public void setOnItemClickListener(OnRunHistoryItemClickListener clickListener) {
+        this.clickListener = clickListener;
+    }
+
+
     public class ViewHolder extends RecyclerView.ViewHolder {
         TextView t_date, t_distance, t_runTime, t_speed, t_walkCount;
 
@@ -142,6 +150,21 @@ public class RunningAdapter extends RecyclerView.Adapter<RunningAdapter.ViewHold
             t_runTime.setText(timeFormat(timeValue));
             t_speed.setText(speedFormat(avgSpeed) + " Km/h");
             t_walkCount.setText(String.valueOf(data.getWalk_count()));
+
+            //Adapter onClick 설정
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // 어댑터의 컨텍스트에서 호출하는 경우 getBindingAdapterPosition()을 호출  /   RecyclerView가 표시하는 위치를 호출하려면 getAbsoluteAdapterPosition()을 호출
+                    int position = getBindingAdapterPosition();
+                    if (clickListener != null) {
+                        TB_Run item = runItems.get(position);
+                        clickListener.onItemClickListener(item, distanceFormat(tDistance), speedFormat(avgSpeed), timeFormat(timeValue));
+
+
+                    }
+                }
+            });
         }
 
         private String speedFormat(double avgSpeed) {

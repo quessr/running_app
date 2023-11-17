@@ -3,39 +3,30 @@ package com.example.running_app.ui.fragments;
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 
-import android.app.Application;
-import android.os.Bundle;
 import android.util.Log;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.LiveData;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.room.Room;
 
 import com.example.running_app.R;
 import com.example.running_app.data.database.dao.GpsDao;
 import com.example.running_app.data.database.dao.RunDao;
-import com.example.running_app.data.database.dao.RunDatabase;
-import com.example.running_app.data.database.dao.TB_GPS;
 import com.example.running_app.data.database.dao.TB_Run;
+import com.example.running_app.data.model.OnRunHistoryItemClickListener;
 import com.example.running_app.data.model.RunRepository;
 import com.example.running_app.ui.RunningAdapter;
 import com.example.running_app.ui.viewmodels.RunViewModel;
 
 import java.util.List;
-import java.util.Objects;
-
-import com.example.running_app.R;
-import com.example.running_app.ui.viewmodels.TimerViewModel;
 
 public class RunHistoryFragment extends Fragment {
 
@@ -72,48 +63,31 @@ public class RunHistoryFragment extends Fragment {
             }
         });
 
-        return view;
-    }
+        runningAdapter.setOnItemClickListener(new OnRunHistoryItemClickListener(){
 
-    private double totalDistance(List<TB_GPS> allGps) {
-          double totalDistance = 0;
-          TB_GPS prevGps = null;
+            @Override
+            public void onItemClickListener(TB_Run item, String distanceFormat, String speedFormat, String timeFormat) {
 
-        for (TB_GPS currentGps : allGps) {
-            if (prevGps != null){
-                // 이전 GPS와 현재 GPS 사이의 거리 계산하여 누적
-//                double segmentDistance = haversine(prevGps.getLatitude(), prevGps.getLongitude(), currentGps.getLatitude(), currentGps.getLongitude());
-                double segmentDistance = haversine(prevGps.getLat(), prevGps.getLon(), currentGps.getLat(), currentGps.getLon());
-                totalDistance += segmentDistance;
+                Toast.makeText(getContext(), "선택 : " + item.getRun_id(), Toast.LENGTH_SHORT).show();
+                DetailMainHistoryFragment detailMainHistoryFragment = new DetailMainHistoryFragment();
+
+
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("RUN_ITEM", item);    //객체로 전달하기 위해 TB_RUN 클래스 Serializable사용
+                bundle.putString("distance", distanceFormat);
+                bundle.putString("speed", speedFormat);
+                bundle.putString("time", timeFormat);
+                detailMainHistoryFragment.setArguments(bundle);
+
+                // 화면 전환
+                FragmentTransaction transaction = requireActivity().getSupportFragmentManager().beginTransaction();
+                transaction.replace(R.id.run_history, detailMainHistoryFragment);
+                transaction.addToBackStack(null);
+                transaction.commit();
             }
-            prevGps = currentGps;   // 현재 GPS를 이전 GPS로 설정하여 다음 순회에 사용
-        }
+        });
 
-        return totalDistance;
-    }
-
-    private double haversine(double lat1, double lon1, double lat2, double lon2) {
-        // 지구의 반경 (단위: km)
-        final double R = 6371.0;
-
-        // 라디안으로 변환
-        lat1 = Math.toRadians(lat1);
-        lon1 = Math.toRadians(lon1);
-        lat2 = Math.toRadians(lat2);
-        lon2 = Math.toRadians(lon2);
-
-        // 위도와 경도의 차이 계산
-        double dLat = lat2 - lat1;
-        double dLon = lon2 - lon1;
-
-        // Haversine 공식 적용
-        double a = Math.pow(Math.sin(dLat / 2), 2) + Math.cos(lat1) * Math.cos(lat2) * Math.pow(Math.sin(dLon / 2), 2);
-        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-
-        // 거리 계산
-        double distance = R * c;
-
-        return distance;
+        return view;
     }
 
 
