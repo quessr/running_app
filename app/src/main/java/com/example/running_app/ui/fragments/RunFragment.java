@@ -66,12 +66,13 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
     protected LocationManager locationManager;
 
     Circle circle;
-    PermissionManager permissionManager;
+    public PermissionManager permissionManager;
     public ActivityResultLauncher<String[]> requestPermissionLauncher;
     boolean isGPSEnabled;
     boolean isNetworkEnabled;
 
 
+    @SuppressLint("MissingPermission")
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -96,15 +97,19 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
                             if (isGranted) {
                                 // 권한이 허용된 경우 처리할 코드
                                 Toast.makeText(getContext(), permission + " 권한이 허용되었습니다.", Toast.LENGTH_SHORT).show();
-                            } else {
+                            } else if (!permissionManager.hasLocationPermissions(getContext())) {
                                 // 권한이 거부된 경우 처리할 코드
                                 Toast.makeText(getContext(), permission + " 권한이 거부되었습니다.", Toast.LENGTH_SHORT).show();
                                 Log.d("HHH", "onActivityResult fail");
                                 permissionManager.showPermissionDeniedNotification(getActivity(), getActivity().getResources().getString(R.string.permission_denied_notification_location_recognition), Settings.ACTION_APPLICATION_DETAILS_SETTINGS, "app_settings");
+                            } else if (!permissionManager.hasBackgroundPermission(getContext())) {
+                                permissionManager.backgroundPermissionDialog(getActivity(), getContext());
                             }
                         }
                     }
                 });
+
+
     }
 
     @SuppressLint("MissingPermission")
@@ -170,23 +175,18 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
 
             Toast.makeText(getContext(), "권한이 모두 허용되었습니다.", Toast.LENGTH_SHORT).show();
 
-            locationManager = (LocationManager) MainActivity.mContext.getSystemService(Context.LOCATION_SERVICE);
+            locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
 
             locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
             locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1, 1, this);
 
-            if (permissionManager.permissionDeniedDialog.isShowing()) {
-                permissionManager.permissionDeniedDialog.dismiss();
-                Log.d("HSR", "onStart() permissionDeniedDialog.dismiss()");
-
-            }
-
-        } else {
+        } else if(!permissionManager.hasBackgroundPermission(requireContext())) {
             // 위치 권한이 거부된 경우 처리할 코드
             // 다이얼로그가 표시된 후 권한을 허용한 경우 처리할 코드
-
             Toast.makeText(getContext(), "백그라운드 위치 권한을 위해 항상 허용으로 설정해주세요.", Toast.LENGTH_SHORT).show();
+            permissionManager.backgroundPermissionDialog(getActivity(), getContext());
         }
+
     }
 
     @Override
@@ -288,9 +288,18 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
 
     }
 
+    @SuppressLint("MissingPermission")
     @Override
     public void onResume() {
         super.onResume();
+
+        if (permissionManager.hasLocationPermissions(getContext())) {
+            locationManager = (LocationManager) MainActivity.mContext.getSystemService(Context.LOCATION_SERVICE);
+
+            locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1, 1, this);
+        }
+
         if (!isGPSEnabled && !isNetworkEnabled) {
             Toast.makeText(getContext(), "위치 권한을 허용해 주세요.", Toast.LENGTH_SHORT).show();
             // 위치 설정 창을 띄우기 위한 인텐트 생성

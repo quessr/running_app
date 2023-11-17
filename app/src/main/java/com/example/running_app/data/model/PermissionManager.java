@@ -14,19 +14,52 @@ import android.provider.Settings;
 
 import androidx.core.app.ActivityCompat;
 
+import com.example.running_app.R;
 import com.example.running_app.ui.fragments.RunFragment;
 
 public class PermissionManager {
 
     public AlertDialog permissionDeniedDialog;
 
-    public static boolean hasLocationPermissions(Context context) {
+    public boolean hasLocationPermissions(Context context) {
         int fineLocationPermission = ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
         int coarseLocationPermission = ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION);
         int backgroundLocationPermission = ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_BACKGROUND_LOCATION);
         int recognitionPermission = ActivityCompat.checkSelfPermission(context, Manifest.permission.ACTIVITY_RECOGNITION);
 
         return fineLocationPermission == PackageManager.PERMISSION_GRANTED && coarseLocationPermission == PackageManager.PERMISSION_GRANTED && backgroundLocationPermission == PackageManager.PERMISSION_GRANTED && recognitionPermission == PackageManager.PERMISSION_GRANTED;
+    }
+
+    public boolean hasBackgroundPermission(Context context) {
+        int backgroundLocationPermission = ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_BACKGROUND_LOCATION);
+
+        return backgroundLocationPermission == PackageManager.PERMISSION_GRANTED;
+    }
+    private void backgroundPermission(Activity activity) {
+        ActivityCompat.requestPermissions(
+                activity,
+                new String[]{android.Manifest.permission.ACCESS_BACKGROUND_LOCATION},
+                2
+        );
+    }
+
+    public void backgroundPermissionDialog(Activity activity, Context context) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle("백그라운드 위치 권한을 위해 항상 허용으로 설정해주세요.");
+
+        DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                if (i == DialogInterface.BUTTON_POSITIVE) {
+                    backgroundPermission(activity);
+                }
+            }
+        };
+
+        builder.setPositiveButton("네", listener);
+        builder.setNegativeButton("아니오", null);
+
+        builder.show();
     }
 
     public void requestPermission(Context context, RunFragment runFragment) {
@@ -56,10 +89,8 @@ public class PermissionManager {
 
     public void showPermissionDeniedNotification(Activity activity, String message, String action, String setting_screen_type) {
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-        builder.setTitle("필수 권한 거부")
         builder.setTitle(activity.getResources().getString(R.string.show_permission_denied_notification_title))
                 .setMessage(message)
-                .setPositiveButton("설정으로 이동", new DialogInterface.OnClickListener() {
                 .setPositiveButton(activity.getResources().getString(R.string.show_permission_denied_notification_positive_button), new DialogInterface.OnClickListener() {
 
                     @Override
@@ -77,7 +108,6 @@ public class PermissionManager {
 
                     }
                 })
-                .setNegativeButton("종료", new DialogInterface.OnClickListener() {
                 .setNegativeButton(activity.getResources().getString(R.string.show_permission_denied_notification_negative_button), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
