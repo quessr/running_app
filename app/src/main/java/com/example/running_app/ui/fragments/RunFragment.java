@@ -97,13 +97,13 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
                             if (isGranted) {
                                 // 권한이 허용된 경우 처리할 코드
                                 Toast.makeText(getContext(), permission + " 권한이 허용되었습니다.", Toast.LENGTH_SHORT).show();
-                            } else if (!permissionManager.hasLocationPermissions(getContext())) {
+                            } else if (!permissionManager.haveRequiredPermissions(getContext())) {
                                 // 권한이 거부된 경우 처리할 코드
                                 Toast.makeText(getContext(), permission + " 권한이 거부되었습니다.", Toast.LENGTH_SHORT).show();
                                 Log.d("HHH", "onActivityResult fail");
                                 permissionManager.showPermissionDeniedNotification(getActivity(), getActivity().getResources().getString(R.string.permission_denied_notification_location_recognition), Settings.ACTION_APPLICATION_DETAILS_SETTINGS, "app_settings");
                             } else if (!permissionManager.hasBackgroundPermission(getContext())) {
-                                permissionManager.backgroundPermissionDialog(getActivity(), getContext());
+                                permissionManager.backgroundPermissionDeniedDialog(getActivity(), getContext());
                             }
                         }
                     }
@@ -168,7 +168,7 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
         isGPSEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
         isNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
 
-        if (permissionManager.hasLocationPermissions(requireContext())) {
+        if (permissionManager.haveRequiredPermissions(requireContext())) {
             // 위치 권한이 허용된 경우 처리할 코드
             // ...
             Log.d("HSR", "onStart() hasLocationPermissions");
@@ -184,7 +184,7 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
             // 위치 권한이 거부된 경우 처리할 코드
             // 다이얼로그가 표시된 후 권한을 허용한 경우 처리할 코드
             Toast.makeText(getContext(), "백그라운드 위치 권한을 위해 항상 허용으로 설정해주세요.", Toast.LENGTH_SHORT).show();
-            permissionManager.backgroundPermissionDialog(getActivity(), getContext());
+            permissionManager.backgroundPermissionDeniedDialog(getActivity(), getContext());
         }
 
     }
@@ -293,7 +293,7 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
     public void onResume() {
         super.onResume();
 
-        if (permissionManager.hasLocationPermissions(getContext())) {
+        if (permissionManager.haveRequiredPermissions(getContext())) {
             locationManager = (LocationManager) MainActivity.mContext.getSystemService(Context.LOCATION_SERVICE);
 
             locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);

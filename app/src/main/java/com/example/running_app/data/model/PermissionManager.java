@@ -21,7 +21,7 @@ public class PermissionManager {
 
     public AlertDialog permissionDeniedDialog;
 
-    public boolean hasLocationPermissions(Context context) {
+    public boolean haveRequiredPermissions(Context context) {
         int fineLocationPermission = ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
         int coarseLocationPermission = ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION);
         int backgroundLocationPermission = ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_BACKGROUND_LOCATION);
@@ -43,9 +43,9 @@ public class PermissionManager {
         );
     }
 
-    public void backgroundPermissionDialog(Activity activity, Context context) {
+    public void backgroundPermissionDeniedDialog(Activity activity, Context context) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle("백그라운드 위치 권한을 위해 항상 허용으로 설정해주세요.");
+        builder.setTitle(activity.getResources().getString(R.string.background_permission_denied_dialog_title));
 
         DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener() {
             @Override
@@ -56,15 +56,15 @@ public class PermissionManager {
             }
         };
 
-        builder.setPositiveButton("네", listener);
-        builder.setNegativeButton("아니오", null);
+        builder.setPositiveButton(activity.getResources().getString(R.string.show_permission_denied_notification_positive_button), listener);
+        builder.setNegativeButton(activity.getResources().getString(R.string.show_permission_denied_notification_negative_button), null);
 
         builder.show();
     }
 
     public void requestPermission(Context context, RunFragment runFragment) {
         // 이미 권한이 있으면 그냥 리턴
-        if (hasLocationPermissions(context)) {
+        if (haveRequiredPermissions(context)) {
             return;
         } else {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
