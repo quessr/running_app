@@ -57,8 +57,10 @@ public class PermissionManager {
     public void showPermissionDeniedNotification(Activity activity, String message, String action, String setting_screen_type) {
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         builder.setTitle("필수 권한 거부")
+        builder.setTitle(activity.getResources().getString(R.string.show_permission_denied_notification_title))
                 .setMessage(message)
                 .setPositiveButton("설정으로 이동", new DialogInterface.OnClickListener() {
+                .setPositiveButton(activity.getResources().getString(R.string.show_permission_denied_notification_positive_button), new DialogInterface.OnClickListener() {
 
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -76,6 +78,7 @@ public class PermissionManager {
                     }
                 })
                 .setNegativeButton("종료", new DialogInterface.OnClickListener() {
+                .setNegativeButton(activity.getResources().getString(R.string.show_permission_denied_notification_negative_button), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
 //                        requireActivity().finish();
