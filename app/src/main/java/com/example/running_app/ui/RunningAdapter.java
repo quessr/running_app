@@ -104,9 +104,9 @@ public class RunningAdapter extends RecyclerView.Adapter<RunningAdapter.ViewHold
 
     //Adapter onClick 설정
     @Override
-    public void onItemClickListener(TB_Run item, String distanceFormat, String speedFormat, String timeFormat) {
+    public void onItemClickListener(TB_Run item, String distanceFormat, String speedFormat, String timeFormat, List<TB_GPS> allGps) {
         if (clickListener != null){
-            clickListener.onItemClickListener(item, distanceFormat, speedFormat, timeFormat);
+            clickListener.onItemClickListener(item, distanceFormat, speedFormat, timeFormat, allGps);
         }
     }
 
@@ -159,7 +159,7 @@ public class RunningAdapter extends RecyclerView.Adapter<RunningAdapter.ViewHold
                     int position = getBindingAdapterPosition();
                     if (clickListener != null) {
                         TB_Run item = runItems.get(position);
-                        clickListener.onItemClickListener(item, distanceFormat(tDistance), speedFormat(avgSpeed), timeFormat(timeValue));
+                        clickListener.onItemClickListener(item, distanceFormat(tDistance), speedFormat(avgSpeed), timeFormat(timeValue), allGps);
 
 
                     }

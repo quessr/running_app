@@ -1,8 +1,13 @@
 package com.example.running_app.ui.fragments;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.activity.OnBackPressedCallback;
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.util.Log;
@@ -10,11 +15,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.running_app.R;
 import com.example.running_app.data.database.dao.TB_Run;
+import com.example.running_app.ui.MainActivity;
 
 public class DetailMainHistoryFragment extends Fragment {
+
+    private OnBackPressedCallback onBackPressedCallback;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -22,6 +31,7 @@ public class DetailMainHistoryFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_detail_main_history, container, false);
 
         DetailHistoryFragment detailHistoryFragment = new DetailHistoryFragment();
+        DetailMapFragment detailMapFragment = new DetailMapFragment();
 
         // DetailMainHistoryFragment에서 받아온 Bundle 객체
         Bundle receivedBundle = getArguments();
@@ -34,15 +44,32 @@ public class DetailMainHistoryFragment extends Fragment {
 
         // DetailHistoryFragment에 전달할 Bundle 설정
         detailHistoryFragment.setArguments(bundle);
+        detailMapFragment.setArguments(bundle);
 
         FragmentTransaction fragmentTransaction = getChildFragmentManager().beginTransaction();
-        fragmentTransaction.add(R.id.mapLayout, new DetailMapFragment());
+        fragmentTransaction.add(R.id.mapLayout, detailMapFragment);
         fragmentTransaction.add(R.id.detailLatout, detailHistoryFragment);
         fragmentTransaction.commit();
 
-
-
         return view;
     }
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+
+        onBackPressedCallback = new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                Toast.makeText(getActivity(), "뒤로가기", Toast.LENGTH_SHORT).show();
+
+                Log.d("HSR", "DetailMainHistoryFragment" + " => handleOnBackPressed");
+
+                requireActivity().getSupportFragmentManager().popBackStack();
+            }
+        };
+        requireActivity().getOnBackPressedDispatcher().addCallback(this, onBackPressedCallback);
+    }
+
 
 }

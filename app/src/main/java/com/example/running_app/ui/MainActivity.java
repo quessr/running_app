@@ -254,10 +254,16 @@ public class MainActivity extends AppCompatActivity {
         Log.d("HSR", "MainActivity onDestroy");
 
     }
-        @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        Log.d("HSR", "MainActivity onBackPressed");
-        finish();
-    }
+
+
+    //RunFragment 에서 backPressed 처리
+//        @Override
+//    public void onBackPressed() {
+//        super.onBackPressed();
+//        Log.d("HSR", "MainActivity onBackPressed : " + getSupportFragmentManager().getFragments().get(0));
+//
+//
+//
+//        // finish();
+//    }
 }

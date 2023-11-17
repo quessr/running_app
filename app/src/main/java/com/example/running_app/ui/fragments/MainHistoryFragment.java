@@ -2,14 +2,13 @@ package com.example.running_app.ui.fragments;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
-
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 
 import com.example.running_app.R;
 import com.example.running_app.ui.MainActivity;
@@ -17,7 +16,6 @@ import com.example.running_app.ui.MainActivity;
 public class MainHistoryFragment extends Fragment {
 
     Toolbar toolbar;
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
