@@ -18,7 +18,8 @@ import com.example.running_app.ui.fragments.RunFragment;
 
 public class PermissionManager {
 
-    private AlertDialog permissionDeniedDialog;
+    public AlertDialog permissionDeniedDialog;
+
     public static boolean hasLocationPermissions(Context context) {
         int fineLocationPermission = ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
         int coarseLocationPermission = ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION);
@@ -41,7 +42,6 @@ public class PermissionManager {
                             android.Manifest.permission.ACTIVITY_RECOGNITION
                     });
                 }
-//                permissionDialog(requireContext());
             } else {
                 if (runFragment.requestPermissionLauncher != null) {
                     runFragment.requestPermissionLauncher.launch(new String[]{
@@ -54,18 +54,25 @@ public class PermissionManager {
         }
     }
 
-    public void showPermissionDeniedNotification(Activity activity) {
+    public void showPermissionDeniedNotification(Activity activity, String message, String action, String setting_screen_type) {
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         builder.setTitle("필수 권한 거부")
-                .setMessage("앱을 사용하기 위해서는 위치 및 신체 활동 권한이 필요합니다. \n거부된 권한을 허용해주시기 바랍니다.")
+                .setMessage(message)
                 .setPositiveButton("설정으로 이동", new DialogInterface.OnClickListener() {
+
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         // 설정 화면으로 이동
-                        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                        Uri uri = Uri.fromParts("package", activity.getPackageName(), null);
-                        intent.setData(uri);
-                        activity.startActivity(intent);
+                        if ("app_settings".equals(setting_screen_type)) {
+                            Intent intent = new Intent(action);
+                            Uri uri = Uri.fromParts("package", activity.getPackageName(), null);
+                            intent.setData(uri);
+                            activity.startActivity(intent);
+                        } else if ("location_setting".equals(setting_screen_type)) {
+                            Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                            activity.startActivity(intent);
+                        }
+
                     }
                 })
                 .setNegativeButton("종료", new DialogInterface.OnClickListener() {
