@@ -29,6 +29,9 @@ import com.example.running_app.data.database.dao.TB_GPS;
 import com.example.running_app.data.database.dao.TB_Run;
 import com.example.running_app.data.model.OnRunHistoryItemClickListener;
 import com.example.running_app.data.model.RunRepository;
+import com.example.running_app.databinding.ActivityMainBinding;
+import com.example.running_app.databinding.FragmentHistoryBinding;
+import com.example.running_app.databinding.FragmentRunHistoryBinding;
 import com.example.running_app.ui.MainActivity;
 import com.example.running_app.ui.RunningAdapter;
 import com.example.running_app.ui.viewmodels.RunViewModel;
@@ -49,11 +52,16 @@ public class RunHistoryFragment extends Fragment {
     RunRepository repository;
     private int activeRunId;
 
+    public FragmentRunHistoryBinding binding;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_run_history, container, false);
+//        View view = inflater.inflate(R.layout.fragment_run_history, container, false);
+        binding = FragmentRunHistoryBinding.inflate(getLayoutInflater());
+        View view = binding.getRoot();
+
         Log.d("onCreateView", "onCreateView 화면");
         findID(view);
 
@@ -76,9 +84,7 @@ public class RunHistoryFragment extends Fragment {
 
             @Override
             public void onItemClickListener(TB_Run item, String distanceFormat, String speedFormat, String timeFormat, List<TB_GPS> allGps) {
-                Toast.makeText(getContext(), "선택 : " + item.getRun_id(), Toast.LENGTH_SHORT).show();
                 DetailMainHistoryFragment detailMainHistoryFragment = new DetailMainHistoryFragment();
-
 
                 Bundle bundle = new Bundle();
                 bundle.putSerializable("RUN_ITEM", item);    //객체로 전달하기 위해 TB_RUN 클래스 Serializable사용
@@ -93,6 +99,8 @@ public class RunHistoryFragment extends Fragment {
                 transaction.add(R.id.run_history, detailMainHistoryFragment);
                 transaction.addToBackStack(null);
                 transaction.commit();
+
+                binding.recyclerview.setVisibility(View.GONE);
             }
         });
 

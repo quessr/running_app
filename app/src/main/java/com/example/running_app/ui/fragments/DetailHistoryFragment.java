@@ -12,6 +12,7 @@ import android.widget.TextView;
 
 import com.example.running_app.R;
 import com.example.running_app.data.database.dao.TB_Run;
+import com.example.running_app.databinding.FragmentHistoryBinding;
 
 public class DetailHistoryFragment extends Fragment {
     TextView distance, date, speed, timer, step;
@@ -38,7 +39,6 @@ public class DetailHistoryFragment extends Fragment {
             String detailDistance = getArguments().getString("distance");
             distance.setText(detailDistance);
         }
-
         return view;
     }
 

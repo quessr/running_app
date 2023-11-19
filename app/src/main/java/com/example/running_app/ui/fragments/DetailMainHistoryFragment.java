@@ -19,6 +19,9 @@ import android.widget.Toast;
 
 import com.example.running_app.R;
 import com.example.running_app.data.database.dao.TB_Run;
+import com.example.running_app.databinding.ActivityMainBinding;
+import com.example.running_app.databinding.FragmentDetailMainHistoryBinding;
+import com.example.running_app.databinding.FragmentHistoryBinding;
 import com.example.running_app.ui.MainActivity;
 
 public class DetailMainHistoryFragment extends Fragment {
@@ -65,7 +68,11 @@ public class DetailMainHistoryFragment extends Fragment {
 
                 Log.d("HSR", "DetailMainHistoryFragment" + " => handleOnBackPressed");
 
-                requireActivity().getSupportFragmentManager().popBackStack();
+                FragmentTransaction fragmentTransaction = getActivity().getSupportFragmentManager().beginTransaction();
+                fragmentTransaction.replace(R.id.run_history, new MainHistoryFragment());
+                fragmentTransaction.commit();
+
+//                requireActivity().getSupportFragmentManager().popBackStack();
             }
         };
         requireActivity().getOnBackPressedDispatcher().addCallback(this, onBackPressedCallback);

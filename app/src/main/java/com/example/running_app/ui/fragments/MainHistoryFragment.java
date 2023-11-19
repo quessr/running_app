@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.example.running_app.R;
+import com.example.running_app.databinding.ActivityMainBinding;
 import com.example.running_app.ui.MainActivity;
 
 public class MainHistoryFragment extends Fragment {
