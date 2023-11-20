@@ -15,6 +15,7 @@ import android.location.LocationManager;
 import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
+import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -73,51 +74,61 @@ public class GpsTrackerService extends Service implements LocationListener {
 
 
             if (!isGPSEnabled && !isNetworkEnabled) {
+                Toast.makeText(getApplicationContext(), "Network, Gps 연결이 없습니다.", Toast.LENGTH_SHORT).show();
 
 //                mListener.occurError(ERROR_CODE_GPS_DISABLE);
 //                mListener.occurError(ERROR_CODE_NETWORK_DISABLE);
 
             } else {
-            int hasFineLocationPermission = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION);
-            int hasCoarseLocationPermission = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION);
 
-            if (hasFineLocationPermission == PackageManager.PERMISSION_GRANTED && hasCoarseLocationPermission == PackageManager.PERMISSION_GRANTED) {
-                if (isNetworkEnabled) {
-                    if (locationManager != null) {
-                        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+                int hasFineLocationPermission = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION);
+                int hasCoarseLocationPermission = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION);
 
-                        if (location == null) {
-                            location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                if (hasFineLocationPermission == PackageManager.PERMISSION_GRANTED && hasCoarseLocationPermission == PackageManager.PERMISSION_GRANTED) {
+                    if (isNetworkEnabled) {
+                        if (locationManager != null) {
+                            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+
+                            if (location == null) {
+                                location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                            }
+
+                            if (location != null) {
+                                latitude = location.getLatitude();
+                                longitude = location.getLongitude();
+
+                            } else {
+                                Toast.makeText(MainActivity.mContext, "location 정보가 없습니다.", Toast.LENGTH_SHORT).show();
+                                // 네트워크 기반 위치 정보 비활성화 상태에서의 예외 처리
+
+                                // 와이파이 설정 창을 띄우기 위한 인텐트 생성
+                                Intent intent = new Intent(Settings.ACTION_WIFI_SETTINGS);
+                                startActivity(intent);
+                            }
+                        }
+                    } else {
+//                        Toast.makeText(getApplicationContext(), "Network 연결이 없습니다.", Toast.LENGTH_SHORT).show();
+                        Log.d("GPS@@", "Network 연결이 없습니다.");
+
+
+                    }
+                    if (isGPSEnabled) {
+
+                        if (locationManager != null) {
+                            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+
+                            if (location == null) {
+                                location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                            }
+
+                            if (location != null) {
+                                latitude = location.getLatitude();
+                                longitude = location.getLongitude();
+                            }
                         }
 
-                        if (location != null) {
-                            latitude = location.getLatitude();
-                            longitude = location.getLongitude();
-
-                        } else {
-                            Toast.makeText(MainActivity.mContext, "location 정보가 없습니다.", Toast.LENGTH_SHORT).show();
-                            // 네트워크 기반 위치 정보 비활성화 상태에서의 예외 처리
-                        }
                     }
                 }
-                if (isGPSEnabled) {
-
-                    if (locationManager != null) {
-                        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
-
-                        if (location == null) {
-                            location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-                        }
-
-                        if (location != null) {
-                            latitude = location.getLatitude();
-                            longitude = location.getLongitude();
-                        }
-                    }
-
-                }
-            }
-
 
             }
 
@@ -208,7 +219,7 @@ public class GpsTrackerService extends Service implements LocationListener {
         }
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(this, channelId)
-                .setContentTitle("GPS Traker")
+                .setContentTitle("RUNNING APP")
                 .setContentText("Tracking your location...")
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT);
