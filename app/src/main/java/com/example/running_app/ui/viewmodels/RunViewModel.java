@@ -15,7 +15,7 @@ import java.util.List;
 public class RunViewModel extends AndroidViewModel {
     RunRepository runRepository;
     MutableLiveData<List<TB_Run>> runList = new MutableLiveData<>();
-    MutableLiveData<List<TB_GPS>> gpsList = new MutableLiveData<>();;
+    MutableLiveData<List<TB_GPS>> gpsList = new MutableLiveData<>();
     public RunViewModel(@NonNull Application application){
         super(application);
         runRepository = new RunRepository(application);

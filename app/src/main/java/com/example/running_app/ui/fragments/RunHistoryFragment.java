@@ -1,6 +1,6 @@
 package com.example.running_app.ui.fragments;
 
-import android.annotation.SuppressLint;
+
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,34 +11,28 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.lifecycle.Observer;
+
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.running_app.R;
-import com.example.running_app.data.database.dao.GpsDao;
-import com.example.running_app.data.database.dao.RunDao;
-import com.example.running_app.data.database.dao.TB_GPS;
-import com.example.running_app.data.database.dao.TB_Run;
-import com.example.running_app.data.model.OnRunHistoryItemClickListener;
-import com.example.running_app.data.model.RunRepository;
-import com.example.running_app.databinding.ActivityMainBinding;
-import com.example.running_app.databinding.FragmentHistoryBinding;
+
+
+
 import com.example.running_app.databinding.FragmentRunHistoryBinding;
 import com.example.running_app.ui.MainActivity;
 import com.example.running_app.ui.RunningAdapter;
 import com.example.running_app.ui.viewmodels.RunViewModel;
 
-import java.io.Serializable;
+
 import java.util.ArrayList;
-import java.util.List;
+
 
 public class RunHistoryFragment extends Fragment {
     private OnBackPressedCallback onBackPressedCallback;
@@ -49,7 +43,7 @@ public class RunHistoryFragment extends Fragment {
     public FragmentRunHistoryBinding binding;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
         binding = FragmentRunHistoryBinding.inflate(getLayoutInflater());
@@ -64,37 +58,29 @@ public class RunHistoryFragment extends Fragment {
         recyclerView.setHasFixedSize(true);
 
         viewModel = new ViewModelProvider(this).get(RunViewModel.class);
-        viewModel.getRunAll().observe(getViewLifecycleOwner(), new Observer<List<TB_Run>>() {
-            @SuppressLint("NotifyDataSetChanged")
-            @Override
-            public void onChanged(List<TB_Run> tbRuns) {
-                runningAdapter.setRunItems(tbRuns);
-                runningAdapter.notifyDataSetChanged();
-            }
+        viewModel.getRunAll().observe(getViewLifecycleOwner(), tbRuns -> {
+            runningAdapter.setRunItems(tbRuns);
+            runningAdapter.notifyDataSetChanged();
         });
 
-        runningAdapter.setOnItemClickListener(new OnRunHistoryItemClickListener(){
+        runningAdapter.setOnItemClickListener((item, distanceFormat, speedFormat, timeFormat, allGps) -> {
+            DetailMainHistoryFragment detailMainHistoryFragment = new DetailMainHistoryFragment();
 
-            @Override
-            public void onItemClickListener(TB_Run item, String distanceFormat, String speedFormat, String timeFormat, List<TB_GPS> allGps) {
-                DetailMainHistoryFragment detailMainHistoryFragment = new DetailMainHistoryFragment();
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("RUN_ITEM", item);    //객체로 전달하기 위해 TB_RUN 클래스 Serializable사용
+            bundle.putString("distance", distanceFormat);
+            bundle.putString("speed", speedFormat);
+            bundle.putString("time", timeFormat);
+            bundle.putParcelableArrayList("GPS_LIST", (ArrayList<? extends Parcelable>) allGps);    //용량제한?
+            detailMainHistoryFragment.setArguments(bundle);
 
-                Bundle bundle = new Bundle();
-                bundle.putSerializable("RUN_ITEM", item);    //객체로 전달하기 위해 TB_RUN 클래스 Serializable사용
-                bundle.putString("distance", distanceFormat);
-                bundle.putString("speed", speedFormat);
-                bundle.putString("time", timeFormat);
-                bundle.putParcelableArrayList("GPS_LIST", (ArrayList<? extends Parcelable>) allGps);
-                detailMainHistoryFragment.setArguments(bundle);
+            // 화면 전환
+            FragmentTransaction transaction = requireActivity().getSupportFragmentManager().beginTransaction();
+            transaction.add(R.id.run_history, detailMainHistoryFragment);
+            transaction.addToBackStack(null);
+            transaction.commit();
 
-                // 화면 전환
-                FragmentTransaction transaction = requireActivity().getSupportFragmentManager().beginTransaction();
-                transaction.add(R.id.run_history, detailMainHistoryFragment);
-                transaction.addToBackStack(null);
-                transaction.commit();
-
-                binding.recyclerview.setVisibility(View.GONE);
-            }
+            binding.recyclerview.setVisibility(View.GONE);
         });
 
         return view;
@@ -112,7 +98,7 @@ public class RunHistoryFragment extends Fragment {
         onBackPressedCallback = new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
-                getActivity().finish();
+                requireActivity().finish();
                 Intent intent = new Intent(getActivity(), MainActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);

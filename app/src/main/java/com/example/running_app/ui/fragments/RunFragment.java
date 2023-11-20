@@ -20,7 +20,6 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
-import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
@@ -33,7 +32,6 @@ import com.example.running_app.data.model.GpsTrackerService;
 import com.example.running_app.data.model.PermissionManager;
 import com.example.running_app.data.model.PolylineUpdater;
 import com.example.running_app.databinding.FragmentRunBinding;
-import com.example.running_app.ui.MainActivity;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -80,29 +78,26 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
 
 
         Log.d("HSR", "onCreate()");
-        locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+        locationManager = (LocationManager) requireActivity().getSystemService(Context.LOCATION_SERVICE);
 
-        geocoder = new Geocoder(getContext(), Locale.KOREA);
+        geocoder = new Geocoder(requireActivity(), Locale.KOREA);
 
         requestPermissionLauncher = registerForActivityResult(
-                new ActivityResultContracts.RequestMultiplePermissions(), new ActivityResultCallback<Map<String, Boolean>>() {
-                    @Override
-                    public void onActivityResult(Map<String, Boolean> result) {
-                        for (Map.Entry<String, Boolean> entry : result.entrySet()) {
-                            String permission = entry.getKey();
-                            boolean isGranted = entry.getValue();
+                new ActivityResultContracts.RequestMultiplePermissions(), result -> {
+                    for (Map.Entry<String, Boolean> entry : result.entrySet()) {
+                        String permission = entry.getKey();
+                        boolean isGranted = entry.getValue();
 
-                            if (isGranted) {
-                                // 권한이 허용된 경우 처리할 코드
-                                Toast.makeText(getContext(), permission + " 권한이 허용되었습니다.", Toast.LENGTH_SHORT).show();
-                            } else if (!permissionManager.haveRequiredPermissions(getContext())) {
-                                // 권한이 거부된 경우 처리할 코드
-                                Toast.makeText(getContext(), permission + " 권한이 거부되었습니다.", Toast.LENGTH_SHORT).show();
-                                Log.d("HHH", "onActivityResult fail");
-                                permissionManager.showPermissionDeniedNotification(getActivity(), getActivity().getResources().getString(R.string.permission_denied_notification_location_recognition), Settings.ACTION_APPLICATION_DETAILS_SETTINGS, "app_settings");
-                            } else if (!permissionManager.hasBackgroundPermission(getContext())) {
-                                permissionManager.backgroundPermissionDeniedDialog(getActivity(), getContext());
-                            }
+                        if (isGranted) {
+                            // 권한이 허용된 경우 처리할 코드
+                            Toast.makeText(getContext(), permission + " 권한이 허용되었습니다.", Toast.LENGTH_SHORT).show();
+                        } else if (!permissionManager.haveRequiredPermissions(getContext())) {
+                            // 권한이 거부된 경우 처리할 코드
+                            Toast.makeText(getContext(), permission + " 권한이 거부되었습니다.", Toast.LENGTH_SHORT).show();
+                            Log.d("HHH", "onActivityResult fail");
+                            permissionManager.showPermissionDeniedNotification(requireActivity(), requireActivity().getResources().getString(R.string.permission_denied_notification_location_recognition), Settings.ACTION_APPLICATION_DETAILS_SETTINGS, "app_settings");
+                        } else if (!permissionManager.hasBackgroundPermission(getContext())) {
+                            permissionManager.backgroundPermissionDeniedDialog(requireActivity(), getContext());
                         }
                     }
                 });
@@ -173,7 +168,7 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
 
             Toast.makeText(getContext(), "권한이 모두 허용되었습니다.", Toast.LENGTH_SHORT).show();
 
-            locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+            locationManager = (LocationManager) requireActivity().getSystemService(Context.LOCATION_SERVICE);
 
             locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
             locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1, 1, this);
@@ -182,7 +177,7 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
             // 위치 권한이 거부된 경우 처리할 코드
             // 다이얼로그가 표시된 후 권한을 허용한 경우 처리할 코드
             Toast.makeText(getContext(), "백그라운드 위치 권한을 위해 항상 허용으로 설정해주세요.", Toast.LENGTH_SHORT).show();
-            permissionManager.backgroundPermissionDeniedDialog(getActivity(), getContext());
+            permissionManager.backgroundPermissionDeniedDialog(requireActivity(), getContext());
         }
 
     }
@@ -190,8 +185,7 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         Log.d("HSR", "onMapReady()");
-        double lastLatitude = 0;
-        double lastLongitude = 0;
+
         mGoogleMap = googleMap;
         mGoogleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         mGoogleMap.setBuildingsEnabled(true);
@@ -276,12 +270,11 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
                     initialMapMarker = mGoogleMap.addMarker(new MarkerOptions()
                             .position(lastKnownLocation)
                             .title(initialMarkerTitle)
-                            .snippet(getActivity().getResources().getString(R.string.map_marker_first_position))
+                            .snippet(getResources().getString(R.string.map_marker_first_position))
                             .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
                 }
 
             }
-        } else {
         }
 
     }
@@ -292,7 +285,7 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
         super.onResume();
 
         if (permissionManager.haveRequiredPermissions(getContext())) {
-            locationManager = (LocationManager) MainActivity.mContext.getSystemService(Context.LOCATION_SERVICE);
+            locationManager = (LocationManager) requireActivity().getSystemService(Context.LOCATION_SERVICE);
 
             locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
             locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1, 1, this);
@@ -301,9 +294,7 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
         if (!isGPSEnabled && !isNetworkEnabled) {
             Toast.makeText(getContext(), "위치 권한을 허용해 주세요.", Toast.LENGTH_SHORT).show();
             // 위치 설정 창을 띄우기 위한 인텐트 생성
-            permissionManager.showPermissionDeniedNotification(getActivity(), getActivity().getResources().getString(R.string.permission_location_off), Settings.ACTION_LOCATION_SOURCE_SETTINGS, "location_setting");
-
-        } else {
+            permissionManager.showPermissionDeniedNotification(getActivity(), requireActivity().getResources().getString(R.string.permission_location_off), Settings.ACTION_LOCATION_SOURCE_SETTINGS, "location_setting");
 
         }
     }
@@ -317,7 +308,7 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
             if (geocoder != null) {
                 address = geocoder.getFromLocation(lat, lng, 1);
                 if (address != null && address.size() > 0) {
-                    nowAddr = address.get(0).getAddressLine(0).toString();
+                    nowAddr = address.get(0).getAddressLine(0);
                 }
             }
         } catch (IOException e) {
