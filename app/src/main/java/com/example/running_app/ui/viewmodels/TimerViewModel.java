@@ -71,10 +71,15 @@ public class TimerViewModel extends AndroidViewModel {
         if(activeRunId == -1) {
             return;
         }
-        tbGps.setRun_id(activeRunId);
-        tbGps.setLat(location.getLatitude());
-        tbGps.setLon(location.getLongitude());
-        runViewModel.setInsertGps(tbGps);
+
+        //GPS 값일 경우만 데이터 저장
+        if (location.getProvider().equals("gps")){
+
+            tbGps.setRun_id(activeRunId);
+            tbGps.setLat(location.getLatitude());
+            tbGps.setLon(location.getLongitude());
+            runViewModel.setInsertGps(tbGps);
+        }
 
     }
     public void startTimer() {
@@ -98,7 +103,6 @@ public class TimerViewModel extends AndroidViewModel {
         }, 3000);
 
         //시작시 테이블 생성
-//        TB_Run tbRun = new TB_Run();
         runViewModel.setInsertRun(tbRun);
         activeRunId = runRepository.getLatestRunId();
     }
