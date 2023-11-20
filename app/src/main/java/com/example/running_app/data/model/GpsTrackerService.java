@@ -36,7 +36,6 @@ import com.example.running_app.ui.viewmodels.TimerViewModel;
 
 
 public class GpsTrackerService extends Service implements LocationListener {
-
     //    private final Context mContext;
     protected LocationManager locationManager;
     private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 1;
@@ -146,8 +145,6 @@ public class GpsTrackerService extends Service implements LocationListener {
 
     @Override
     public void onLocationChanged(@NonNull Location location) {
-        // updateLocation(location);
-
 
         Toast.makeText(getApplicationContext(), "현재위치 " + location.getProvider() + " \n위도 " + location.getLatitude() + "\n경도 " + longitude, Toast.LENGTH_LONG).show();
         if (mListener != null) mListener.updateMap(location);
@@ -183,8 +180,6 @@ public class GpsTrackerService extends Service implements LocationListener {
     public interface updateMap {
         void updateMap(Location location);
 
-        //오류 발생 될 경우
-//        void occurError(int errorCode);
 
     }
 
@@ -218,11 +213,6 @@ public class GpsTrackerService extends Service implements LocationListener {
                 .setContentText("Tracking your location...")
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT);
-
-//        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
-//
-//        // notificationId is a unique int for each notification that you must define
-//        notificationManager.notify(notificationId, builder.build());
         return builder.build();
     }
 

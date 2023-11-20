@@ -16,8 +16,6 @@ public class RunViewModel extends AndroidViewModel {
     RunRepository runRepository;
     MutableLiveData<List<TB_Run>> runList = new MutableLiveData<>();
     MutableLiveData<List<TB_GPS>> gpsList = new MutableLiveData<>();;
-    TB_GPS getFirstLocation;
-    TB_GPS getLastLocation;
     public RunViewModel(@NonNull Application application){
         super(application);
         runRepository = new RunRepository(application);

@@ -53,14 +53,6 @@ public class MainActivity extends AppCompatActivity {
     private TimerViewModel timerViewModel;
     private RunViewModel runViewModel;
 
-    //StepCounter
-    private StepCounter stepCounter;
-
-    private String[] permissions = {
-            android.Manifest.permission.ACCESS_COARSE_LOCATION,
-            android.Manifest.permission.ACCESS_FINE_LOCATION,
-            android.Manifest.permission.ACTIVITY_RECOGNITION
-    };
 
     @RequiresApi(api = Build.VERSION_CODES.Q)
     @Override
@@ -100,8 +92,6 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, RunStartCountdownActivity.class);
                 startActivity(intent);
-
-//                int savedStepCount = stepCounter.loadStepCount(mContext); // 저장된 걸음수를 불러옴
 
                 gpsTracker.startLocationUpdate();
                 stepCounter.start();
@@ -204,11 +194,5 @@ public class MainActivity extends AppCompatActivity {
         unbindService(serviceGpsTrackerConnection);
         Log.d("HSR", "MainActivity onDestroy");
 
-    }
-        @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        Log.d("HSR", "MainActivity onBackPressed");
-        finish();
     }
 }

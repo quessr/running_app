@@ -29,7 +29,6 @@ public class StepCounter implements SensorEventListener {
 
     //stepCount
     TimerViewModel timerViewModel;
-    RunViewModel runViewModel;
 
     @RequiresApi(api = Build.VERSION_CODES.Q)
     public StepCounter(Context context, TimerViewModel timerViewModel) {
