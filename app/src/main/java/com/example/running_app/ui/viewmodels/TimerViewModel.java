@@ -1,8 +1,6 @@
 package com.example.running_app.ui.viewmodels;
 
-import android.annotation.SuppressLint;
 import android.app.Application;
-import android.content.Context;
 import android.location.Location;
 import android.os.Handler;
 import android.os.Looper;
@@ -12,10 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
 
-import com.example.running_app.data.database.dao.RunDao;
-import com.example.running_app.data.database.dao.RunDatabase;
 import com.example.running_app.data.database.dao.TB_GPS;
 import com.example.running_app.data.database.dao.TB_Run;
 import com.example.running_app.data.model.RunRepository;
@@ -23,23 +18,24 @@ import com.example.running_app.data.model.RunRepository;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
+import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
 public class TimerViewModel extends AndroidViewModel {
     public static final String DATE_FORMAT = "yyyy-MM-dd";
     private long time = 0;
-    private SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss");
+
+    private final SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
     private Timer timer;
     private TimerTask timerTask;
-    private boolean handler;
+//    private boolean handler;
 
     //db가 동작할때 run_id를 한번만 쓰기 위해 activeRunId 변수 설정
     private int activeRunId = -1;
 
     //timer, room DB
-    private RunDao runDao;
+//    private RunDao runDao;
     RunViewModel runViewModel;
     RunRepository runRepository;
 
@@ -48,7 +44,7 @@ public class TimerViewModel extends AndroidViewModel {
 
     TB_Run tbRun = new TB_Run();
     TB_GPS tbGps = new TB_GPS();
-    private MutableLiveData<String> timeTextLiveData = new MutableLiveData<>();
+    private final MutableLiveData<String> timeTextLiveData = new MutableLiveData<>();
 
     public LiveData<String> getTimeTextLiveData() {
         return timeTextLiveData;
@@ -57,7 +53,7 @@ public class TimerViewModel extends AndroidViewModel {
     public TimerViewModel(@NonNull Application application) {
         super(application);
         runRepository = new RunRepository(application);
-        runDao = RunDatabase.INSTANCE.runDao();
+//        runDao = RunDatabase.INSTANCE.runDao();
     }
 
     public void setRunViewModel(RunViewModel runViewModel){
@@ -73,7 +69,7 @@ public class TimerViewModel extends AndroidViewModel {
         }
 
         //GPS 값일 경우만 데이터 저장
-        if (location.getProvider().equals("gps")){
+        if ("gps".equals(location.getProvider())){
 
             tbGps.setRun_id(activeRunId);
             tbGps.setLat(location.getLatitude());
@@ -87,19 +83,16 @@ public class TimerViewModel extends AndroidViewModel {
     }
 
     private void start() {
-        handler = new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                timer = new Timer();
-                timerTask = new TimerTask() {
-                    @Override
-                    public void run() {
-                        time++;
-                        timeTextLiveData.postValue(getTimeStringFromLong(time));
-                    }
-                };
-                timer.scheduleAtFixedRate(timerTask, 0, 1000);
-            }
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+            timer = new Timer();
+            timerTask = new TimerTask() {
+                @Override
+                public void run() {
+                    time++;
+                    timeTextLiveData.postValue(getTimeStringFromLong(time));
+                }
+            };
+            timer.scheduleAtFixedRate(timerTask, 0, 1000);
         }, 3000);
 
         //시작시 테이블 생성
@@ -135,8 +128,8 @@ public class TimerViewModel extends AndroidViewModel {
     }
 
     private String currentDate() {
-        @SuppressLint("SimpleDateFormat")
-        SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
+//        @SuppressLint("SimpleDateFormat")
+        SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT, Locale.getDefault());
         Date today = Calendar.getInstance().getTime();
         return dateFormat.format(today);
     }
@@ -144,7 +137,8 @@ public class TimerViewModel extends AndroidViewModel {
 
     //SimpleDateFormat 함수 사용
     private String getTimeStringFromLong(long time) {
-        int resultInt = (int) Math.round(time);
+
+        int resultInt = Math.round(time);
         int hours = resultInt / 3600;
         int minutes = (resultInt % 3600) / 60;
         int seconds = resultInt % 60;

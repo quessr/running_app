@@ -2,10 +2,8 @@ package com.example.running_app.ui;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.os.Handler;
 import android.widget.TextView;
 
 import com.example.running_app.R;

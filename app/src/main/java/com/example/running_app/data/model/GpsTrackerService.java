@@ -92,7 +92,7 @@ public class GpsTrackerService extends Service implements LocationListener {
                                 longitude = location.getLongitude();
 
                             } else {
-                                Toast.makeText(MainActivity.mContext, "location 정보가 없습니다.", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(this, "location 정보가 없습니다.", Toast.LENGTH_SHORT).show();
                                 // 네트워크 기반 위치 정보 비활성화 상태에서의 예외 처리
 
                                 // 와이파이 설정 창을 띄우기 위한 인텐트 생성

@@ -11,7 +11,6 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.example.running_app.R;
-import com.example.running_app.databinding.ActivityMainBinding;
 import com.example.running_app.ui.MainActivity;
 
 public class MainHistoryFragment extends Fragment {
@@ -32,13 +31,10 @@ public class MainHistoryFragment extends Fragment {
         toolbar.setTitle("운동기록");
         toolbar.setNavigationIcon(R.drawable.baseline_arrow_back_24);
         //뒤로 가기
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(getActivity(), MainActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-                startActivity(intent);
-            }
+        toolbar.setNavigationOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), MainActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+            startActivity(intent);
         });
 
         return view;

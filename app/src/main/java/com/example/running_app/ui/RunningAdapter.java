@@ -1,13 +1,10 @@
 package com.example.running_app.ui;
 
-import static java.lang.String.format;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Application;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,7 +16,6 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.running_app.R;
-import com.example.running_app.data.database.dao.RunDatabase;
 import com.example.running_app.data.database.dao.TB_GPS;
 import com.example.running_app.data.database.dao.TB_Run;
 import com.example.running_app.data.model.OnRunHistoryItemClickListener;
@@ -32,16 +28,16 @@ import java.util.List;
 public class RunningAdapter extends RecyclerView.Adapter<RunningAdapter.ViewHolder> implements OnRunHistoryItemClickListener {
     private OnRunHistoryItemClickListener clickListener;
     private List<TB_Run> runItems = new ArrayList<>();
-    private Application application;
-    private Activity activity;
-    private RunViewModel viewModel;
+//    private Application application;
+    private final Activity activity;
+    private final RunViewModel viewModel;
 
     int runId;
 
     public RunningAdapter(Application application, Activity activity) {
         super();
         this.activity = activity;
-        this.application = application;
+//        this.application = application;
         viewModel = new RunViewModel(application);
     }
 
@@ -59,32 +55,26 @@ public class RunningAdapter extends RecyclerView.Adapter<RunningAdapter.ViewHold
         holder.bind(data);
 
         holder.list_setting.setImageResource(R.drawable.baseline_delete_24);
-        holder.list_setting.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //Alert 창
-                AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-                builder.setMessage("운동기록을 삭제하시겠습니까?");
-                builder.setNegativeButton("취소", null);
-                builder.setPositiveButton("확인", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
+        holder.list_setting.setOnClickListener(v -> {
+            //Alert 창
+            AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+            builder.setMessage("운동기록을 삭제하시겠습니까?");
+            builder.setNegativeButton("취소", null);
+            builder.setPositiveButton("확인", (dialog, which) -> {
 
-                        Toast.makeText(application.getApplicationContext(), "삭제 완료", Toast.LENGTH_SHORT).show();
+                Toast.makeText(activity, "삭제 완료", Toast.LENGTH_SHORT).show();
 
-                        //delete
-                        TB_Run tbRun = new TB_Run();
-                        runId = data.getRun_id();
-                        tbRun.setRun_id(runId);
-                        viewModel.setDeleteRun(tbRun);
-                        //현재 list 화면에서 삭제시 바로 화면 반영
-                        runItems.remove(holder.getAbsoluteAdapterPosition());
-                        notifyItemRemoved(holder.getAbsoluteAdapterPosition());
-                    }
-                });
-                AlertDialog dialog = builder.create();
-                dialog.show();
-            }
+                //delete
+//                        TB_Run tbRun = new TB_Run();
+//                        runId = data.getRun_id();
+//                        tbRun.setRun_id(runId);
+                viewModel.setDeleteRun(data);
+                //현재 list 화면에서 삭제시 바로 화면 반영
+                runItems.remove(holder.getAbsoluteAdapterPosition());
+                notifyItemRemoved(holder.getAbsoluteAdapterPosition());
+            });
+            AlertDialog dialog = builder.create();
+            dialog.show();
         });
 
     }
@@ -149,17 +139,14 @@ public class RunningAdapter extends RecyclerView.Adapter<RunningAdapter.ViewHold
             t_walkCount.setText(String.valueOf(data.getWalk_count()));
 
             //Adapter onClick 설정
-            itemView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    // 어댑터의 컨텍스트에서 호출하는 경우 getBindingAdapterPosition()을 호출  /   RecyclerView가 표시하는 위치를 호출하려면 getAbsoluteAdapterPosition()을 호출
-                    int position = getBindingAdapterPosition();
-                    if (clickListener != null) {
-                        TB_Run item = runItems.get(position);
-                        clickListener.onItemClickListener(item, distanceFormat(tDistance), speedFormat(avgSpeed), timeFormat(timeValue), allGps);
+            itemView.setOnClickListener(v -> {
+                // 어댑터의 컨텍스트에서 호출하는 경우 getBindingAdapterPosition()을 호출  /   RecyclerView가 표시하는 위치를 호출하려면 getAbsoluteAdapterPosition()을 호출
+                int position = getBindingAdapterPosition();
+                if (clickListener != null) {
+                    TB_Run item = runItems.get(position);
+                    clickListener.onItemClickListener(item, distanceFormat(tDistance), speedFormat(avgSpeed), timeFormat(timeValue), allGps);
 
 
-                    }
                 }
             });
         }
@@ -229,8 +216,7 @@ public class RunningAdapter extends RecyclerView.Adapter<RunningAdapter.ViewHold
         double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
         // 거리 계산
-        double distance = R * c;
 
-        return distance;
+        return R * c;
     }
 }
