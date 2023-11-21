@@ -110,6 +110,7 @@ public class MainActivity extends AppCompatActivity {
 
             FragmentTransaction transaction = fragmentManager.beginTransaction();
             transaction.replace(R.id.run_history, new MainHistoryFragment());
+            transaction.addToBackStack(null);   //transaction 단위 저장
             transaction.commit();
 
             binding.mainConstraintLayout.setVisibility(View.GONE);
@@ -120,6 +121,7 @@ public class MainActivity extends AppCompatActivity {
 
             FragmentTransaction transaction = fragmentManager.beginTransaction();
             transaction.replace(R.id.run_history, new MainHistoryFragment());
+            transaction.addToBackStack(null);   //transaction 단위 저장
             transaction.commit();
 
             binding.runStartBtn.setVisibility(View.GONE);

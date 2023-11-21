@@ -56,9 +56,7 @@ public class DetailMainHistoryFragment extends Fragment {
 
                 Log.d("HSR", "DetailMainHistoryFragment" + " => handleOnBackPressed");
 
-                FragmentTransaction fragmentTransaction = requireActivity().getSupportFragmentManager().beginTransaction();
-                fragmentTransaction.replace(R.id.run_history, new MainHistoryFragment());
-                fragmentTransaction.commit();
+                requireActivity().getSupportFragmentManager().popBackStack();
             }
         };
         requireActivity().getOnBackPressedDispatcher().addCallback(this, onBackPressedCallback);

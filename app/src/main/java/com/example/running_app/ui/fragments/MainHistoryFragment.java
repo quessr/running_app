@@ -1,17 +1,18 @@
 package com.example.running_app.ui.fragments;
 
-import android.content.Intent;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.activity.OnBackPressedCallback;
+import androidx.annotation.NonNull;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.example.running_app.R;
-import com.example.running_app.ui.MainActivity;
 
 public class MainHistoryFragment extends Fragment {
 
@@ -32,11 +33,39 @@ public class MainHistoryFragment extends Fragment {
         toolbar.setNavigationIcon(R.drawable.baseline_arrow_back_24);
         //뒤로 가기
         toolbar.setNavigationOnClickListener(v -> {
-            Intent intent = new Intent(getActivity(), MainActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-            startActivity(intent);
+
+            requireActivity().getSupportFragmentManager().popBackStack();
+            viewFind();
         });
 
         return view;
     }
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+
+        OnBackPressedCallback onBackPressedCallback = new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+
+                requireActivity().getSupportFragmentManager().popBackStack();
+                viewFind();
+
+            }
+        };
+        requireActivity().getOnBackPressedDispatcher().addCallback(this, onBackPressedCallback);
+    }
+
+
+
+    private void viewFind() {
+        View mainView = requireActivity().findViewById(R.id.mainConstraintLayout);
+        View runView = requireActivity().findViewById(R.id.run_start_btn);
+        View recordView = requireActivity().findViewById(R.id.show_record_btn);
+        mainView.setVisibility(View.VISIBLE);
+        runView.setVisibility(View.VISIBLE);
+        recordView.setVisibility(View.VISIBLE);
+    }
+
 }
