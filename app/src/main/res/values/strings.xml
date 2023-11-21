@@ -22,8 +22,8 @@
     <string name="adapter_dialog_positive">확인</string>
     <string name="adapter_dialog_complete">삭제 완료</string>
 
-    <string name="adapter_text_distance">&#160;Km</string>
-    <string name="adapter_text_speed">&#160;Km/h</string>
+    <string name="adapter_text_distance">%s Km</string>
+    <string name="adapter_text_speed">%s Km/h</string>
 
     <string name="detail_map_gpsList">GPS 정보를 찾을 수 없습니다.</string>
     <string name="detail_map_currentLocation">현재 위치를 가져올 수 없습니다.</string>

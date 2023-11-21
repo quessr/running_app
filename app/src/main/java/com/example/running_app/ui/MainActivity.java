@@ -134,12 +134,12 @@ public class MainActivity extends AppCompatActivity {
     GpsTrackerService.updateMap listener = new GpsTrackerService.updateMap(){
 
         @Override
-        public void updateMap(Location location) {
+        public void drawMap(Location location) {
             Log.d("HSR", "MainActivity.updateMap : "+location);
 
             timerViewModel.setGpsLocation(location);
 
-            runFragment.updateMap(location);
+            runFragment.drawMap(location);
         }
 
     };

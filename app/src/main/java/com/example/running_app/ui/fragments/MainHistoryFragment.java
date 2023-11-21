@@ -1,6 +1,7 @@
 package com.example.running_app.ui.fragments;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,6 +14,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.example.running_app.R;
+import com.example.running_app.ui.MainActivity;
 
 public class MainHistoryFragment extends Fragment {
 
@@ -25,7 +27,7 @@ public class MainHistoryFragment extends Fragment {
         toolbar = view.findViewById(R.id.runToolbar);
 
         FragmentTransaction fragmentTransaction = getChildFragmentManager().beginTransaction();
-        fragmentTransaction.add(R.id.listFrameLayout, new RunHistoryFragment());
+        fragmentTransaction.replace(R.id.listFrameLayout, new RunHistoryFragment());    //add 로 할경우, 상세화면갔다가 돌아와서 item 삭제시 중첩되서 화면에 보여지는 오류발생
         fragmentTransaction.commit();
 
         //Toolbar
@@ -36,6 +38,12 @@ public class MainHistoryFragment extends Fragment {
 
             requireActivity().getSupportFragmentManager().popBackStack();
             viewFind();
+
+//            //현재 액티비티 종료후 다시 Main 실행
+//            requireActivity().finish();
+//            Intent intent = new Intent(getActivity(), MainActivity.class);
+//            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//            startActivity(intent);
         });
 
         return view;
@@ -49,8 +57,15 @@ public class MainHistoryFragment extends Fragment {
             @Override
             public void handleOnBackPressed() {
 
+                //여기서 popBackStack 처리시 DB insert 오류 발생 -> runId 중복 오류
                 requireActivity().getSupportFragmentManager().popBackStack();
                 viewFind();
+
+//                //현재 액티비티 종료후 다시 Main 실행
+//                requireActivity().finish();
+//                Intent intent = new Intent(getActivity(), MainActivity.class);
+//                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//                startActivity(intent);
 
             }
         };

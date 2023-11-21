@@ -198,7 +198,7 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
     }
 
     @Override
-    public void updateMap(Location location) {
+    public void drawMap(Location location) {
         Log.d("HSR", "RunFragment : " + location);
 
         LatLng lastKnownLocation = new LatLng(location.getLatitude(), location.getLongitude());

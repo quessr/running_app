@@ -38,7 +38,7 @@ public class TimerViewModel extends AndroidViewModel {
     //stepCounter
     private int mStepDetector;
 
-    TB_Run tbRun = new TB_Run();
+
     TB_GPS tbGps = new TB_GPS();
     private final MutableLiveData<String> timeTextLiveData = new MutableLiveData<>();
 
@@ -91,7 +91,8 @@ public class TimerViewModel extends AndroidViewModel {
         }, 3000);
 
         //시작시 테이블 생성
-        runViewModel.setInsertRun(tbRun);
+        TB_Run tb_run = new TB_Run();
+        runViewModel.setInsertRun(tb_run);
         activeRunId = runRepository.getLatestRunId();
     }
 
@@ -106,11 +107,13 @@ public class TimerViewModel extends AndroidViewModel {
             //update 함수 호출하면서 비어있던 데이터 저장
             activeRunId = runRepository.getLatestRunId();
 
-            tbRun.setRun_id(activeRunId);
-            tbRun.setWalk_count(mStepDetector);
-            tbRun.setTimer(time);
-            tbRun.setCreate_at(currentDate());
-            runViewModel.setUpdateRun(tbRun);
+            TB_Run tbRun1 = new TB_Run();
+
+            tbRun1.setRun_id(activeRunId);
+            tbRun1.setWalk_count(mStepDetector);
+            tbRun1.setTimer(time);
+            tbRun1.setCreate_at(currentDate());
+            runViewModel.setUpdateRun(tbRun1);
 
 
             //stop 버튼 클릭시 바로 0.0 초로 리셋

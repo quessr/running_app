@@ -24,6 +24,7 @@ import com.example.running_app.ui.viewmodels.RunViewModel;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class RunningAdapter extends RecyclerView.Adapter<RunningAdapter.ViewHolder> implements OnRunHistoryItemClickListener {
     private OnRunHistoryItemClickListener clickListener;
@@ -133,9 +134,11 @@ public class RunningAdapter extends RecyclerView.Adapter<RunningAdapter.ViewHold
             double avgSpeed = resultAvgSpeed(timeValue, tDistance);
 
             t_date.setText(data.getCreate_at());
-            t_distance.setText(distanceFormat(tDistance) + activity.getResources().getString(R.string.adapter_text_distance));
+//            t_distance.setText(distanceFormat(tDistance) + activity.getResources().getString(R.string.adapter_text_distance));
+            t_distance.setText(String.format(Locale.US, activity.getResources().getString(R.string.adapter_text_distance),distanceFormat(tDistance)));
             t_runTime.setText(timeFormat(timeValue));
-            t_speed.setText(speedFormat(avgSpeed) + activity.getResources().getString(R.string.adapter_text_speed));
+//            t_speed.setText(speedFormat(avgSpeed) + activity.getResources().getString(R.string.adapter_text_speed));
+            t_speed.setText(String.format(Locale.US, activity.getResources().getString(R.string.adapter_text_speed), speedFormat(avgSpeed)));
             t_walkCount.setText(String.valueOf(data.getWalk_count()));
 
             //Adapter onClick 설정

@@ -1,6 +1,5 @@
 package com.example.running_app.ui.fragments;
 
-import android.annotation.SuppressLint;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -13,10 +12,11 @@ import android.widget.TextView;
 import com.example.running_app.R;
 import com.example.running_app.data.database.dao.TB_Run;
 
+import java.util.Locale;
+
 public class DetailHistoryFragment extends Fragment {
     TextView distance, date, speed, timer, step;
 
-    @SuppressLint("SetTextI18n")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -36,7 +36,8 @@ public class DetailHistoryFragment extends Fragment {
             timer.setText(detailTime);
 
             String detailSpeed = getArguments().getString("speed");
-            speed.setText(detailSpeed + getResources().getString(R.string.adapter_text_speed));
+//            speed.setText(detailSpeed + getResources().getString(R.string.adapter_text_speed));
+            speed.setText(String.format(Locale.US, getResources().getString(R.string.adapter_text_speed), detailSpeed));
 
             String detailDistance = getArguments().getString("distance");
             distance.setText(detailDistance);

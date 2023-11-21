@@ -14,7 +14,6 @@ import android.location.LocationManager;
 import android.os.Binder;
 import android.os.Build;
 import android.os.IBinder;
-import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -27,13 +26,10 @@ import com.example.running_app.R;
 
 
 public class GpsTrackerService extends Service implements LocationListener {
-    //    private final Context mContext;
     protected LocationManager locationManager;
     private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 1;
-    private static final long MIN_TIME_BW_UPDATES = 1000 * 1 * 1;
+    private static final long MIN_TIME_BW_UPDATES = 1000;
     Location location;
-    double latitude;
-    double longitude;
     private updateMap mListener;
     private NotificationManager notificationManager;
     int notificationId = 0;
@@ -66,30 +62,22 @@ public class GpsTrackerService extends Service implements LocationListener {
                 Toast.makeText(getApplicationContext(), "Network, Gps 연결이 없습니다.", Toast.LENGTH_SHORT).show();
 
             } else {
-                int hasFineLocationPermission = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION);
-                int hasCoarseLocationPermission = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION);
+                int hasFineLocationPermission = ContextCompat.checkSelfPermission(getApplicationContext(),
+                        Manifest.permission.ACCESS_FINE_LOCATION);
+                int hasCoarseLocationPermission = ContextCompat.checkSelfPermission(getApplicationContext(),
+                        Manifest.permission.ACCESS_COARSE_LOCATION);
 
-                if (hasFineLocationPermission == PackageManager.PERMISSION_GRANTED && hasCoarseLocationPermission == PackageManager.PERMISSION_GRANTED) {
+                if (hasFineLocationPermission == PackageManager.PERMISSION_GRANTED && hasCoarseLocationPermission
+                        == PackageManager.PERMISSION_GRANTED) {
                     if (isNetworkEnabled) {
                         if (locationManager != null) {
-                            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+                            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME_BW_UPDATES,
+                                    MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
 
                             if (location == null) {
                                 location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
                             }
 
-                            if (location != null) {
-                                latitude = location.getLatitude();
-                                longitude = location.getLongitude();
-
-                            } else {
-                                Toast.makeText(this, "location 정보가 없습니다.", Toast.LENGTH_SHORT).show();
-                                // 네트워크 기반 위치 정보 비활성화 상태에서의 예외 처리
-
-                                // 와이파이 설정 창을 띄우기 위한 인텐트 생성
-                                Intent intent = new Intent(Settings.ACTION_WIFI_SETTINGS);
-                                startActivity(intent);
-                            }
                         }
                     } else {
 //                        Toast.makeText(getApplicationContext(), "Network 연결이 없습니다.", Toast.LENGTH_SHORT).show();
@@ -100,16 +88,13 @@ public class GpsTrackerService extends Service implements LocationListener {
                     if (isGPSEnabled) {
 
                         if (locationManager != null) {
-                            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME_BW_UPDATES, MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+                            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, MIN_TIME_BW_UPDATES,
+                                    MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
 
                             if (location == null) {
                                 location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
                             }
 
-                            if (location != null) {
-                                latitude = location.getLatitude();
-                                longitude = location.getLongitude();
-                            }
                         }
 
                     }
@@ -119,44 +104,21 @@ public class GpsTrackerService extends Service implements LocationListener {
 
 
         } catch (Exception e) {
-            Log.d("GPS@@", "" + e);
+            Log.e("GPS@@", "" + e);
+            e.printStackTrace();
         }
     }
 
 
-    public void updateLocation(Location location) {
-        if (location != null) {
-            this.location = location;
-            latitude = location.getLatitude();
-            longitude = location.getLongitude();
-            Log.d("GPS@@", "latitude" + latitude);
-            Log.d("GPS@@", "longitude" + longitude);
-        }
-    }
 
     @Override
     public void onLocationChanged(@NonNull Location location) {
 
-        Toast.makeText(getApplicationContext(), "현재위치 " + location.getProvider() + " \n위도 " + location.getLatitude() + "\n경도 " + longitude, Toast.LENGTH_LONG).show();
-        if (mListener != null) mListener.updateMap(location);
+        Toast.makeText(getApplicationContext(), "현재위치 " + location.getProvider() + " \n위도 " + location.getLatitude() + "\n경도 " + location.getLongitude(), Toast.LENGTH_LONG).show();
+        if (mListener != null) mListener.drawMap(location);
     }
 
-    public double getLongitude() {
-        if (location != null) {
-            longitude = location.getLongitude();
-        }
 
-        return longitude;
-    }
-
-    public double getLatitude() {
-        if (location != null) {
-            latitude = location.getLatitude();
-
-        }
-
-        return latitude;
-    }
 
     public void stopUsingGPS() {
         if (locationManager != null) {
@@ -169,7 +131,7 @@ public class GpsTrackerService extends Service implements LocationListener {
     }
 
     public interface updateMap {
-        void updateMap(Location location);
+        void drawMap(Location location);
 
 
     }

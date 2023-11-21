@@ -39,8 +39,8 @@ public class DetailMainHistoryFragment extends Fragment {
         detailMapFragment.setArguments(bundle);
 
         FragmentTransaction fragmentTransaction = getChildFragmentManager().beginTransaction();
-        fragmentTransaction.add(R.id.mapLayout, detailMapFragment);
-        fragmentTransaction.add(R.id.detailLatout, detailHistoryFragment);
+        fragmentTransaction.replace(R.id.mapLayout, detailMapFragment);
+        fragmentTransaction.replace(R.id.detailLatout, detailHistoryFragment);
         fragmentTransaction.commit();
 
         return view;
