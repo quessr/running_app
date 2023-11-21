@@ -24,11 +24,11 @@ import com.example.running_app.ui.viewmodels.RunViewModel;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class RunningAdapter extends RecyclerView.Adapter<RunningAdapter.ViewHolder> implements OnRunHistoryItemClickListener {
     private OnRunHistoryItemClickListener clickListener;
     private List<TB_Run> runItems = new ArrayList<>();
-//    private Application application;
     private final Activity activity;
     private final RunViewModel viewModel;
 
@@ -37,7 +37,6 @@ public class RunningAdapter extends RecyclerView.Adapter<RunningAdapter.ViewHold
     public RunningAdapter(Application application, Activity activity) {
         super();
         this.activity = activity;
-//        this.application = application;
         viewModel = new RunViewModel(application);
     }
 
@@ -58,16 +57,18 @@ public class RunningAdapter extends RecyclerView.Adapter<RunningAdapter.ViewHold
         holder.list_setting.setOnClickListener(v -> {
             //Alert 창
             AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-            builder.setMessage("운동기록을 삭제하시겠습니까?");
-            builder.setNegativeButton("취소", null);
-            builder.setPositiveButton("확인", (dialog, which) -> {
+            builder.setMessage(activity.getResources().getString(R.string.adapter_dialog_message));
+            builder.setNegativeButton(activity.getResources().getString(R.string.adapter_dialog_negative), null);
+            builder.setPositiveButton(activity.getResources().getString(R.string.adapter_dialog_positive), (dialog, which) -> {
 
-                Toast.makeText(activity, "삭제 완료", Toast.LENGTH_SHORT).show();
+                Toast.makeText(activity, activity.getResources().getString(R.string.adapter_dialog_complete), Toast.LENGTH_SHORT).show();
 
                 //delete
+                /*
 //                        TB_Run tbRun = new TB_Run();
 //                        runId = data.getRun_id();
 //                        tbRun.setRun_id(runId);
+                 */
                 viewModel.setDeleteRun(data);
                 //현재 list 화면에서 삭제시 바로 화면 반영
                 runItems.remove(holder.getAbsoluteAdapterPosition());
@@ -133,9 +134,11 @@ public class RunningAdapter extends RecyclerView.Adapter<RunningAdapter.ViewHold
             double avgSpeed = resultAvgSpeed(timeValue, tDistance);
 
             t_date.setText(data.getCreate_at());
-            t_distance.setText(distanceFormat(tDistance) + " Km");
+//            t_distance.setText(distanceFormat(tDistance) + activity.getResources().getString(R.string.adapter_text_distance));
+            t_distance.setText(String.format(Locale.US, activity.getResources().getString(R.string.adapter_text_distance),distanceFormat(tDistance)));
             t_runTime.setText(timeFormat(timeValue));
-            t_speed.setText(speedFormat(avgSpeed) + " Km/h");
+//            t_speed.setText(speedFormat(avgSpeed) + activity.getResources().getString(R.string.adapter_text_speed));
+            t_speed.setText(String.format(Locale.US, activity.getResources().getString(R.string.adapter_text_speed), speedFormat(avgSpeed)));
             t_walkCount.setText(String.valueOf(data.getWalk_count()));
 
             //Adapter onClick 설정

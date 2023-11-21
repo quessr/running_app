@@ -25,24 +25,20 @@ import java.util.TimerTask;
 public class TimerViewModel extends AndroidViewModel {
     public static final String DATE_FORMAT = "yyyy-MM-dd";
     private long time = 0;
-
-    private final SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
     private Timer timer;
     private TimerTask timerTask;
-//    private boolean handler;
 
     //db가 동작할때 run_id를 한번만 쓰기 위해 activeRunId 변수 설정
     private int activeRunId = -1;
 
     //timer, room DB
-//    private RunDao runDao;
     RunViewModel runViewModel;
     RunRepository runRepository;
 
     //stepCounter
     private int mStepDetector;
 
-    TB_Run tbRun = new TB_Run();
+
     TB_GPS tbGps = new TB_GPS();
     private final MutableLiveData<String> timeTextLiveData = new MutableLiveData<>();
 
@@ -53,7 +49,6 @@ public class TimerViewModel extends AndroidViewModel {
     public TimerViewModel(@NonNull Application application) {
         super(application);
         runRepository = new RunRepository(application);
-//        runDao = RunDatabase.INSTANCE.runDao();
     }
 
     public void setRunViewModel(RunViewModel runViewModel){
@@ -96,7 +91,8 @@ public class TimerViewModel extends AndroidViewModel {
         }, 3000);
 
         //시작시 테이블 생성
-        runViewModel.setInsertRun(tbRun);
+        TB_Run tb_run = new TB_Run();
+        runViewModel.setInsertRun(tb_run);
         activeRunId = runRepository.getLatestRunId();
     }
 
@@ -111,11 +107,13 @@ public class TimerViewModel extends AndroidViewModel {
             //update 함수 호출하면서 비어있던 데이터 저장
             activeRunId = runRepository.getLatestRunId();
 
-            tbRun.setRun_id(activeRunId);
-            tbRun.setWalk_count(mStepDetector);
-            tbRun.setTimer(time);
-            tbRun.setCreate_at(currentDate());
-            runViewModel.setUpdateRun(tbRun);
+            TB_Run tbRun1 = new TB_Run();
+
+            tbRun1.setRun_id(activeRunId);
+            tbRun1.setWalk_count(mStepDetector);
+            tbRun1.setTimer(time);
+            tbRun1.setCreate_at(currentDate());
+            runViewModel.setUpdateRun(tbRun1);
 
 
             //stop 버튼 클릭시 바로 0.0 초로 리셋
@@ -128,7 +126,6 @@ public class TimerViewModel extends AndroidViewModel {
     }
 
     private String currentDate() {
-//        @SuppressLint("SimpleDateFormat")
         SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT, Locale.getDefault());
         Date today = Calendar.getInstance().getTime();
         return dateFormat.format(today);
@@ -143,8 +140,14 @@ public class TimerViewModel extends AndroidViewModel {
         int minutes = (resultInt % 3600) / 60;
         int seconds = resultInt % 60;
 
-        Date date = new Date(0, 0, 0, hours, minutes, seconds);
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, hours);
+        calendar.set(Calendar.MINUTE, minutes);
+        calendar.set(Calendar.SECOND, seconds);
 
+        Date date = calendar.getTime();
+
+        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
         return timeFormat.format(date);
     }
 

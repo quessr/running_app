@@ -1,8 +1,6 @@
 package com.example.running_app.ui.fragments;
 
 
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 
 import android.os.Parcelable;
@@ -12,7 +10,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
@@ -26,7 +23,6 @@ import com.example.running_app.R;
 
 
 import com.example.running_app.databinding.FragmentRunHistoryBinding;
-import com.example.running_app.ui.MainActivity;
 import com.example.running_app.ui.RunningAdapter;
 import com.example.running_app.ui.viewmodels.RunViewModel;
 
@@ -35,7 +31,6 @@ import java.util.ArrayList;
 
 
 public class RunHistoryFragment extends Fragment {
-    private OnBackPressedCallback onBackPressedCallback;
     RunViewModel viewModel;
     RecyclerView recyclerView;
     RunningAdapter runningAdapter;
@@ -76,8 +71,8 @@ public class RunHistoryFragment extends Fragment {
 
             // 화면 전환
             FragmentTransaction transaction = requireActivity().getSupportFragmentManager().beginTransaction();
-            transaction.add(R.id.run_history, detailMainHistoryFragment);
-            transaction.addToBackStack(null);
+            transaction.replace(R.id.run_history, detailMainHistoryFragment);
+            transaction.addToBackStack(null);   //백스택에 add,replace 할때 사용(transaction 단위 저장) -> popBackStack 실행으로 백스택에 저장된 transaction을 pop해서 역순으로 동작 시킨다.
             transaction.commit();
 
             binding.recyclerview.setVisibility(View.GONE);
@@ -89,24 +84,6 @@ public class RunHistoryFragment extends Fragment {
 
     private void findID(View view) {
         recyclerView = view.findViewById(R.id.recyclerview);
-    }
-
-    @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-
-        onBackPressedCallback = new OnBackPressedCallback(true) {
-            @Override
-            public void handleOnBackPressed() {
-                requireActivity().finish();
-                Intent intent = new Intent(getActivity(), MainActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(intent);
-
-
-            }
-        };
-        requireActivity().getOnBackPressedDispatcher().addCallback(this, onBackPressedCallback);
     }
 
 }

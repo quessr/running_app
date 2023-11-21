@@ -17,7 +17,6 @@ import android.widget.Toast;
 
 import com.example.running_app.R;
 import com.example.running_app.data.database.dao.TB_GPS;
-import com.example.running_app.data.database.dao.TB_Run;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -33,7 +32,6 @@ import java.util.List;
 public class DetailMapFragment extends Fragment implements OnMapReadyCallback {
 
     private FusedLocationProviderClient fusedLocationProviderClient;
-    private GoogleMap googleMap;
 
     private MapView mMapView;
 
@@ -86,7 +84,6 @@ public class DetailMapFragment extends Fragment implements OnMapReadyCallback {
 
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
-        this.googleMap = googleMap;
 
         if (getArguments() != null) {
             List<TB_GPS> gpsList = getArguments().getParcelableArrayList("GPS_LIST");
@@ -131,7 +128,7 @@ public class DetailMapFragment extends Fragment implements OnMapReadyCallback {
                 // gpsList가 비어있는 경우 처리할 코드 작성
                 Log.e("DetailMapFragment", "GPS 리스트가 비어 있습니다.");
                 // 예를 들어 사용자에게 메시지를 표시할 수 있습니다.
-                Toast.makeText(requireContext(), "GPS 정보를 찾을 수 없습니다.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), getResources().getString(R.string.detail_map_gpsList), Toast.LENGTH_SHORT).show();
 
                 if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
                         != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_COARSE_LOCATION)
@@ -149,13 +146,11 @@ public class DetailMapFragment extends Fragment implements OnMapReadyCallback {
                                 googleMap.addMarker(currentMarker);
                                 googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 15));
                             } else {
-                                Log.e("DetailMapFragment", "마지막 위치를 가져올 수 없습니다.");
-                                Toast.makeText(requireContext(), "현재 위치를 가져올 수 없습니다.", Toast.LENGTH_SHORT).show();
+                                Log.e("DetailMapFragment", "현재 위치를 가져올 수 없습니다.");
+                                Toast.makeText(requireContext(), getResources().getString(R.string.detail_map_currentLocation), Toast.LENGTH_SHORT).show();
                             }
                         })
-                        .addOnFailureListener(requireActivity(), e -> {
-                            Log.e("DetailMapFragment", "위치 정보를 가져오지 못했습니다: " + e.getMessage());
-                        });
+                        .addOnFailureListener(requireActivity(), e -> Log.e("DetailMapFragment", "위치 정보를 가져오지 못했습니다: " + e.getMessage()));
             }
         }
     }

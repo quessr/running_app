@@ -49,8 +49,6 @@ import java.util.Locale;
 import java.util.Map;
 
 public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrackerService.updateMap, LocationListener {
-    private OnBackPressedCallback onBackPressedCallback;
-    private FragmentRunBinding binding;
     public GoogleMap mGoogleMap;
     SupportMapFragment mapFragment;
     Geocoder geocoder;
@@ -109,7 +107,7 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        binding = FragmentRunBinding.inflate(inflater, container, false);
+        FragmentRunBinding binding = FragmentRunBinding.inflate(inflater, container, false);
         View view = binding.getRoot();
         Log.e("HSR", "onCreateView");
 
@@ -200,7 +198,7 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
     }
 
     @Override
-    public void updateMap(Location location) {
+    public void drawMap(Location location) {
         Log.d("HSR", "RunFragment : " + location);
 
         LatLng lastKnownLocation = new LatLng(location.getLatitude(), location.getLongitude());
@@ -240,7 +238,7 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
             animator.start();
 
         } else {
-            if (location.getProvider().equals("gps")) {
+            if ("gps".equals(location.getProvider())) {
                 runStartMapMarker.setPosition(lastKnownLocation);
                 circle.setCenter(lastKnownLocation);
                 polylineMarkerUpdater.updatePolyline(location);
@@ -338,7 +336,7 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-        onBackPressedCallback = new OnBackPressedCallback(true) {
+        OnBackPressedCallback onBackPressedCallback = new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
                 requireActivity().finish();

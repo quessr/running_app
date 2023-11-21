@@ -32,7 +32,6 @@ import com.example.running_app.ui.viewmodels.RunViewModel;
 import com.example.running_app.ui.viewmodels.TimerViewModel;
 
 public class MainActivity extends AppCompatActivity {
-//    public static Context mContext;
     FragmentManager fragmentManager = getSupportFragmentManager();
     FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
     RunFragment runFragment = new RunFragment();
@@ -43,7 +42,6 @@ public class MainActivity extends AppCompatActivity {
 
     //timer, room DB
     private TimerViewModel timerViewModel;
-//    private RunViewModel runViewModel;
 
 
     @RequiresApi(api = Build.VERSION_CODES.Q)
@@ -58,7 +56,6 @@ public class MainActivity extends AppCompatActivity {
         timerViewModel = new ViewModelProvider(this).get(TimerViewModel.class);
         RunViewModel runViewModel = new ViewModelProvider(this).get(RunViewModel.class);
         timerViewModel.setRunViewModel(runViewModel);
-//        mContext = this;
 
         binding.runStartBtn.setVisibility(View.VISIBLE);
         binding.runEndBtn.setVisibility(View.GONE);
@@ -113,6 +110,7 @@ public class MainActivity extends AppCompatActivity {
 
             FragmentTransaction transaction = fragmentManager.beginTransaction();
             transaction.replace(R.id.run_history, new MainHistoryFragment());
+            transaction.addToBackStack(null);   //transaction 단위 저장
             transaction.commit();
 
             binding.mainConstraintLayout.setVisibility(View.GONE);
@@ -123,6 +121,7 @@ public class MainActivity extends AppCompatActivity {
 
             FragmentTransaction transaction = fragmentManager.beginTransaction();
             transaction.replace(R.id.run_history, new MainHistoryFragment());
+            transaction.addToBackStack(null);   //transaction 단위 저장
             transaction.commit();
 
             binding.runStartBtn.setVisibility(View.GONE);
@@ -135,12 +134,12 @@ public class MainActivity extends AppCompatActivity {
     GpsTrackerService.updateMap listener = new GpsTrackerService.updateMap(){
 
         @Override
-        public void updateMap(Location location) {
+        public void drawMap(Location location) {
             Log.d("HSR", "MainActivity.updateMap : "+location);
 
             timerViewModel.setGpsLocation(location);
 
-            runFragment.updateMap(location);
+            runFragment.drawMap(location);
         }
 
     };

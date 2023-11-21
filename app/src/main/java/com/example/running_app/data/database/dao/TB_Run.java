@@ -50,13 +50,4 @@ public class TB_Run implements Serializable {
         this.create_at = create_at;
     }
 
-    @Override
-    public String toString() {
-        return "TB_Run{" +
-                "run_id=" + run_id +
-                ", walk_count=" + walk_count +
-                ", timer=" + timer +
-                ", create_at='" + create_at + '\'' +
-                '}';
-    }
 }
