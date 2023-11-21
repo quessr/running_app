@@ -35,7 +35,6 @@ import java.util.ArrayList;
 
 
 public class RunHistoryFragment extends Fragment {
-    private OnBackPressedCallback onBackPressedCallback;
     RunViewModel viewModel;
     RecyclerView recyclerView;
     RunningAdapter runningAdapter;
@@ -95,7 +94,7 @@ public class RunHistoryFragment extends Fragment {
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
 
-        onBackPressedCallback = new OnBackPressedCallback(true) {
+        OnBackPressedCallback onBackPressedCallback = new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
                 requireActivity().finish();

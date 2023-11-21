@@ -1,10 +1,6 @@
 package com.example.running_app.data.model;
 
-import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -14,16 +10,11 @@ import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
-import com.example.running_app.ui.MainActivity;
-import com.example.running_app.ui.viewmodels.RunViewModel;
 import com.example.running_app.ui.viewmodels.TimerViewModel;
 
 public class StepCounter implements SensorEventListener {
-    private SensorManager sensorManager;
-    private Sensor stepCountSensor;
+    private final SensorManager sensorManager;
+    private final Sensor stepCountSensor;
     private int mStepDetector = 0;  //현재 걸음수
     private StepCountListener stepCountListener;
 

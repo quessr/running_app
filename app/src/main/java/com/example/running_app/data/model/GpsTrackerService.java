@@ -2,7 +2,6 @@ package com.example.running_app.data.model;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.Application;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -25,14 +24,6 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 
 import com.example.running_app.R;
-import com.example.running_app.data.database.dao.GpsDao;
-import com.example.running_app.data.database.dao.RunDao;
-import com.example.running_app.data.database.dao.RunDatabase;
-import com.example.running_app.data.database.dao.TB_GPS;
-import com.example.running_app.data.database.dao.TB_Run;
-import com.example.running_app.ui.MainActivity;
-import com.example.running_app.ui.viewmodels.RunViewModel;
-import com.example.running_app.ui.viewmodels.TimerViewModel;
 
 
 public class GpsTrackerService extends Service implements LocationListener {
@@ -128,7 +119,7 @@ public class GpsTrackerService extends Service implements LocationListener {
 
 
         } catch (Exception e) {
-            Log.d("GPS@@", "" + e.toString());
+            Log.d("GPS@@", "" + e);
         }
     }
 

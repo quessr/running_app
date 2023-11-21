@@ -6,7 +6,6 @@ import android.util.Log;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
@@ -15,8 +14,8 @@ import java.util.List;
 
 public class PolylineUpdater {
     private Polyline polyline;
-    private List<LatLng> polylinePoints = new ArrayList<>();
-    private GoogleMap mGoogleMap;
+    private final List<LatLng> polylinePoints = new ArrayList<>();
+    private final GoogleMap mGoogleMap;
 
     public PolylineUpdater(GoogleMap googleMap) {
         mGoogleMap = googleMap;

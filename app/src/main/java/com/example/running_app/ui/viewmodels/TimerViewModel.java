@@ -25,17 +25,13 @@ import java.util.TimerTask;
 public class TimerViewModel extends AndroidViewModel {
     public static final String DATE_FORMAT = "yyyy-MM-dd";
     private long time = 0;
-
-    private final SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
     private Timer timer;
     private TimerTask timerTask;
-//    private boolean handler;
 
     //db가 동작할때 run_id를 한번만 쓰기 위해 activeRunId 변수 설정
     private int activeRunId = -1;
 
     //timer, room DB
-//    private RunDao runDao;
     RunViewModel runViewModel;
     RunRepository runRepository;
 
@@ -53,7 +49,6 @@ public class TimerViewModel extends AndroidViewModel {
     public TimerViewModel(@NonNull Application application) {
         super(application);
         runRepository = new RunRepository(application);
-//        runDao = RunDatabase.INSTANCE.runDao();
     }
 
     public void setRunViewModel(RunViewModel runViewModel){
@@ -128,7 +123,6 @@ public class TimerViewModel extends AndroidViewModel {
     }
 
     private String currentDate() {
-//        @SuppressLint("SimpleDateFormat")
         SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT, Locale.getDefault());
         Date today = Calendar.getInstance().getTime();
         return dateFormat.format(today);
@@ -143,8 +137,14 @@ public class TimerViewModel extends AndroidViewModel {
         int minutes = (resultInt % 3600) / 60;
         int seconds = resultInt % 60;
 
-        Date date = new Date(0, 0, 0, hours, minutes, seconds);
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, hours);
+        calendar.set(Calendar.MINUTE, minutes);
+        calendar.set(Calendar.SECOND, seconds);
 
+        Date date = calendar.getTime();
+
+        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
         return timeFormat.format(date);
     }
 

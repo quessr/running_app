@@ -1,10 +1,10 @@
 package com.example.running_app.ui.fragments;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,10 +12,11 @@ import android.widget.TextView;
 
 import com.example.running_app.R;
 import com.example.running_app.data.database.dao.TB_Run;
-import com.example.running_app.databinding.FragmentHistoryBinding;
 
 public class DetailHistoryFragment extends Fragment {
     TextView distance, date, speed, timer, step;
+
+    @SuppressLint("SetTextI18n")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -23,18 +24,19 @@ public class DetailHistoryFragment extends Fragment {
 
         findId(view);
 
-        if (getArguments() != null){
+        if (getArguments() != null) {
             TB_Run tbRun = (TB_Run) getArguments().getSerializable("RUN_ITEM");
-            Log.d("DetailHistoryFragment", tbRun.getRun_id() + " | " + tbRun.getCreate_at() + " | " + tbRun.getTimer() + " | " + tbRun.getWalk_count());
 
-            date.setText(tbRun.getCreate_at());
-            step.setText(String.valueOf(tbRun.getWalk_count()));
+            if (tbRun != null) {
+                date.setText(tbRun.getCreate_at());
+                step.setText(String.valueOf(tbRun.getWalk_count()));
+            }
 
             String detailTime = getArguments().getString("time");
             timer.setText(detailTime);
 
             String detailSpeed = getArguments().getString("speed");
-            speed.setText(detailSpeed + " Km/h");
+            speed.setText(detailSpeed + getResources().getString(R.string.adapter_text_speed));
 
             String detailDistance = getArguments().getString("distance");
             distance.setText(detailDistance);

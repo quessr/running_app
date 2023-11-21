@@ -1,6 +1,5 @@
 package com.example.running_app.data.database.dao;
 
-import android.annotation.SuppressLint;
 import android.os.Parcel;
 import android.os.Parcelable;
 
