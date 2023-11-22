@@ -98,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
 
         binding.runEndBtn.setOnClickListener(v -> {
             gpsTracker.stopUsingGPS();
-            gpsTracker.stopService(new Intent(MainActivity.this,GpsTrackerService.class));
+            gpsTracker.stopService(new Intent(MainActivity.this, GpsTrackerService.class));
             gpsTracker.stopNotification();
             stepCounter.stop();
 
@@ -131,11 +131,11 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    GpsTrackerService.updateMap listener = new GpsTrackerService.updateMap(){
+    GpsTrackerService.updateMap listener = new GpsTrackerService.updateMap() {
 
         @Override
         public void drawMap(Location location) {
-            Log.d("HSR", "MainActivity.updateMap : "+location);
+            Log.d("HSR", "MainActivity.updateMap : " + location);
 
             timerViewModel.setGpsLocation(location);
 
@@ -154,8 +154,8 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
-            if(service != null){
-                GpsTrackerService.LocalBinder mGpsTrackerServiceBinder = (GpsTrackerService.LocalBinder)service;
+            if (service != null) {
+                GpsTrackerService.LocalBinder mGpsTrackerServiceBinder = (GpsTrackerService.LocalBinder) service;
                 gpsTracker = mGpsTrackerServiceBinder.getService();
                 gpsTracker.startForeground();
                 gpsTracker.setListener(listener);
@@ -169,6 +169,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         unbindService(serviceGpsTrackerConnection);
+
         Log.d("HSR", "MainActivity onDestroy");
 
     }

@@ -50,7 +50,6 @@ import java.util.Map;
 
 public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrackerService.updateMap, LocationListener {
     public GoogleMap mGoogleMap;
-    SupportMapFragment mapFragment;
     Geocoder geocoder;
 
     private PolylineUpdater polylineMarkerUpdater;
@@ -65,6 +64,7 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
     boolean isGPSEnabled;
     boolean isNetworkEnabled;
     Location location;
+
 
 
     @SuppressLint("MissingPermission")
@@ -114,7 +114,7 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
 
         // 구글 맵 띄우기
 
-        SupportMapFragment mapFragment = (SupportMapFragment) getActivity()
+        SupportMapFragment mapFragment = (SupportMapFragment) requireActivity()
                 .getSupportFragmentManager().findFragmentById(R.id.map);
 
         if (mapFragment == null) {
@@ -122,9 +122,7 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
             getChildFragmentManager().beginTransaction().replace(R.id.map, mapFragment).commit();
         }
 
-        if (mapFragment != null) {
             mapFragment.getMapAsync(this);
-        }
 
         try {
             locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);

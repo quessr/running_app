@@ -31,7 +31,7 @@ public class PolylineUpdater {
             polyline.remove();
         }
 
-        PolylineOptions polylineOptions = new PolylineOptions().addAll(polylinePoints).color(Color.BLUE).width(10f).geodesic(true);
+        PolylineOptions polylineOptions = new PolylineOptions().addAll(polylinePoints).color(Color.BLUE).width(15).geodesic(true);
 
         polyline = mGoogleMap.addPolyline(polylineOptions);
     }
