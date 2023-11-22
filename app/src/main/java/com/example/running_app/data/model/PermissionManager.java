@@ -21,6 +21,12 @@ public class PermissionManager {
 
     public AlertDialog permissionDeniedDialog;
 
+    public String[] requiredPermissions = {
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.ACTIVITY_RECOGNITION
+    };
+
     public boolean haveRequiredPermissions(Context context) {
         int fineLocationPermission = ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
         int coarseLocationPermission = ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION);
@@ -28,6 +34,13 @@ public class PermissionManager {
         int recognitionPermission = ActivityCompat.checkSelfPermission(context, Manifest.permission.ACTIVITY_RECOGNITION);
 
         return fineLocationPermission == PackageManager.PERMISSION_GRANTED && coarseLocationPermission == PackageManager.PERMISSION_GRANTED && backgroundLocationPermission == PackageManager.PERMISSION_GRANTED && recognitionPermission == PackageManager.PERMISSION_GRANTED;
+    }
+
+    public boolean haveLocationPermissions(Context context) {
+        int fineLocationPermission = ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
+        int coarseLocationPermission = ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION);
+
+        return fineLocationPermission == PackageManager.PERMISSION_GRANTED && coarseLocationPermission == PackageManager.PERMISSION_GRANTED;
     }
 
     public boolean hasBackgroundPermission(Context context) {
@@ -69,19 +82,7 @@ public class PermissionManager {
         } else {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 if (runFragment.requestPermissionLauncher != null) {
-                    runFragment.requestPermissionLauncher.launch(new String[]{
-                            android.Manifest.permission.ACCESS_COARSE_LOCATION,
-                            android.Manifest.permission.ACCESS_FINE_LOCATION,
-                            android.Manifest.permission.ACTIVITY_RECOGNITION
-                    });
-                }
-            } else {
-                if (runFragment.requestPermissionLauncher != null) {
-                    runFragment.requestPermissionLauncher.launch(new String[]{
-                            android.Manifest.permission.ACCESS_COARSE_LOCATION,
-                            android.Manifest.permission.ACCESS_FINE_LOCATION,
-                            android.Manifest.permission.ACTIVITY_RECOGNITION
-                    });
+                    runFragment.requestPermissionLauncher.launch(requiredPermissions);
                 }
             }
         }
@@ -111,7 +112,6 @@ public class PermissionManager {
                 .setNegativeButton(activity.getResources().getString(R.string.show_permission_denied_notification_negative_button), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-//                        requireActivity().finish();
                         permissionDeniedDialog.dismiss();
                     }
                 })
