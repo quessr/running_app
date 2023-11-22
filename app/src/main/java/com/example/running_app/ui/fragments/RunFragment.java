@@ -50,7 +50,6 @@ import java.util.Map;
 
 public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrackerService.updateMap, LocationListener {
     public GoogleMap mGoogleMap;
-    SupportMapFragment mapFragment;
     Geocoder geocoder;
 
     private PolylineUpdater polylineMarkerUpdater;
@@ -64,6 +63,8 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
     public ActivityResultLauncher<String[]> requestPermissionLauncher;
     boolean isGPSEnabled;
     boolean isNetworkEnabled;
+    Location location;
+
 
 
     @SuppressLint("MissingPermission")
@@ -72,7 +73,6 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
         super.onCreate(savedInstanceState);
 
         permissionManager = new PermissionManager();
-        permissionManager.requestPermission(getContext(), this);
 
 
         Log.d("HSR", "onCreate()");
@@ -112,32 +112,25 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
         Log.e("HSR", "onCreateView");
 
 
-        try {
-            Log.e("HSR", "onCreateView try");
+        // 구글 맵 띄우기
 
+        SupportMapFragment mapFragment = (SupportMapFragment) requireActivity()
+                .getSupportFragmentManager().findFragmentById(R.id.map);
 
-            // 구글 맵 띄우기
-            mapFragment = new SupportMapFragment();
+        if (mapFragment == null) {
+            mapFragment = SupportMapFragment.newInstance();
             getChildFragmentManager().beginTransaction().replace(R.id.map, mapFragment).commit();
-
-            if (mapFragment != null) {
-                mapFragment.getMapAsync(this);
-
-            } else {
-                Log.e("RunFragment", "mapFragment is null");
-            }
-
-            try {
-                locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-                locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1, 1, this);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-
-        } catch (Exception e) {
-            Log.d("HHH", e.toString());
         }
+
+            mapFragment.getMapAsync(this);
+
+        try {
+            locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1, 1, this);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
 
         return view;
     }
@@ -146,8 +139,10 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        Log.d("HSR", "onViewCreated()");
 
         permissionManager.requestPermission(requireContext(), this);
+
     }
 
     @SuppressLint("MissingPermission")
@@ -168,14 +163,17 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
 
             locationManager = (LocationManager) requireActivity().getSystemService(Context.LOCATION_SERVICE);
 
-            locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+            location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
             locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1, 1, this);
 
-        } else if(!permissionManager.hasBackgroundPermission(requireContext())) {
+        } else if (!permissionManager.hasBackgroundPermission(requireContext())) {
             // 위치 권한이 거부된 경우 처리할 코드
             // 다이얼로그가 표시된 후 권한을 허용한 경우 처리할 코드
             Toast.makeText(getContext(), "백그라운드 위치 권한을 위해 항상 허용으로 설정해주세요.", Toast.LENGTH_SHORT).show();
             permissionManager.backgroundPermissionDeniedDialog(requireActivity(), getContext());
+        } else {
+//            requestPermissionLauncher.launch(permissionManager.requiredPermissions);
+            permissionManager.requestPermission(requireContext(), this);
         }
 
     }
@@ -282,11 +280,15 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
     public void onResume() {
         super.onResume();
 
+        Log.d("HSR", "onResume()");
+
+
         if (permissionManager.haveRequiredPermissions(getContext())) {
             locationManager = (LocationManager) requireActivity().getSystemService(Context.LOCATION_SERVICE);
 
-            locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+            location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
             locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1, 1, this);
+
         }
 
         if (!isGPSEnabled && !isNetworkEnabled) {

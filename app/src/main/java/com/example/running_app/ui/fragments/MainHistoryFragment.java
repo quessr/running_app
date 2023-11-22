@@ -36,6 +36,7 @@ public class MainHistoryFragment extends Fragment {
 
             requireActivity().getSupportFragmentManager().popBackStack();
             viewFind();
+            
         });
 
         return view;

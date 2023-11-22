@@ -1,13 +1,11 @@
 package com.example.running_app.data.model;
 
-import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -20,7 +18,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
-import androidx.core.content.ContextCompat;
 
 import com.example.running_app.R;
 
@@ -36,6 +33,8 @@ public class GpsTrackerService extends Service implements LocationListener {
 
     private final IBinder mBinder = new LocalBinder();
 
+    private final PermissionManager permissionManager = new PermissionManager();
+
 
     public class LocalBinder extends Binder {
         public GpsTrackerService getService() {
@@ -47,7 +46,7 @@ public class GpsTrackerService extends Service implements LocationListener {
         getLocation();
     }
 
-    @SuppressLint("ServiceCast")
+    @SuppressLint({"ServiceCast", "MissingPermission"})
     public void getLocation() {
         try {
             locationManager = (LocationManager) getApplicationContext().getSystemService(LOCATION_SERVICE);
@@ -57,18 +56,13 @@ public class GpsTrackerService extends Service implements LocationListener {
 
             Log.d("GPS@@", "isGPSEnabled : " + isGPSEnabled + " isNetworkEnabled : " + isNetworkEnabled);
 
+//                int hasFineLocationPermission = ContextCompat.checkSelfPermission(getApplicationContext(),
+//                        Manifest.permission.ACCESS_FINE_LOCATION);
+//                int hasCoarseLocationPermission = ContextCompat.checkSelfPermission(getApplicationContext(),
+//                        Manifest.permission.ACCESS_COARSE_LOCATION);
 
-            if (!isGPSEnabled && !isNetworkEnabled) {
-                Toast.makeText(getApplicationContext(), "Network, Gps 연결이 없습니다.", Toast.LENGTH_SHORT).show();
+                if (permissionManager.haveLocationPermissions(getApplicationContext())) {
 
-            } else {
-                int hasFineLocationPermission = ContextCompat.checkSelfPermission(getApplicationContext(),
-                        Manifest.permission.ACCESS_FINE_LOCATION);
-                int hasCoarseLocationPermission = ContextCompat.checkSelfPermission(getApplicationContext(),
-                        Manifest.permission.ACCESS_COARSE_LOCATION);
-
-                if (hasFineLocationPermission == PackageManager.PERMISSION_GRANTED && hasCoarseLocationPermission
-                        == PackageManager.PERMISSION_GRANTED) {
                     if (isNetworkEnabled) {
                         if (locationManager != null) {
                             locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, MIN_TIME_BW_UPDATES,
@@ -79,12 +73,8 @@ public class GpsTrackerService extends Service implements LocationListener {
                             }
 
                         }
-                    } else {
-//                        Toast.makeText(getApplicationContext(), "Network 연결이 없습니다.", Toast.LENGTH_SHORT).show();
-                        Log.d("GPS@@", "Network 연결이 없습니다.");
-
-
                     }
+
                     if (isGPSEnabled) {
 
                         if (locationManager != null) {
@@ -100,11 +90,7 @@ public class GpsTrackerService extends Service implements LocationListener {
                     }
                 }
 
-            }
-
-
         } catch (Exception e) {
-            Log.e("GPS@@", "" + e);
             e.printStackTrace();
         }
     }
@@ -154,6 +140,7 @@ public class GpsTrackerService extends Service implements LocationListener {
         String channelId = "gps_tacker_channel";
 
 
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(channelId, "GPS Tracker Channel", NotificationManager.IMPORTANCE_DEFAULT);
 
@@ -161,11 +148,22 @@ public class GpsTrackerService extends Service implements LocationListener {
             notificationManager.createNotificationChannel(channel);
         }
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, channelId)
-                .setContentTitle("RUNNING APP")
-                .setContentText("Tracking your location...")
-                .setSmallIcon(R.drawable.ic_launcher_foreground)
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+        NotificationCompat.Builder builder = null;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            builder = new NotificationCompat.Builder(this, channelId)
+                    .setContentTitle("RUNNING APP")
+                    .setContentText("Tracking your location...")
+                    .setSmallIcon(R.drawable.ic_launcher_foreground)
+                    .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+        }
+        else {
+            //noinspection deprecation
+            builder = new NotificationCompat.Builder(this)
+                    .setContentTitle("RUNNING APP")
+                    .setContentText("Tracking your location...")
+                    .setSmallIcon(R.drawable.ic_launcher_foreground)
+                    .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+        }
         return builder.build();
     }
 
