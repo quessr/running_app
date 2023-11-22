@@ -60,12 +60,9 @@ public class PermissionManager {
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle(activity.getResources().getString(R.string.background_permission_denied_dialog_title));
 
-        DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                if (i == DialogInterface.BUTTON_POSITIVE) {
-                    backgroundPermission(activity);
-                }
+        DialogInterface.OnClickListener listener = (dialogInterface, i) -> {
+            if (i == DialogInterface.BUTTON_POSITIVE) {
+                backgroundPermission(activity);
             }
         };
 
@@ -92,29 +89,20 @@ public class PermissionManager {
         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
         builder.setTitle(activity.getResources().getString(R.string.show_permission_denied_notification_title))
                 .setMessage(message)
-                .setPositiveButton(activity.getResources().getString(R.string.show_permission_denied_notification_positive_button), new DialogInterface.OnClickListener() {
-
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        // 설정 화면으로 이동
-                        if ("app_settings".equals(setting_screen_type)) {
-                            Intent intent = new Intent(action);
-                            Uri uri = Uri.fromParts("package", activity.getPackageName(), null);
-                            intent.setData(uri);
-                            activity.startActivity(intent);
-                        } else if ("location_setting".equals(setting_screen_type)) {
-                            Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                            activity.startActivity(intent);
-                        }
-
+                .setPositiveButton(activity.getResources().getString(R.string.show_permission_denied_notification_positive_button), (dialog, which) -> {
+                    // 설정 화면으로 이동
+                    if ("app_settings".equals(setting_screen_type)) {
+                        Intent intent = new Intent(action);
+                        Uri uri = Uri.fromParts("package", activity.getPackageName(), null);
+                        intent.setData(uri);
+                        activity.startActivity(intent);
+                    } else if ("location_setting".equals(setting_screen_type)) {
+                        Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                        activity.startActivity(intent);
                     }
+
                 })
-                .setNegativeButton(activity.getResources().getString(R.string.show_permission_denied_notification_negative_button), new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        permissionDeniedDialog.dismiss();
-                    }
-                })
+                .setNegativeButton(activity.getResources().getString(R.string.show_permission_denied_notification_negative_button), (dialog, which) -> permissionDeniedDialog.dismiss())
                 .setCancelable(false);
 
 
