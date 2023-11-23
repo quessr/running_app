@@ -1,5 +1,7 @@
 package com.example.running_app.ui;
 
+import static com.example.running_app.data.model.PolylineUpdater.clearPolyline;
+
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
@@ -24,6 +26,7 @@ import android.view.View;
 import com.example.running_app.R;
 
 import com.example.running_app.data.model.GpsTrackerService;
+import com.example.running_app.data.model.PolylineUpdater;
 import com.example.running_app.data.model.StepCounter;
 import com.example.running_app.databinding.ActivityMainBinding;
 import com.example.running_app.ui.fragments.MainHistoryFragment;
@@ -79,6 +82,10 @@ public class MainActivity extends AppCompatActivity {
         binding.runStartBtn.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, RunStartCountdownActivity.class);
             startActivity(intent);
+
+            // 재 시작시, 기존 폴리라인, 마커 초기화
+            clearPolyline();
+            clearStartMarkerAndCircle();
 
             gpsTracker.startLocationUpdate();
             stepCounter.start();
@@ -143,6 +150,12 @@ public class MainActivity extends AppCompatActivity {
         }
 
     };
+
+    public void clearStartMarkerAndCircle() {
+        if (runFragment != null) {
+            runFragment.clearStartMarkerAndCircle();
+        }
+    }
     ServiceConnection serviceGpsTrackerConnection = new ServiceConnection() {
         @Override
         public void onServiceDisconnected(ComponentName name) {
@@ -164,6 +177,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     };
+
 
     @Override
     protected void onDestroy() {

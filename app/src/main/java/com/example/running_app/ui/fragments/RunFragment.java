@@ -246,6 +246,18 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
 
     }
 
+    public void clearStartMarkerAndCircle() {
+        if (runStartMapMarker != null) {
+            runStartMapMarker.remove();
+            runStartMapMarker = null;
+        }
+        if (circle != null) {
+            circle.remove();
+            animator.removeAllUpdateListeners();
+            circle = null;
+            animator = null;
+        }
+    }
 
     @Override
     public void onLocationChanged(@NonNull Location location) {
