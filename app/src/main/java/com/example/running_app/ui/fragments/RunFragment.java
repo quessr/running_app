@@ -53,18 +53,18 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
     Geocoder geocoder;
 
     private PolylineUpdater polylineMarkerUpdater;
-    private Marker initialMapMarker;
+    private static Marker initialMapMarker;
     private Marker runStartMapMarker;
 
     protected LocationManager locationManager;
 
     Circle circle;
+    ValueAnimator animator;
     public PermissionManager permissionManager;
     public ActivityResultLauncher<String[]> requestPermissionLauncher;
     boolean isGPSEnabled;
     boolean isNetworkEnabled;
     Location location;
-
 
 
     @SuppressLint("MissingPermission")
@@ -78,7 +78,7 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
         Log.d("HSR", "onCreate()");
         locationManager = (LocationManager) requireActivity().getSystemService(Context.LOCATION_SERVICE);
 
-        geocoder = new Geocoder(requireActivity(), Locale.KOREA);
+        geocoder = new Geocoder(requireActivity(), Locale.getDefault());
 
         requestPermissionLauncher = registerForActivityResult(
                 new ActivityResultContracts.RequestMultiplePermissions(), result -> {
@@ -122,7 +122,7 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
             getChildFragmentManager().beginTransaction().replace(R.id.map, mapFragment).commit();
         }
 
-            mapFragment.getMapAsync(this);
+        mapFragment.getMapAsync(this);
 
         try {
             locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
@@ -172,7 +172,6 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
             Toast.makeText(getContext(), "백그라운드 위치 권한을 위해 항상 허용으로 설정해주세요.", Toast.LENGTH_SHORT).show();
             permissionManager.backgroundPermissionDeniedDialog(requireActivity(), getContext());
         } else {
-//            requestPermissionLauncher.launch(permissionManager.requiredPermissions);
             permissionManager.requestPermission(requireContext(), this);
         }
 
@@ -199,13 +198,30 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
     public void drawMap(Location location) {
         Log.d("HSR", "RunFragment : " + location);
 
-        LatLng lastKnownLocation = new LatLng(location.getLatitude(), location.getLongitude());
+        double lastLatitude = location.getLatitude();
+        double lastLongitude = location.getLongitude();
+        LatLng lastKnownLocation = new LatLng(lastLatitude, lastLongitude);
+
+        if (initialMapMarker == null) {
+            Log.d("HSR", "geocoder :" + geocoder);
+            String initialMarkerTitle = (getAddress(getContext(), lastLatitude, lastLongitude));
+
+            if (isAdded()) {
+                initialMapMarker = mGoogleMap.addMarker(new MarkerOptions()
+                        .position(lastKnownLocation)
+                        .title(initialMarkerTitle)
+                        .snippet(getResources().getString(R.string.map_marker_first_position))
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
+            }
+
+        }
+
 
         if (runStartMapMarker == null) {
             mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(lastKnownLocation, 15));
 
             if (geocoder != null) {
-                String currentMarkerTitle = (getAddress(getContext(), location.getLatitude(), location.getLongitude()));
+                String currentMarkerTitle = (getAddress(getContext(), lastLatitude, lastLongitude));
 
 
                 runStartMapMarker = mGoogleMap.addMarker(new MarkerOptions()
@@ -224,7 +240,7 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
             circle = mGoogleMap.addCircle(circleOptions);
 
             // Circle 깜빡임 애니메이션 적용
-            ValueAnimator animator = new ValueAnimator();
+            animator = new ValueAnimator();
             animator.setRepeatCount(ValueAnimator.INFINITE);
             animator.setRepeatMode(ValueAnimator.RESTART);
             animator.setIntValues(0, 100);
@@ -237,15 +253,31 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
 
         } else {
             if ("gps".equals(location.getProvider())) {
-                runStartMapMarker.setPosition(lastKnownLocation);
-                circle.setCenter(lastKnownLocation);
-                polylineMarkerUpdater.updatePolyline(location);
+            runStartMapMarker.setPosition(lastKnownLocation);
+            circle.setCenter(lastKnownLocation);
+            polylineMarkerUpdater.updatePolyline(location);
             }
 
         }
 
     }
 
+    public void clearMarkersAndCircle() {
+        if (initialMapMarker != null) {
+            initialMapMarker.remove();
+            initialMapMarker = null;
+        }
+        if (runStartMapMarker != null) {
+            runStartMapMarker.remove();
+            runStartMapMarker = null;
+        }
+        if (circle != null) {
+            circle.remove();
+            animator.removeAllUpdateListeners();
+            circle = null;
+            animator = null;
+        }
+    }
 
     @Override
     public void onLocationChanged(@NonNull Location location) {
@@ -275,13 +307,13 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
 
     }
 
+
     @SuppressLint("MissingPermission")
     @Override
     public void onResume() {
         super.onResume();
 
         Log.d("HSR", "onResume()");
-
 
         if (permissionManager.haveRequiredPermissions(getContext())) {
             locationManager = (LocationManager) requireActivity().getSystemService(Context.LOCATION_SERVICE);
@@ -299,6 +331,7 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
         }
     }
 
+
     public String getAddress(Context mContext, double lat, double lng) {
 
         String nowAddr = "현재 위치를 확인 할 수 없습니다.";
@@ -310,6 +343,8 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
                 if (address != null && address.size() > 0) {
                     nowAddr = address.get(0).getAddressLine(0);
                 }
+            } else {
+                geocoder = new Geocoder(mContext, Locale.getDefault());
             }
         } catch (IOException e) {
             Toast.makeText(mContext, "주소를 가져 올 수 없습니다.", Toast.LENGTH_LONG).show();

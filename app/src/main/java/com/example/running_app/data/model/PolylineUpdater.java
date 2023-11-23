@@ -13,8 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PolylineUpdater {
-    private Polyline polyline;
-    private final List<LatLng> polylinePoints = new ArrayList<>();
+    public static Polyline polyline;
+    private static final List<LatLng> polylinePoints = new ArrayList<>();
     private final GoogleMap mGoogleMap;
 
     public PolylineUpdater(GoogleMap googleMap) {
@@ -36,4 +36,15 @@ public class PolylineUpdater {
         polyline = mGoogleMap.addPolyline(polylineOptions);
     }
 
+    public static void clearPolyline() {
+        if (polyline != null) {
+            polyline.remove();
+            polyline = null;
+        }
+        polylinePoints.clear();
+    }
+
+    public boolean isPolylineDrawn() {
+        return polyline != null;
+    }
 }
