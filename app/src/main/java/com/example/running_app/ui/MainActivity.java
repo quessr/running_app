@@ -26,7 +26,6 @@ import android.view.View;
 import com.example.running_app.R;
 
 import com.example.running_app.data.model.GpsTrackerService;
-import com.example.running_app.data.model.PolylineUpdater;
 import com.example.running_app.data.model.StepCounter;
 import com.example.running_app.databinding.ActivityMainBinding;
 import com.example.running_app.ui.fragments.MainHistoryFragment;
@@ -83,9 +82,9 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(MainActivity.this, RunStartCountdownActivity.class);
             startActivity(intent);
 
-            // 재 시작시, 기존 폴리라인, 마커 초기화
+            // 재 시작시, 기존 폴리라인, 마커(처음위치, 현재위치) 초기화
             clearPolyline();
-            clearStartMarkerAndCircle();
+            clearMarkersAndCircle();
 
             gpsTracker.startLocationUpdate();
             stepCounter.start();
@@ -151,9 +150,9 @@ public class MainActivity extends AppCompatActivity {
 
     };
 
-    public void clearStartMarkerAndCircle() {
+    public void clearMarkersAndCircle() {
         if (runFragment != null) {
-            runFragment.clearStartMarkerAndCircle();
+            runFragment.clearMarkersAndCircle();
         }
     }
     ServiceConnection serviceGpsTrackerConnection = new ServiceConnection() {

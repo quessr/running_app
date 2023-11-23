@@ -53,18 +53,18 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
     Geocoder geocoder;
 
     private PolylineUpdater polylineMarkerUpdater;
-    private Marker initialMapMarker;
+    private static Marker initialMapMarker;
     private Marker runStartMapMarker;
 
     protected LocationManager locationManager;
 
     Circle circle;
+    ValueAnimator animator;
     public PermissionManager permissionManager;
     public ActivityResultLauncher<String[]> requestPermissionLauncher;
     boolean isGPSEnabled;
     boolean isNetworkEnabled;
     Location location;
-
 
 
     @SuppressLint("MissingPermission")
@@ -122,7 +122,7 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
             getChildFragmentManager().beginTransaction().replace(R.id.map, mapFragment).commit();
         }
 
-            mapFragment.getMapAsync(this);
+        mapFragment.getMapAsync(this);
 
         try {
             locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
@@ -172,7 +172,6 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
             Toast.makeText(getContext(), "백그라운드 위치 권한을 위해 항상 허용으로 설정해주세요.", Toast.LENGTH_SHORT).show();
             permissionManager.backgroundPermissionDeniedDialog(requireActivity(), getContext());
         } else {
-//            requestPermissionLauncher.launch(permissionManager.requiredPermissions);
             permissionManager.requestPermission(requireContext(), this);
         }
 
@@ -201,6 +200,23 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
 
         LatLng lastKnownLocation = new LatLng(location.getLatitude(), location.getLongitude());
 
+        if (initialMapMarker == null) {
+            Log.d("HSR", "geocoder :" + geocoder);
+
+            if (geocoder != null) {
+                String initialMarkerTitle = (getAddress(getContext(), location.getLatitude(), location.getLongitude()));
+
+                if (isAdded()) {
+                    initialMapMarker = mGoogleMap.addMarker(new MarkerOptions()
+                            .position(lastKnownLocation)
+                            .title(initialMarkerTitle)
+                            .snippet(getResources().getString(R.string.map_marker_first_position))
+                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
+                }
+
+            }
+        }
+
         if (runStartMapMarker == null) {
             mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(lastKnownLocation, 15));
 
@@ -224,7 +240,7 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
             circle = mGoogleMap.addCircle(circleOptions);
 
             // Circle 깜빡임 애니메이션 적용
-            ValueAnimator animator = new ValueAnimator();
+            animator = new ValueAnimator();
             animator.setRepeatCount(ValueAnimator.INFINITE);
             animator.setRepeatMode(ValueAnimator.RESTART);
             animator.setIntValues(0, 100);
@@ -237,16 +253,20 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
 
         } else {
             if ("gps".equals(location.getProvider())) {
-                runStartMapMarker.setPosition(lastKnownLocation);
-                circle.setCenter(lastKnownLocation);
-                polylineMarkerUpdater.updatePolyline(location);
+            runStartMapMarker.setPosition(lastKnownLocation);
+            circle.setCenter(lastKnownLocation);
+            polylineMarkerUpdater.updatePolyline(location);
             }
 
         }
 
     }
 
-    public void clearStartMarkerAndCircle() {
+    public void clearMarkersAndCircle() {
+        if (initialMapMarker != null) {
+            initialMapMarker.remove();
+            initialMapMarker = null;
+        }
         if (runStartMapMarker != null) {
             runStartMapMarker.remove();
             runStartMapMarker = null;
@@ -287,6 +307,7 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
 
     }
 
+
     @SuppressLint("MissingPermission")
     @Override
     public void onResume() {
@@ -310,6 +331,7 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
 
         }
     }
+
 
     public String getAddress(Context mContext, double lat, double lng) {
 
