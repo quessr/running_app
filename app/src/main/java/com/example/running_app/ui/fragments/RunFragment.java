@@ -78,7 +78,7 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
         Log.d("HSR", "onCreate()");
         locationManager = (LocationManager) requireActivity().getSystemService(Context.LOCATION_SERVICE);
 
-        geocoder = new Geocoder(requireActivity(), Locale.KOREA);
+        geocoder = new Geocoder(requireActivity(), Locale.getDefault());
 
         requestPermissionLauncher = registerForActivityResult(
                 new ActivityResultContracts.RequestMultiplePermissions(), result -> {
@@ -198,30 +198,30 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
     public void drawMap(Location location) {
         Log.d("HSR", "RunFragment : " + location);
 
-        LatLng lastKnownLocation = new LatLng(location.getLatitude(), location.getLongitude());
+        double lastLatitude = location.getLatitude();
+        double lastLongitude = location.getLongitude();
+        LatLng lastKnownLocation = new LatLng(lastLatitude, lastLongitude);
 
         if (initialMapMarker == null) {
             Log.d("HSR", "geocoder :" + geocoder);
+            String initialMarkerTitle = (getAddress(getContext(), lastLatitude, lastLongitude));
 
-            if (geocoder != null) {
-                String initialMarkerTitle = (getAddress(getContext(), location.getLatitude(), location.getLongitude()));
-
-                if (isAdded()) {
-                    initialMapMarker = mGoogleMap.addMarker(new MarkerOptions()
-                            .position(lastKnownLocation)
-                            .title(initialMarkerTitle)
-                            .snippet(getResources().getString(R.string.map_marker_first_position))
-                            .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
-                }
-
+            if (isAdded()) {
+                initialMapMarker = mGoogleMap.addMarker(new MarkerOptions()
+                        .position(lastKnownLocation)
+                        .title(initialMarkerTitle)
+                        .snippet(getResources().getString(R.string.map_marker_first_position))
+                        .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)));
             }
+
         }
+
 
         if (runStartMapMarker == null) {
             mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(lastKnownLocation, 15));
 
             if (geocoder != null) {
-                String currentMarkerTitle = (getAddress(getContext(), location.getLatitude(), location.getLongitude()));
+                String currentMarkerTitle = (getAddress(getContext(), lastLatitude, lastLongitude));
 
 
                 runStartMapMarker = mGoogleMap.addMarker(new MarkerOptions()
@@ -315,7 +315,6 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
 
         Log.d("HSR", "onResume()");
 
-
         if (permissionManager.haveRequiredPermissions(getContext())) {
             locationManager = (LocationManager) requireActivity().getSystemService(Context.LOCATION_SERVICE);
 
@@ -344,6 +343,8 @@ public class RunFragment extends Fragment implements OnMapReadyCallback, GpsTrac
                 if (address != null && address.size() > 0) {
                     nowAddr = address.get(0).getAddressLine(0);
                 }
+            } else {
+                geocoder = new Geocoder(mContext, Locale.getDefault());
             }
         } catch (IOException e) {
             Toast.makeText(mContext, "주소를 가져 올 수 없습니다.", Toast.LENGTH_LONG).show();
