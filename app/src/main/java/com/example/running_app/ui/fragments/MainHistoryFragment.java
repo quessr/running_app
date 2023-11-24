@@ -1,5 +1,7 @@
 package com.example.running_app.ui.fragments;
 
+import static com.example.running_app.ui.MainActivity.bottomSheet;
+
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -52,9 +54,14 @@ public class MainHistoryFragment extends Fragment {
         OnBackPressedCallback onBackPressedCallback = new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
-
-                requireActivity().getSupportFragmentManager().popBackStack();
-                viewFind();
+                if (bottomSheet.getVisibility() != View.VISIBLE) {
+                    bottomSheet.setVisibility(View.VISIBLE);
+                    requireActivity().getSupportFragmentManager().popBackStack();
+                    viewFind();
+                } else {
+                    requireActivity().getSupportFragmentManager().popBackStack();
+                    viewFind();
+                }
 
             }
         };

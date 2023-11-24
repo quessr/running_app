@@ -48,6 +48,8 @@ public class MainActivity extends AppCompatActivity {
     //timer, room DB
     private TimerViewModel timerViewModel;
     private float initialY;
+    public static View bottomSheet;
+
 
 
     @RequiresApi(api = Build.VERSION_CODES.Q)
@@ -58,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
         View view = binding.getRoot();
         setContentView(view);
 
-        View bottomSheet = binding.bottomSheet;
+        bottomSheet = binding.bottomSheet;
 
         BottomSheetBehavior<View> sheetBehavior = BottomSheetBehavior.from(bottomSheet);
         sheetBehavior.setHideable(true);
@@ -76,7 +78,6 @@ public class MainActivity extends AppCompatActivity {
             }
             return true;
         });
-
         sheetBehavior.addBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
             public void onStateChanged(@NonNull View bottomSheet, int newState) {
@@ -84,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
                     case BottomSheetBehavior.STATE_COLLAPSED:
                         sheetBehavior.setPeekHeight(100); // 최소 높이 설정
                         break;
-                    case BottomSheetBehavior.STATE_HIDDEN:
+                    case     BottomSheetBehavior.STATE_HIDDEN:
                         sheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED); // 숨겨진 상태일 때는 COLLAPSED 상태로 변경
                         break;
                 }
@@ -105,6 +106,7 @@ public class MainActivity extends AppCompatActivity {
         binding.runEndBtn.setVisibility(View.GONE);
         binding.showRecordBtn.setVisibility(View.VISIBLE);
         binding.stepcountTimerContainer.setVisibility(View.GONE);
+
 
         fragmentTransaction.add(R.id.run_fragment_container, runFragment);
         fragmentTransaction.commit();
@@ -152,12 +154,13 @@ public class MainActivity extends AppCompatActivity {
 
             binding.stepcountTimerContainer.setVisibility(View.GONE);
             binding.runEndBtn.setVisibility(View.GONE);
+            binding.bottomSheet.setVisibility(View.GONE);
 
             //timer
             timerViewModel.stopTimer();
 
             FragmentTransaction transaction = fragmentManager.beginTransaction();
-            transaction.replace(R.id.run_history, new MainHistoryFragment());
+            transaction.add(R.id.run_history, new MainHistoryFragment());
             transaction.addToBackStack(null);   //transaction 단위 저장
             transaction.commit();
 
@@ -168,7 +171,7 @@ public class MainActivity extends AppCompatActivity {
         binding.showRecordBtn.setOnClickListener(v -> {
 
             FragmentTransaction transaction = fragmentManager.beginTransaction();
-            transaction.replace(R.id.run_history, new MainHistoryFragment());
+            transaction.add(R.id.run_history, new MainHistoryFragment());
             transaction.addToBackStack(null);   //transaction 단위 저장
             transaction.commit();
 
@@ -176,8 +179,10 @@ public class MainActivity extends AppCompatActivity {
             binding.showRecordBtn.setVisibility(View.GONE);
 
             binding.mainConstraintLayout.setVisibility(View.GONE);
+            binding.bottomSheet.setVisibility(View.GONE);
         });
     }
+
 
     GpsTrackerService.updateMap listener = new GpsTrackerService.updateMap() {
 
